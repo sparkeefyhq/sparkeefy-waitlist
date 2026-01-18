@@ -128,7 +128,7 @@ function checkRateLimit(ipAddress: string | undefined): void {
  *   });
  * ```
  */
-export const requireAuth = t.middleware(async ({ ctx, next }) => {
+export const requireAuth = await t.middleware(async ({ ctx, next }) => {
   // Check if user exists in context (hydrated by context factory)
   if (!ctx.user) {
     logger.warn("Unauthorized access attempt", {

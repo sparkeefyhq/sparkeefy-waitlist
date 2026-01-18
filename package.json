@@ -2,6 +2,7 @@
   "name": "waitlist",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "prisma": {
     "schema": "src/backend/db/schema.prisma"
   },
