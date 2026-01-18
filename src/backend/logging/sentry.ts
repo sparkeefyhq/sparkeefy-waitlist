@@ -8,9 +8,9 @@
  */
 
 import * as Sentry from "@sentry/node";
-import { ProfilingIntegration } from "@sentry/profiling-node";
-import { config } from "../config";
-import { logger } from "./logger";
+// import { ProfilingIntegration } from "@sentry/profiling-node";
+import { config } from "../config.js";
+import { logger } from "./logger.js";
 
 // ============================================================================
 // SENTRY INITIALIZATION
@@ -39,10 +39,10 @@ export function initializeSentry(): void {
       tracesSampleRate: 0.1, // 10% of transactions
 
       // Profiling
-      profilesSampleRate: 0.1, // 10% of transactions
-      integrations: [
-        new ProfilingIntegration(),
-      ],
+      // profilesSampleRate: 0.1, // 10% of transactions
+      // integrations: [
+      //   new ProfilingIntegration(),
+      // ],
 
       // Error Filtering
       beforeSend(event, hint) {

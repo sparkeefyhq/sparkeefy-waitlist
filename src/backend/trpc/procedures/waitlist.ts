@@ -9,7 +9,6 @@
 
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { t } from "../router";
 import { requireAuth, rateLimit } from "../middleware";
 import { WaitlistService } from "../../services/WaitlistService";
 import { ReferralService } from "../../services/ReferralService";
@@ -24,10 +23,15 @@ import type {
   UserStatsResponse, 
   ReferralCodeValidationResponse 
 } from "../../types/index";
+import { router, publicProcedure } from '../base.js';
+
 
 // ============================================================================
 // INPUT VALIDATION SCHEMAS
 // ============================================================================
+
+const protectedProcedure = publicProcedure.use(requireAuth);
+const rateLimitedProcedure = publicProcedure.use(rateLimit);
 
 /**
  * Join Waitlist Input Schema
@@ -126,7 +130,7 @@ type ValidateReferralCodeInput = z.infer<typeof validateReferralCodeInput>;
  * @rateLimit 5 requests per IP per hour
  * @realtime Triggers SSE event if referral credited
  */
-const join = t.procedure
+const join = rateLimitedProcedure
   .use(rateLimit)
   .input(joinWaitlistInput)
   .mutation(async ({ input, ctx }): Promise<WaitlistJoinResponse> => {
@@ -465,7 +469,7 @@ const join = t.procedure
  * @protected Requires valid session
  * @realtime None (just returns current state)
  */
-const getMyStats = t.procedure
+const getMyStats = protectedProcedure  
   .use(requireAuth)
   .input(getMyStatsInput)
   .query(async ({ ctx }): Promise<UserStatsResponse> => {
@@ -561,7 +565,7 @@ const getMyStats = t.procedure
  * @public
  * @realtime None
  */
-const validateReferralCode = t.procedure
+const validateReferralCode = publicProcedure  
   .input(validateReferralCodeInput)
   .query(async ({ input, ctx }): Promise<ReferralCodeValidationResponse> => {
     const requestId = ctx.requestId || "unknown";
@@ -624,7 +628,7 @@ const validateReferralCode = t.procedure
  * Waitlist Router
  * Combines all waitlist procedures into a single router
  */
-export const waitlistRouter = t.router({
+export const waitlistRouter = router({
   join,
   getMyStats,
   validateReferralCode,

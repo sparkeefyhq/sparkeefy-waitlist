@@ -7,37 +7,9 @@
  * @module trpc/router
  */
 
-import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
-import { Context } from "./context";
-import { waitlistRouter } from "./procedures/waitlist";
+import { TRPCError } from "@trpc/server";
 import { logger } from "../logging/logger";
-
-/**
- * Initialize tRPC with context type
- * SuperJSON enables passing Date objects and other non-JSON types
- */
-export const t = initTRPC.context<Context>().create({
-  transformer: superjson,
-  errorFormatter({ shape, error }) {
-    // Custom error formatting for consistent client responses
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        // Add custom fields if needed
-        requestId: error.cause instanceof Error ? undefined : error.cause,
-      },
-    };
-  },
-});
-
-/**
- * Export base procedure builder
- * Used by individual procedure files to create endpoints
- */
-export const router = t.router;
-export const publicProcedure = t.procedure;
+import { router, publicProcedure, t } from "./base.js";
 
 /**
  * Create reusable logging middleware
@@ -96,6 +68,10 @@ export const procedure = t.procedure.use(loggingMiddleware);
  * Main Application Router
  * Combines all feature routers into unified API
  */
+
+import { waitlistRouter } from "./procedures/waitlist";
+
+// Import procedures AFTER defining 't'
 export const appRouter = router({
   // Waitlist and referral procedures
   waitlist: waitlistRouter,

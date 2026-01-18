@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sparkeefy_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: sparkeefy
+      POSTGRES_PASSWORD: sparkeefy123
+      POSTGRES_DB: sparkeefy_waitlist
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+# # Start PostgreSQL
+# docker-compose up -d
+
+# # Check status
+# docker-compose ps
+
+# # View logs
+# docker-compose logs -f postgres

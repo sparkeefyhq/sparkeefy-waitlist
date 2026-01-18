@@ -2521,3 +2521,40 @@ This documentation provides comprehensive specifications for implementing a prod
 6. **Maintainability**: Clear separation of concerns (procedures, services, utilities)
 
 Implementation should follow this documentation precisely to ensure consistency, security, and production readiness.
+
+Using PRISMA:
+
+# Connect as postgres superuser
+psql -U postgres
+
+# Grant all privileges
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE sparkeefy_waitlist TO postgres;
+ALTER DATABASE sparkeefy_waitlist OWNER TO postgres;
+
+# If you created a custom user (e.g., 'sparkeefy')
+GRANT ALL ON SCHEMA public TO sparkeefy;
+GRANT ALL PRIVILEGES ON DATABASE sparkeefy_waitlist TO sparkeefy;
+ALTER DATABASE sparkeefy_waitlist OWNER TO sparkeefy;
+
+# Grant usage on public schema
+GRANT USAGE, CREATE ON SCHEMA public TO postgres;
+
+# Exit
+\q
+
+DATABASE_URL="postgresql://postgres_USER:your_password@localhost:5432/sparkeefy_waitlist"
+
+# Connect to database
+psql -U postgres -d sparkeefy_waitlist
+
+# List tables
+\dt
+
+# Should show:
+# public | referrals       | table | postgres
+# public | waitlist_users  | table | postgres
+
+# Describe tables
+\d waitlist_users
+\d referrals

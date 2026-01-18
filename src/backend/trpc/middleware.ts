@@ -8,7 +8,7 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { t } from "./router";
+import { createMiddleware } from './base.js';
 import { logger } from "../logging/logger";
 
 // ============================================================================
@@ -128,7 +128,7 @@ function checkRateLimit(ipAddress: string | undefined): void {
  *   });
  * ```
  */
-export const requireAuth = await t.middleware(async ({ ctx, next }) => {
+export const requireAuth = createMiddleware(async ({ ctx, next }) => {
   // Check if user exists in context (hydrated by context factory)
   if (!ctx.user) {
     logger.warn("Unauthorized access attempt", {
@@ -182,7 +182,7 @@ export const requireAuth = await t.middleware(async ({ ctx, next }) => {
  * @note Disabled in development mode for easier testing
  * @note Uses in-memory store - suitable for single-server MVP
  */
-export const rateLimit = t.middleware(async ({ ctx, next }) => {
+export const rateLimit = createMiddleware(async ({ ctx, next }) => {
   const ipAddress = ctx.ipAddress;
 
   // Check rate limit for this IP
@@ -222,7 +222,7 @@ export const rateLimit = t.middleware(async ({ ctx, next }) => {
  *   });
  * ```
  */
-export const protectedProcedure = t.procedure.use(requireAuth);
+// export const protectedProcedure = t.procedure.use(requireAuth);
 
 /**
  * Rate Limited Procedure
@@ -239,7 +239,7 @@ export const protectedProcedure = t.procedure.use(requireAuth);
  *   });
  * ```
  */
-export const rateLimitedProcedure = t.procedure.use(rateLimit);
+// export const rateLimitedProcedure = t.procedure.use(rateLimit);
 
 // ============================================================================
 // RATE LIMIT STATS (OPTIONAL - FOR MONITORING)
