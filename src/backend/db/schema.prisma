@@ -1,0 +1,84 @@
+// Prisma Schema for Sparkeefy Waitlist System
+// 
+// This schema defines the database structure for the waitlist and referral system.
+// Supports both PostgreSQL and MySQL (configure via DATABASE_URL).
+//
+// Tables:
+// - WaitlistUser: User registry with session tokens and referral codes
+// - Referral: Referrer-referee relationship tracking
+//
+// @see Database Schema Documentation
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// WAITLIST USERS TABLE
+// ============================================================================
+
+/// Central user registry storing all waitlist entries, referral codes, and session tokens
+model WaitlistUser {
+  // Primary Key
+  id                String   @id @default(uuid()) @db.Uuid
+
+  // User Information
+  email             String   @unique @db.VarChar(255)
+  username          String?  @db.VarChar(100)
+  firstName         String?  @map("first_name") @db.VarChar(100)
+  lastName          String?  @map("last_name") @db.VarChar(100)
+  phoneNumber       String?  @map("phone_number") @db.VarChar(20)
+  marketingOptIn    Boolean  @default(false) @map("marketing_opt_in")
+  additionalRemarks String?  @map("additional_remarks") @db.Text
+
+  // Referral System
+  referralCode      String   @unique @map("referral_code") @db.VarChar(8)
+
+  // Session Management
+  sessionToken      String   @unique @map("session_token") @db.VarChar(64)
+  sessionExpiresAt  DateTime @map("session_expires_at")
+
+  // Timestamps
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  referralsGiven    Referral[] @relation("ReferralsGiven")
+  referralsReceived Referral[] @relation("ReferralsReceived")
+
+  @@index([email])
+  @@index([referralCode])
+  @@index([sessionToken])
+  @@map("waitlist_users")
+}
+
+// ============================================================================
+// REFERRALS TABLE
+// ============================================================================
+
+/// Tracks referrer-referee relationships for referral counting and analytics
+model Referral {
+  // Primary Key
+  id          String   @id @default(uuid()) @db.Uuid
+
+  // Referral Relationship
+  referrerId  String   @map("referrer_id") @db.Uuid
+  refereeId   String   @map("referee_id") @db.Uuid
+
+  // Timestamp
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relationships
+  referrer    WaitlistUser @relation("ReferralsGiven", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee     WaitlistUser @relation("ReferralsReceived", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@unique([referrerId, refereeId], name: "unique_referral")
+  @@index([referrerId])
+  @@index([refereeId])
+  @@map("referrals")
+}
