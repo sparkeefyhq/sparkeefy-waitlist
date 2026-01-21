@@ -153,6 +153,18 @@ export class DatabaseClient {
     }) as WaitlistUser | null;
   }
 
+    /**
+   * Find User by Magic Link Token
+   * 
+   * @param {string} token - Magic link token
+   * @returns {Promise<WaitlistUser | null>} User or null if not found
+   */
+  async findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null> {
+    return await this.prisma.waitlistUser.findUnique({
+      where: { magicLinkToken: token },
+    }) as WaitlistUser | null;
+  }
+
   /**
    * Find User by Session Token
    * 
@@ -194,6 +206,7 @@ export class DatabaseClient {
         marketingOptIn: data.marketingOptIn,
         additionalRemarks: data.additionalRemarks,
         referralCode: data.referralCode,
+        magicLinkToken: data.magicLinkToken,
         sessionToken: data.sessionToken,
         sessionExpiresAt: data.sessionExpiresAt,
       },

@@ -6,7 +6,13 @@
  * 
  * @module procedures/waitlist
  */
-
+import { 
+  generateReferralCode, 
+  generateUniqueCode,
+  generateMagicLinkToken,
+  generateSessionToken
+} from "../../utils/generators";
+import { buildReferralLink, buildMagicLinkUrl } from "../../utils/links.js";  // UPDATE this line
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { requireAuth, rateLimit } from "../middleware";
@@ -16,7 +22,6 @@ import { SessionService } from "../../services/SessionService";
 import { SSEManager } from "../../sse/SSEManager";
 import { logger } from "../../logging/logger";
 import { calculateTier, getTierInfo, getNextTierThreshold } from "../../utils/tiers";
-import { buildReferralLink } from "../../utils/links";
 import { db } from "../../db/client";
 import type { 
   WaitlistJoinResponse, 
@@ -106,6 +111,20 @@ const validateReferralCodeInput = z.object({
     .regex(/^[A-Za-z0-9]{8}$/, "Referral code must be alphanumeric")
     .toUpperCase(),
 });
+
+/**
+ * Authenticate with Magic Link Input Schema
+ * Validates magic link token format (64-char hex)
+ */
+const authenticateWithMagicLinkInput = z.object({
+  token: z
+    .string({ required_error: "Magic link token is required" })
+    .length(64, "Invalid token format")
+    .regex(/^[a-f0-9]{64}$/i, "Invalid token format"),
+});
+
+// ADD THIS NEW TYPE:
+type AuthenticateWithMagicLinkInput = z.infer<typeof authenticateWithMagicLinkInput>;
 
 // ============================================================================
 // TYPE INFERENCE FROM SCHEMAS
@@ -280,7 +299,8 @@ const join = rateLimitedProcedure
             additionalRemarks: input.additionalRemarks,
             referralCode: undefined,
             sessionToken: undefined,
-            sessionExpiresAt: undefined
+            sessionExpiresAt: undefined,
+            magicLinkToken: generateMagicLinkToken()
           });
 
           message = "Successfully joined waitlist";
@@ -398,7 +418,8 @@ const join = rateLimitedProcedure
 
       // Build referral link
       const referralLink = buildReferralLink(user.referralCode);
-
+      const magicLinkUrl = buildMagicLinkUrl(user.magicLinkToken);
+      
       const duration = Date.now() - startTime;
 
       logger.info("Waitlist join completed", {
@@ -424,6 +445,7 @@ const join = rateLimitedProcedure
           additionalRemarks: user.additionalRemarks,
           referralCode: user.referralCode,
           referralLink,
+          magicLinkUrl,
           actualReferralCount,
           displayReferralCount,
           tier,
@@ -621,6 +643,165 @@ const validateReferralCode = publicProcedure
   });
 
 // ============================================================================
+// PROCEDURE 4: waitlist.authenticateWithMagicLink
+// ============================================================================
+
+/**
+ * Authenticate with Magic Link Procedure
+ * 
+ * Public endpoint that validates magic link token and sets new session cookie.
+ * Can be called multiple times - generates fresh session each time.
+ * No expiration on magic link tokens - they work forever.
+ * 
+ * @mutation
+ * @public
+ * @realtime None (just returns current state)
+ */
+const authenticateWithMagicLink = publicProcedure
+  .input(authenticateWithMagicLinkInput)
+  .mutation(async ({ input, ctx }): Promise<UserStatsResponse> => {
+    const { token } = input;
+    const requestId = ctx.requestId || "unknown";
+    const startTime = Date.now();
+
+    try {
+      logger.info("Magic link authentication attempt", {
+        tokenPrefix: token.substring(0, 8) + "***",
+        requestId,
+        ipAddress: ctx.ipAddress,
+      });
+
+      // Initialize services
+      const waitlistService = new WaitlistService(db);
+      const referralService = new ReferralService(db);
+      const sessionService = new SessionService();
+
+      // Find user by magic link token
+      const user = await waitlistService.findUserByMagicLinkToken(token);
+
+      if (!user) {
+        logger.warn("Invalid magic link token", {
+          tokenPrefix: token.substring(0, 8) + "***",
+          requestId,
+          ipAddress: ctx.ipAddress,
+        });
+
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid or expired magic link. Please request a new one.",
+        });
+      }
+
+      logger.info("Magic link token validated", {
+        userId: user.id,
+        email: user.email.substring(0, 5) + "***",
+        requestId,
+      });
+
+      // Generate new session token
+      const newSessionToken = generateSessionToken();
+      const sessionExpiresAt = new Date(
+        Date.now() + 30 * 24 * 60 * 60 * 1000 // 30 days
+      );
+
+      // Update user's session token in database
+      await (db as any).waitlistUser.update({
+        where: { id: user.id },
+        data: {
+          sessionToken: newSessionToken,
+          sessionExpiresAt,
+        },
+      });
+
+      logger.info("New session token generated", {
+        userId: user.id,
+        sessionExpiresAt: sessionExpiresAt.toISOString(),
+        requestId,
+      });
+
+      // Set session cookie
+      sessionService.setSessionCookie(
+        ctx.res!,
+        newSessionToken,
+        !ctx.req?.get("host")?.includes("localhost")
+      );
+
+      // Get referral stats
+      const actualReferralCount = await referralService.countUserReferrals(user.id);
+      const displayReferralCount = Math.min(actualReferralCount, 10);
+
+      // Calculate tier information
+      const tier = calculateTier(actualReferralCount);
+      const tierInfo = getTierInfo(tier);
+      const nextTierAt = getNextTierThreshold(actualReferralCount);
+      const nextTierLabel = nextTierAt 
+        ? getTierInfo(calculateTier(nextTierAt)).label 
+        : null;
+
+      // Build referral link
+      const referralLink = buildReferralLink(user.referralCode);
+
+      const duration = Date.now() - startTime;
+
+      logger.info("Magic link authentication successful", {
+        userId: user.id,
+        email: user.email.substring(0, 5) + "***",
+        tier,
+        referralCount: actualReferralCount,
+        duration: `${duration}ms`,
+        requestId,
+      });
+
+      // Return user stats (same format as getMyStats)
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: user.phoneNumber,
+          marketingOptIn: user.marketingOptIn,
+          additionalRemarks: user.additionalRemarks,
+          referralCode: user.referralCode,
+          referralLink,
+          createdAt: user.createdAt.toISOString(),
+          updatedAt: user.updatedAt.toISOString(),
+        },
+        referralStats: {
+          actualReferralCount,
+          displayReferralCount,
+          tier,
+          tierLabel: tierInfo.label,
+          nextTierAt: nextTierAt ?? undefined,
+          nextTierLabel: nextTierLabel ?? undefined,
+        },
+        sessionExpiresAt: sessionExpiresAt.toISOString(),
+      };
+    } catch (error) {
+      // Re-throw tRPC errors as-is
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+
+      // Log and wrap unexpected errors
+      logger.error("Unexpected error in magic link authentication", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        tokenPrefix: token.substring(0, 8) + "***",
+        requestId,
+      });
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to authenticate with magic link. Please try again.",
+        cause: error,
+      });
+    }
+  });
+
+
+// ============================================================================
 // EXPORT WAITLIST ROUTER
 // ============================================================================
 
@@ -632,6 +813,7 @@ export const waitlistRouter = router({
   join,
   getMyStats,
   validateReferralCode,
+  authenticateWithMagicLink,
 });
 
 // Type export for frontend type-safety

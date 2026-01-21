@@ -10,7 +10,7 @@
     "lint": "eslint",
     "dev": "tsx watch src/backend/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node src/backend/index.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",

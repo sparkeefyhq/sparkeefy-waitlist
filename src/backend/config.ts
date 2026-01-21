@@ -27,10 +27,10 @@ const envSchema = z.object({
   PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("3000"),
 
   // Database Configuration
-  DATABASE_URL: z.string().url(),
+  // DATABASE_URL: z.string().url(),
 
-  // Frontend Configuration
-  FRONTEND_URL: z.string().url(),
+  // // Frontend Configuration
+  // FRONTEND_URL: z.string().url(),
 
   // CORS Configuration
   CORS_ORIGIN: z.string().default("*"),
@@ -38,6 +38,13 @@ const envSchema = z.object({
   // Sentry Configuration (Optional in development)
   SENTRY_DSN: z.string().url().optional(),
   SENTRY_ENVIRONMENT: z.string().optional(),
+
+  // SMTP Email Configuration
+  SMTP_HOST: z.string().default("smtp.gmail.com"),
+  SMTP_PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("587"),
+  SMTP_USER: z.string().email("Invalid SMTP user email").optional(),
+  SMTP_PASS: z.string().min(1, "SMTP password required").optional(),
+  SMTP_FROM: z.string().email("Invalid FROM email").optional(),
 
   // Session Configuration
   SESSION_COOKIE_NAME: z.string().default("sparkeefy_session"),
@@ -102,10 +109,10 @@ export const config = {
   isTest: env.NODE_ENV === "test",
 
   // Database
-  databaseUrl: env.DATABASE_URL,
+  // databaseUrl: env.DATABASE_URL,
 
-  // Frontend
-  frontendUrl: env.FRONTEND_URL,
+  // // Frontend
+  // frontendUrl: env.FRONTEND_URL,
 
   // CORS
   cors: {
@@ -127,6 +134,17 @@ export const config = {
     durationDays: env.SESSION_DURATION_DAYS,
   },
 
+  // SMTP Email
+  smtp: {
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    user: env.SMTP_USER || "",
+    pass: env.SMTP_PASS || "",
+    from: env.SMTP_FROM || env.SMTP_USER || "noreply@sparkeefy.com", // TODO: change this to your actual email
+    enabled: !!(env.SMTP_USER && env.SMTP_PASS), // Only enabled if credentials provided, real gmail/email access required here
+  },
+
+
   // Rate Limiting
   rateLimit: {
     windowMs: env.RATE_LIMIT_WINDOW_MS,
@@ -144,8 +162,9 @@ if (config.isDevelopment) {
   console.log({
     nodeEnv: config.nodeEnv,
     port: config.port,
-    frontendUrl: config.frontendUrl,
-    databaseUrl: config.databaseUrl.replace(/:\/\/.*@/, "://***:***@"), // Hide credentials
+    // frontendUrl: config.frontendUrl,
+    // databaseUrl: config.databaseUrl.replace(/:\/\/.*@/, "://***:***@"), // Hide credentials
     sentryEnabled: config.sentry.enabled,
+    smtpEnabled: config.smtp.enabled,
   });
 }

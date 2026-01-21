@@ -63,6 +63,78 @@ export function buildReferralLink(referralCode: string): string {
 }
 
 /**
+ * Build Magic Link URL
+ * 
+ * Constructs a permanent authentication link for email delivery.
+ * Link never expires and can be reused to generate new sessions.
+ * 
+ * @param {string} magicLinkToken - User's unique 64-char magic link token
+ * @returns {string} Full magic link URL with token parameter
+ * 
+ * @example
+ * const url = buildMagicLinkUrl("a3f5b2c1d4e6f7g8...");
+ * // Returns: "https://sparkeefy.com/auth/magic?token=a3f5b2c1d4e6f7g8..."
+ * 
+ * @throws {Error} If magicLinkToken is not 64 characters
+ */
+export function buildMagicLinkUrl(magicLinkToken: string): string {
+  // Validate token format
+  if (!magicLinkToken || magicLinkToken.length !== 64) {
+    throw new Error(
+      `Invalid magic link token format: ${magicLinkToken}. Must be 64 hex characters.`
+    );
+  }
+
+  // Get base URL from environment
+  const baseUrl = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
+
+  // Remove trailing slash if present
+  const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+
+  // Construct URL with magic link route and token parameter
+  return `${cleanBaseUrl}/auth/magic?token=${magicLinkToken}`;
+}
+
+/**
+ * Extract Magic Link Token from URL
+ * 
+ * Parses magic link URL and extracts the token parameter.
+ * 
+ * @param {string} url - Full URL or query string
+ * @returns {string | null} Extracted token or null if invalid
+ * 
+ * @example
+ * extractMagicLinkToken("https://app.com/auth/magic?token=abc...");
+ * // Returns: "abc..."
+ */
+export function extractMagicLinkToken(url: string): string | null {
+  if (!url) return null;
+
+  try {
+    let urlObj: URL;
+
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      urlObj = new URL(url);
+    } else if (url.startsWith("?")) {
+      urlObj = new URL(`http://sparkeefy.com${url}`);
+    } else {
+      return null;
+    }
+
+    const token = urlObj.searchParams.get("token");
+
+    // Validate token format (64 hex characters)
+    if (token && /^[a-f0-9]{64}$/i.test(token)) {
+      return token;
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
  * Build Referral Links in Bulk
  * 
  * Constructs multiple referral links at once.
