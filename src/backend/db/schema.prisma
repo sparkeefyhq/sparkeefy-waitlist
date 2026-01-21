@@ -51,9 +51,13 @@ model WaitlistUser {
   referralsGiven    Referral[] @relation("ReferralsGiven")
   referralsReceived Referral[] @relation("ReferralsReceived")
 
+  // Magic Link Authentication
+  magicLinkToken    String   @unique @map("magic_link_token") @db.VarChar(64)
+  
   @@index([email])
   @@index([referralCode])
   @@index([sessionToken])
+  @@index([magicLinkToken])
   @@map("waitlist_users")
 }
 

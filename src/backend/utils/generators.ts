@@ -96,6 +96,53 @@ export function isValidReferralCodeFormat(code: string): boolean {
 }
 
 // ============================================================================
+// MAGIC LINK TOKEN GENERATION
+// ============================================================================
+
+/**
+ * Generate Magic Link Token
+ * 
+ * Same format as session token (64-char hex) but used for email links.
+ * Never expires, can be used multiple times to generate new sessions.
+ * 
+ * @returns {string} 64-character hex string (32 bytes)
+ * 
+ * @example
+ * const token = generateMagicLinkToken();
+ * console.log(token); // "a3f5b2c1d4e6f7g8h9i0j1k2l3m4n5o6..."
+ * console.log(token.length); // 64
+ * 
+ * @note Token space: 2^256 = ~10^77 possible values
+ * @note Never expires - tied to user email for permanent access
+ */
+export function generateMagicLinkToken(): string {
+  return randomBytes(SESSION_TOKEN_BYTES).toString("hex");
+}
+
+/**
+ * Validate Magic Link Token Format
+ * 
+ * Checks if string matches magic link token pattern.
+ * Used for input validation before database lookup.
+ * 
+ * @param {string} token - Token to validate
+ * @returns {boolean} True if valid format, false otherwise
+ * 
+ * @example
+ * isValidMagicLinkTokenFormat("a3f5b2c1..."); // true (if 64 chars hex)
+ * isValidMagicLinkTokenFormat("invalid"); // false
+ * isValidMagicLinkTokenFormat("xyz..."); // false (not hex)
+ */
+export function isValidMagicLinkTokenFormat(token: string): boolean {
+  if (typeof token !== "string" || token.length !== SESSION_TOKEN_BYTES * 2) {
+    return false;
+  }
+
+  // Check if all characters are valid hex
+  return /^[a-f0-9]{64}$/i.test(token);
+}
+
+// ============================================================================
 // SESSION TOKEN GENERATION
 // ============================================================================
 
@@ -318,6 +365,13 @@ export function getGeneratorStats() {
       hexLength: SESSION_TOKEN_BYTES * 2,
       bits: SESSION_TOKEN_BYTES * 8,
       totalCombinations: Math.pow(2, SESSION_TOKEN_BYTES * 8),
+    },
+    magicLinkToken: {
+      bytes: SESSION_TOKEN_BYTES,
+      hexLength: SESSION_TOKEN_BYTES * 2,
+      bits: SESSION_TOKEN_BYTES * 8,
+      totalCombinations: Math.pow(2, SESSION_TOKEN_BYTES * 8),
+      neverExpires: true,
     },
   };
 }

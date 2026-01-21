@@ -31,6 +31,7 @@ export interface WaitlistUser {
   referralCode: string;
   sessionToken: string;
   sessionExpiresAt: Date;
+  magicLinkToken: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -157,6 +158,7 @@ export interface WaitlistJoinResponse {
     additionalRemarks: string | null;
     referralCode: string;
     referralLink: string;
+    magicLinkUrl: string;
     actualReferralCount: number;
     displayReferralCount: number;
     tier: TierType;
@@ -308,6 +310,7 @@ export interface CreateUserInput {
   phoneNumber?: string | null;
   marketingOptIn?: boolean;
   additionalRemarks?: string | null;
+  magicLinkToken: any;
 }
 
 /**
@@ -485,6 +488,7 @@ export function isWaitlistUser(obj: any): obj is WaitlistUser {
     typeof obj.email === "string" &&
     typeof obj.referralCode === "string" &&
     typeof obj.sessionToken === "string" &&
+    typeof obj.magicLinkToken === "string" &&
     obj.sessionExpiresAt instanceof Date
   );
 }
