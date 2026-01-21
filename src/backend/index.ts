@@ -345,7 +345,7 @@ async function startServer() {
       logger.info("Server started", {
         port: config.port,
         nodeEnv: config.nodeEnv,
-        frontendUrl: config.frontendUrl,
+        // frontendUrl: config.frontendUrl,
       });
 
       logger.info("Available endpoints:", {
