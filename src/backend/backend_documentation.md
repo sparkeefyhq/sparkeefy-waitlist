@@ -2243,6 +2243,26 @@ Process:
 
 ---
 
+Magic Link Token
+64-character hex string (256-bit security)
+
+Never expires (no expiration date)
+
+Reusable forever (generates new session cookie each time)
+
+Unique per user (1:1 mapping with email)
+
+Format: https://sparkeefy.com/auth/magic?token={magicLinkToken}
+
+Email Delivery
+SMTP using net and tls modules
+
+No external dependencies (no nodemailer)
+
+Gmail SMTP
+
+HTML email template with professional styling
+
 ## Type Definitions & Interfaces
 
 ### Global Types

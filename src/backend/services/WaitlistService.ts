@@ -46,6 +46,7 @@ export interface DatabaseClient {
   findUserByEmail(email: string): Promise<WaitlistUser | null>;
   findUserByReferralCode(code: string): Promise<WaitlistUser | null>;
   findUserBySessionToken(token: string): Promise<WaitlistUser | null>;
+  findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null>;
   createUser(data: CreateUserInput): Promise<WaitlistUser>;
   updateUser(id: string, data: Partial<WaitlistUser>): Promise<WaitlistUser>;
   countUserReferrals(userId: string): Promise<number>;
@@ -191,6 +192,9 @@ export class WaitlistService {
       const sessionExpiresAt = new Date();
       sessionExpiresAt.setDate(sessionExpiresAt.getDate() + 30);
 
+      // Generate magic link token for email verification
+      const magicLinkToken = generateUniqueCode(generateReferralCode, async () => false, 1);
+
       const userData: CreateUserInput = {
         email: normalizedEmail,
         username: input.username ? sanitizeString(input.username) : null,
@@ -202,6 +206,7 @@ export class WaitlistService {
           ? sanitizeString(input.additionalRemarks) 
           : null,
         referralCode: userReferralCode,
+        magicLinkToken: await magicLinkToken,
         sessionToken,
         sessionExpiresAt,
       };
@@ -406,7 +411,7 @@ export class WaitlistService {
     }
   }
 
-  /**
+    /**
    * Find User by Session Token
    * 
    * @param {string} token - Session token
@@ -425,6 +430,50 @@ export class WaitlistService {
       });
     }
   }
+
+  /**
+   * Find User by Magic Link Token
+   * 
+   * Retrieves user by their permanent magic link token.
+   * Used for authentication via email links.
+   * 
+   * @param {string} magicLinkToken - 64-character hex token
+   * @returns {Promise<WaitlistUser | null>} User if found, null otherwise
+   * 
+   * @example
+   * const user = await service.findUserByMagicLinkToken(token);
+   * if (user) {
+   *   // Generate new session and set cookie
+   * }
+   * 
+   * @throws {TRPCError} INTERNAL_SERVER_ERROR - Database error
+   */
+  async findUserByMagicLinkToken(magicLinkToken: string): Promise<WaitlistUser | null> {
+    try {
+      // Validate token format before database lookup
+      if (!magicLinkToken || magicLinkToken.length !== 64) {
+        logger.warn("Invalid magic link token format", {
+          tokenPrefix: magicLinkToken?.substring(0, 8) + "***" || "undefined",
+        });
+        return null;
+      }
+
+      // Find user by magic link token (assuming db client supports it)
+      return await (this.db as any).findUserByMagicLinkToken?.(magicLinkToken) || null;
+    } catch (error) {
+      logger.error("Error finding user by magic link token", { 
+        error, 
+        tokenPrefix: magicLinkToken.substring(0, 8) + "***" 
+      });
+      Sentry.captureException(error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Database error during magic link authentication",
+        cause: error,
+      });
+    }
+  }
+
 
   /**
    * Find User by ID
