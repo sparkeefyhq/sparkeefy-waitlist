@@ -22,6 +22,12 @@ import { logger } from "./logging/logger";
 import { initializeSentry, sentryErrorHandler } from "./logging/sentry";
 import { sseReferralUpdatesHandler } from "./sse/handler";
 
+import { config as loadDotenv } from "dotenv";
+import { resolve } from "path";
+
+
+loadDotenv({ path: resolve(process.cwd(), ".env") });
+
 // ============================================================================
 // SENTRY INITIALIZATION
 // ============================================================================

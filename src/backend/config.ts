@@ -140,10 +140,9 @@ export const config = {
     port: env.SMTP_PORT,
     user: env.SMTP_USER || "",
     pass: env.SMTP_PASS || "",
-    from: env.SMTP_FROM || env.SMTP_USER || "noreply@sparkeefy.com", // TODO: change this to your actual email
+    from: env.SMTP_FROM || env.SMTP_USER || "sparkeefy@gmail.com", // TODO: change this to your actual email
     enabled: !!(env.SMTP_USER && env.SMTP_PASS), // Only enabled if credentials provided, real gmail/email access required here
   },
-
 
   // Rate Limiting
   rateLimit: {
@@ -167,4 +166,5 @@ if (config.isDevelopment) {
     sentryEnabled: config.sentry.enabled,
     smtpEnabled: config.smtp.enabled,
   });
+  
 }

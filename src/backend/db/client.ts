@@ -148,9 +148,19 @@ export class DatabaseClient {
    * @returns {Promise<WaitlistUser | null>} User or null if not found
    */
   async findUserByReferralCode(code: string): Promise<WaitlistUser | null> {
-    return await this.prisma.waitlistUser.findUnique({
-      where: { referralCode: code.toUpperCase() },
-    }) as WaitlistUser | null;
+    try {
+      return await this.prisma.waitlistUser.findFirst({
+        where: {
+          referralCode: {
+            equals: code,
+            mode: 'insensitive', // ✅ Case-insensitive
+          },
+        },
+      }) as WaitlistUser | null;
+    } catch (error) {
+      logger.error("Database error: findUserByReferralCode", { error, code });
+      throw error;
+    }
   }
 
     /**
@@ -159,11 +169,19 @@ export class DatabaseClient {
    * @param {string} token - Magic link token
    * @returns {Promise<WaitlistUser | null>} User or null if not found
    */
-  async findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null> {
-    return await this.prisma.waitlistUser.findUnique({
-      where: { magicLinkToken: token },
-    }) as WaitlistUser | null;
-  }
+    async findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null> {
+      try {
+        return await prisma.waitlistUser.findUnique({
+          where: { magicLinkToken: token },
+        });
+      } catch (error) {
+        logger.error("Database error: findUserByMagicLinkToken", { 
+          error, 
+          tokenPrefix: token.substring(0, 8) + "***" 
+        });
+        throw error;
+      }
+    }
 
   /**
    * Find User by Session Token
@@ -183,10 +201,15 @@ export class DatabaseClient {
    * @param {string} id - User ID (UUID)
    * @returns {Promise<WaitlistUser | null>} User or null if not found
    */
-  async findUserById(id: string): Promise<WaitlistUser | null> {
-    return await this.prisma.waitlistUser.findUnique({
-      where: { id },
-    }) as WaitlistUser | null;
+  async findUserById(userId: string): Promise<WaitlistUser | null> {
+    try {
+      return await prisma.waitlistUser.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      logger.error("Database error: findUserById", { error, userId });
+      throw error;
+    }
   }
 
   /**
@@ -227,6 +250,20 @@ export class DatabaseClient {
     return await this.prisma.waitlistUser.update({
       where: { id },
       data,
+    }) as WaitlistUser;
+  }
+
+  async updateUserSession(
+    userId: string,
+    sessionToken: string,
+    sessionExpiresAt: Date
+  ): Promise<WaitlistUser> {
+    return await this.prisma.waitlistUser.update({
+      where: { id: userId },
+      data: {
+        sessionToken,
+        sessionExpiresAt,
+      },
     }) as WaitlistUser;
   }
 
