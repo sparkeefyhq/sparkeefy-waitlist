@@ -150,11 +150,11 @@ export class EmailService {
     const startTime = Date.now();
 
     return new Promise((resolve, reject) => {
-      let socket: net.Socket | tls.TLSSocket | null = null;
+      let socket: net.Socket | tls.TLSSocket;
       let buffer = "";
       let isSecure = false;
+      let conversationStep = 0; // Track conversation state
 
-      // Timeout handler
       const timeout = setTimeout(() => {
         if (socket) socket.destroy();
         reject(new Error("SMTP timeout"));
@@ -163,19 +163,9 @@ export class EmailService {
       // Create initial TCP connection
       socket = net.createConnection(this.port, this.host);
 
-      // Handle connection
-      socket.on("connect", () => {
-        logger.debug("Connected to SMTP server", {
-          host: this.host,
-          port: this.port,
-        });
-      });
-
-      // Handle data from server
-      socket.on("data", async (data: Buffer) => {
+      const handleData = (data: Buffer) => {
         buffer += data.toString();
 
-        // Process complete lines
         let lineEnd: number;
         while ((lineEnd = buffer.indexOf(CRLF)) !== -1) {
           const line = buffer.substring(0, lineEnd);
@@ -186,51 +176,70 @@ export class EmailService {
           const response = this.parseSMTPResponse(line);
 
           try {
-            // Handle SMTP conversation
-            if (response.code === 220 && !isSecure) {
-              // Server greeting - send EHLO
-              this.send(socket!, `EHLO ${this.host}${CRLF}`);
+            if (response.code === 220 && conversationStep === 0) {
+              // Server greeting
+              conversationStep = 1;
+              this.send(socket, `EHLO ${this.host}${CRLF}`);
             } else if (response.code === 250 && line.includes("STARTTLS") && !isSecure) {
-              // Server supports STARTTLS - upgrade connection
-              this.send(socket!, `STARTTLS${CRLF}`);
+              // Found STARTTLS capability
+              this.send(socket, `STARTTLS${CRLF}`);
             } else if (response.code === 220 && line.includes("Ready to start TLS")) {
               // Upgrade to TLS
               isSecure = true;
-              socket = this.upgradeToTLS(socket as net.Socket);
+              conversationStep = 2;
 
-              // Re-send EHLO after TLS upgrade
+              // Remove old listeners
+              socket.removeAllListeners("data");
+              socket.removeAllListeners("error");
+
+              // Upgrade socket
+              socket = tls.connect({
+                socket: socket as net.Socket,
+                host: this.host,
+                rejectUnauthorized: true,
+              });
+
+              // Re-attach listeners to TLS socket
+              socket.on("data", handleData);
+              socket.on("error", handleError);
+
+              // Send EHLO again after TLS
               this.send(socket, `EHLO ${this.host}${CRLF}`);
-            } else if (response.code === 250 && isSecure && line.includes("AUTH")) {
-              // Server ready for authentication
-              this.send(socket!, `AUTH LOGIN${CRLF}`);
+            } else if (response.code === 250 && isSecure && conversationStep === 2) {
+              // After TLS EHLO, start AUTH
+              conversationStep = 3;
+              this.send(socket, `AUTH LOGIN${CRLF}`);
             } else if (response.code === 334 && response.message.includes("VXNlcm5hbWU")) {
-              // Server asking for username (Base64: "Username")
               const username = Buffer.from(this.user).toString("base64");
-              this.send(socket!, `${username}${CRLF}`);
+              this.send(socket, `${username}${CRLF}`);
             } else if (response.code === 334 && response.message.includes("UGFzc3dvcmQ")) {
-              // Server asking for password (Base64: "Password")
               const password = Buffer.from(this.pass).toString("base64");
-              this.send(socket!, `${password}${CRLF}`);
+              this.send(socket, `${password}${CRLF}`);
             } else if (response.code === 235) {
-              // Authentication successful - send MAIL FROM
-              this.send(socket!, `MAIL FROM:<${this.from}>${CRLF}`);
-            } else if (response.code === 250 && line.includes("Sender OK")) {
-              // Sender accepted - send RCPT TO
-              this.send(socket!, `RCPT TO:<${options.to}>${CRLF}`);
-            } else if (response.code === 250 && line.includes("Recipient OK")) {
-              // Recipient accepted - send DATA command
-              this.send(socket!, `DATA${CRLF}`);
+              // Auth success
+              this.send(socket, `MAIL FROM:<${this.from}>${CRLF}`);
+            } else if (response.code === 250 && line.match(/2\.1\.0.*OK/)) {
+              // Sender OK
+              this.send(socket, `RCPT TO:<${options.to}>${CRLF}`);
+            } else if (response.code === 250 && line.match(/2\.1\.5.*OK/)) {
+              // Recipient OK
+              this.send(socket, `DATA${CRLF}`);
             } else if (response.code === 354) {
-              // Server ready for message data - send email content
+              // Ready for data
               const emailData = this.buildEmailMessage(options);
-              this.send(socket!, `${emailData}${CRLF}.${CRLF}`);
-            } else if (response.code === 250 && line.includes("Message accepted")) {
-              // Email sent successfully - send QUIT
-              this.send(socket!, `QUIT${CRLF}`);
+              this.send(socket, `${emailData}${CRLF}.${CRLF}`);
+            } else if (response.code === 250 && (line.includes("2.0.0") || line.includes("OK:"))) {
+              // Message accepted/queued - Gmail responds with various formats:
+              // "250 2.0.0 OK: queued as ..."
+              // "250 2.0.0 OK 1234567890 - gsmtp"
+              // Only send QUIT if we haven't already sent DATA
+              if (!line.includes("2.1.0") && !line.includes("2.1.5")) {
+                this.send(socket, `QUIT${CRLF}`);
+              }
             } else if (response.code === 221) {
-              // Server closing connection - success!
+              // Goodbye
               clearTimeout(timeout);
-              socket!.end();
+              socket.end();
 
               const duration = Date.now() - startTime;
               logger.info("Email sent successfully", {
@@ -240,7 +249,6 @@ export class EmailService {
 
               resolve();
             } else if (response.code >= 400) {
-              // SMTP error
               throw new Error(`SMTP Error ${response.code}: ${response.message}`);
             }
           } catch (error) {
@@ -249,23 +257,31 @@ export class EmailService {
             reject(error);
           }
         }
-      });
+      };
 
-      // Handle errors
-      socket.on("error", (error: Error) => {
+      const handleError = (error: Error) => {
         clearTimeout(timeout);
         logger.error("SMTP connection error", { error });
         Sentry.captureException(error);
         reject(error);
+      };
+
+      socket.on("connect", () => {
+        logger.debug("Connected to SMTP server", {
+          host: this.host,
+          port: this.port,
+        });
       });
 
-      // Handle connection close
+      socket.on("data", handleData);
+      socket.on("error", handleError);
       socket.on("close", () => {
         clearTimeout(timeout);
         logger.debug("SMTP connection closed");
       });
     });
   }
+
 
   // ==========================================================================
   // PRIVATE HELPER METHODS
