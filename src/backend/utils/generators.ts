@@ -115,7 +115,7 @@ export function isValidReferralCodeFormat(code: string): boolean {
  * @note Token space: 2^256 = ~10^77 possible values
  * @note Never expires - tied to user email for permanent access
  */
-export function generateMagicLinkToken(): string {
+export async function generateMagicLinkToken(): Promise<string> {
   return randomBytes(SESSION_TOKEN_BYTES).toString("hex");
 }
 

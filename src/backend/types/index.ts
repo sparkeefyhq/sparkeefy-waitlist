@@ -300,9 +300,9 @@ export interface HeartbeatEventData {
  * Parameters for creating a new waitlist user
  */
 export interface CreateUserInput {
-  referralCode: any;
-  sessionToken: any;
-  sessionExpiresAt: any;
+  referralCode: string;
+  sessionToken: string;
+  sessionExpiresAt: Date;
   email: string;
   username?: string | null;
   firstName?: string | null;
@@ -310,7 +310,7 @@ export interface CreateUserInput {
   phoneNumber?: string | null;
   marketingOptIn?: boolean;
   additionalRemarks?: string | null;
-  magicLinkToken: any;
+  magicLinkToken: string;
 }
 
 /**

@@ -89,7 +89,7 @@ const joinWaitlistInput = z.object({
     .string()
     .length(8, "Referral code must be exactly 8 characters")
     .regex(/^[A-Za-z0-9]{8}$/, "Referral code must be alphanumeric")
-    .toUpperCase()
+    .trim()
     .optional()
     .nullable(),
 });
@@ -109,7 +109,7 @@ const validateReferralCodeInput = z.object({
     .string({ required_error: "Referral code is required" })
     .length(8, "Referral code must be exactly 8 characters")
     .regex(/^[A-Za-z0-9]{8}$/, "Referral code must be alphanumeric")
-    .toUpperCase(),
+    .trim(),
 });
 
 /**
@@ -288,6 +288,37 @@ const join = rateLimitedProcedure
       } else {
         // NEW USER - Create waitlist entry
         try {
+          // Generate unique referral code
+          const userReferralCode = await generateUniqueCode(
+            generateReferralCode,
+            async (code: string) => {
+              const existing = await waitlistService.findUserByReferralCode(code);
+              return !!existing; // Return true if code exists (collision)
+            },
+            5 // Max attempts
+          );
+
+          logger.debug("Generated unique referral code", {
+            referralCode: userReferralCode,
+            email: input.email.substring(0, 5) + "***",
+            requestId,
+          });
+
+          // Generate session token and expiration
+          const sessionToken = generateSessionToken();
+          const sessionExpiresAt = new Date();
+          sessionExpiresAt.setDate(sessionExpiresAt.getDate() + 30); // 30 days from now
+
+          // Generate magic link token (await the Promise!)
+          const magicLinkToken = await generateMagicLinkToken();
+
+          logger.debug("Generated authentication tokens", {
+            hasSessionToken: !!sessionToken,
+            hasMagicLinkToken: !!magicLinkToken,
+            sessionExpiresAt: sessionExpiresAt.toISOString(),
+            requestId,
+          });
+
           // Create new user with all provided fields
           user = await waitlistService.createUser({
             email: input.email,
@@ -297,10 +328,10 @@ const join = rateLimitedProcedure
             phoneNumber: input.phoneNumber,
             marketingOptIn: input.marketingOptIn ?? false,
             additionalRemarks: input.additionalRemarks,
-            referralCode: undefined,
-            sessionToken: undefined,
-            sessionExpiresAt: undefined,
-            magicLinkToken: generateMagicLinkToken()
+            referralCode: userReferralCode,
+            sessionToken: sessionToken,
+            sessionExpiresAt: sessionExpiresAt,
+            magicLinkToken: magicLinkToken,
           });
 
           message = "Successfully joined waitlist";
@@ -312,6 +343,7 @@ const join = rateLimitedProcedure
             hasMarketing: input.marketingOptIn,
             requestId,
           });
+
 
           // If referral code provided, create referral relationship
           if (input.referralCode) {
@@ -705,13 +737,11 @@ const authenticateWithMagicLink = publicProcedure
       );
 
       // Update user's session token in database
-      await (db as any).waitlistUser.update({
-        where: { id: user.id },
-        data: {
-          sessionToken: newSessionToken,
-          sessionExpiresAt,
-        },
+      await db.updateUser(user.id, {
+        sessionToken: newSessionToken,
+        sessionExpiresAt,
       });
+
 
       logger.info("New session token generated", {
         userId: user.id,

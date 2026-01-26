@@ -448,21 +448,22 @@ export class WaitlistService {
    * 
    * @throws {TRPCError} INTERNAL_SERVER_ERROR - Database error
    */
-  async findUserByMagicLinkToken(magicLinkToken: string): Promise<WaitlistUser | null> {
+    async findUserByMagicLinkToken(magicLinkToken: string): Promise<WaitlistUser | null> {
     try {
       // Validate token format before database lookup
       if (!magicLinkToken || magicLinkToken.length !== 64) {
         logger.warn("Invalid magic link token format", {
           tokenPrefix: magicLinkToken?.substring(0, 8) + "***" || "undefined",
+          length: magicLinkToken?.length || 0,
         });
         return null;
       }
 
-      // Find user by magic link token (assuming db client supports it)
-      return await (this.db as any).findUserByMagicLinkToken?.(magicLinkToken) || null;
+      // ✅ FIXED: Call the proper db method
+      return await this.db.findUserByMagicLinkToken(magicLinkToken);
     } catch (error) {
       logger.error("Error finding user by magic link token", { 
-        error, 
+        error: error instanceof Error ? error.message : String(error),
         tokenPrefix: magicLinkToken.substring(0, 8) + "***" 
       });
       Sentry.captureException(error);
@@ -489,7 +490,7 @@ export class WaitlistService {
       // This assumes db client has findUserById method
       // If not available, this would be implemented in the actual database client
       // For now, we'll use a type assertion since this is abstracted
-      return await (this.db as any).findUserById?.(userId) || null;
+      return await (this.db as any).findUserById(userId);
     } catch (error) {
       logger.error("Error finding user by ID", { error, userId });
       Sentry.captureException(error);
