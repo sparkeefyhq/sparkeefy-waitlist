@@ -5,101 +5,85 @@ import { featureCards } from "./data";
 export interface FeatureCardProps {
   card: typeof featureCards[0];
   index: number;
-  activeIndex?: number; // Optional to support existing calls without refactor
+  activeIndex?: number;
   scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
   totalCards: number;
   variant?: "default" | "tilted";
 }
 
 export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, totalCards, variant = "default" }: FeatureCardProps) => {
-  // Spring config for smooth, natural motion
-  const springConfig = { stiffness: 120, damping: 20, mass: 0.5 };
-  
-  // Calculate specific timing for THIS card
-  // Entry phase: ends at index * 0.24 (card becomes fully active)
-  const activeStart = index * 0.24;
-  
-  // Calculate dynamic scale range
-  const rangeInput = [activeStart - 0.1, activeStart];
-  const rangeScale = [1, 1];
-  
-  // Stacking parameters
-  const topOffset = index * 15; // Fixed downward offset for visibility
-  const scaleStep = 0.05;
+  // Config
+  const step = 0.25;
+  const holdDuration = 0.15;
+  const isLast = index === totalCards - 1;
+  const baseTilt = 5; // Uniform Clockwise Tilt
 
-  // Add scale points for subsequent cards
-  for (let i = 1; i <= totalCards - 1 - index; i++) {
-    const nextCardStart = activeStart + (i * 0.24);
-    rangeInput.push(nextCardStart);
-    rangeScale.push(1 - (scaleStep * i));
-  }
+  // Timeline Points
+  // enterStart: When prev card finishes holding (starts exiting)
+  const enterStart = (index - 1) * step + holdDuration; 
+  const activeStart = index * step; 
+  const activeEnd = activeStart + holdDuration;
+  // Exit MUST finish exactly when next card starts (at activeStart + step) to prevent overlap at snap point
+  const exitEnd = activeStart + step; 
 
-  // --- Rotation Logic for Tilted Variant ---
-  // Using activeIndex for strict state control to ensure active card is ALWAYS straight.
-  // - Active (index === activeIndex): 0 deg
-  // - Covered (index < activeIndex): 6 deg (Clockwise - opposite of previous)
-  // - Entering (index > activeIndex): 0 deg (or custom entry angle)
-  const targetRotation = variant === "tilted" && index < activeIndex ? 6 : 0;
-
-  // --- X Position Logic ---
-  // Default: 0
-  // Tilted: Enter from Right (100 -> 0)
-  const xEntryValues = variant === "tilted" ? [100, 0] : [0, 0];
-  const xRaw = useTransform(
+  // 1. Rotation: Tilted -> Straight (Hold) -> Tilted Exit
+  const rotateRaw = useTransform(
     scrollYProgress,
-    [activeStart - 0.1, activeStart],
-    xEntryValues
+    isLast ? [enterStart, activeStart] : [enterStart, activeStart, activeEnd, exitEnd],
+    isLast ? [baseTilt, 0]             : [baseTilt, 0, 0, 15]
   );
-  const x = useSpring(xRaw, springConfig);
 
-  // --- Y Position Logic ---
-  // Default: Enter from Bottom (200 -> 0)
-  // Tilted: Enter from Top (-100 -> 0)
-  const yEntryValues = variant === "tilted" ? [-100, 0] : [200, 0];
-  const yRaw = useTransform(
+  // 2. Scale: Always 1 (Disabled scaling)
+  const scaleRaw = useTransform(
     scrollYProgress,
-    [activeStart - 0.1, activeStart],
-    yEntryValues
+    [enterStart, activeStart],
+    [1, 1]
   );
-  const y = useSpring(yRaw, springConfig);
 
-  const scaleRaw = useTransform(scrollYProgress, rangeInput, rangeScale);
-  const scale = useSpring(scaleRaw, springConfig);
-  
+  // 3. Opacity: Exit Fade Only (Stacked cards are full opacity)
   const opacityRaw = useTransform(
     scrollYProgress,
-    [activeStart - 0.1, activeStart - 0.09],
-    [0, 1]
+    isLast 
+      ? [activeStart, activeStart + 0.01] // Always 1
+      : [activeEnd, activeEnd + 0.07, exitEnd], // Stay opaque for 70% of flight, then quick fade
+    isLast 
+      ? [1, 1] 
+      : [1, 1, 0] 
   );
-  const opacity = useSpring(opacityRaw, { stiffness: 300, damping: 20 });
-  
+
+  // 4. Exit Transforms (Peel Off after Hold)
+  const xExitRaw = useTransform(scrollYProgress, [activeEnd, exitEnd], [0, 900]);
+  const yExitRaw = useTransform(scrollYProgress, [activeEnd, exitEnd], [0, -300]);
+
+  // Spring Smoothing
+  const springConfig = { stiffness: 120, damping: 20, mass: 0.5 };
+  const x = useSpring(xExitRaw, springConfig);
+  const y = useSpring(yExitRaw, springConfig);
+  const rotate = useSpring(rotateRaw, springConfig);
+  const opacity = useSpring(opacityRaw, springConfig);
+  const scale = useSpring(scaleRaw, springConfig);
+
   // Track hover state for button animation
   const [isHovered, setIsHovered] = React.useState(false);
 
-  // Fix blocking issues: Set pointer-events to none when not fully visible
+  // Pointer Events: Auto only when Active (Straight)
   const pointerEvents = useTransform(
     scrollYProgress,
-    (val) => (val >= activeStart - 0.1 ? "auto" : "none")
+    (val) => (val >= activeStart - 0.05 && val < activeEnd + 0.05 ? "auto" : "none")
   );
 
   return (
     <motion.div
-      className={`absolute left-0 w-full h-full rounded-3xl p-8 md:px-24 md:py-20 ${card.gradient} shadow-2xl`}
+      className={`absolute left-0 w-full h-full rounded-3xl p-8 md:px-24 md:py-20 ${card.gradient} shadow-2xl origin-bottom`}
       style={{
-        x: index === 0 ? 0 : x,
-        y: index === 0 ? 0 : y,
-        top: topOffset, // Fixed offset ensures previous cards stay visible at top
-        opacity: index === 0 ? 1 : opacity,
-        // rotate is handled by animate prop below for state-based control
-        scale: index === totalCards - 1 ? 1 : scale,
-        zIndex: index + 1,
+        x: variant === "tilted" && !isLast ? x : 0,
+        y: variant === "tilted" && !isLast ? y : 0,
+        rotate: variant === "tilted" ? rotate : 0,
+        opacity: variant === "tilted" ? opacity : 1,
+        scale: variant === "tilted" ? scale : 1,
+        zIndex: totalCards - index,
+        top: index * 12, // Consistent styling offset
         pointerEvents: index === 0 ? "auto" : pointerEvents,
-      }}
-      animate={{
-        rotate: targetRotation
-      }}
-      transition={{
-        rotate: { duration: 0.4, ease: "easeInOut" } // Smooth rotation transition
       }}
     >
 
@@ -119,7 +103,7 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
           className="text-2xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-white"
           style={{ 
             // Using CSS variable or direct style for dynamic color
-            backgroundImage: `linear-gradient(to right, ${card.gradientStartColor}, #ffffff)`
+            backgroundImage: `linear-gradient(90deg, ${card.gradientStartColor} 0%, #FFFFFF 55%)`
           }}
         >
           {card.subtitle}

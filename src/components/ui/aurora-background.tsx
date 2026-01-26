@@ -27,7 +27,7 @@ export const AuroraBackground = ({
   return (
     <div
       className={cn(
-        "transition-bg relative flex min-h-screen flex-col items-center justify-center bg-[#0a0008] text-white",
+        "transition-bg relative flex min-h-screen flex-col items-center justify-center bg-[#010302] text-white",
         className,
       )}
       {...props}
@@ -76,10 +76,10 @@ export const AuroraBackground = ({
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[100%] h-[70%] bg-gradient-to-t from-pink-600/40 via-pink-500/20 to-transparent blur-[100px]" />
 
         {/* TOP FADE */}
-        <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#0a0008] via-[#0a0008]/70 to-transparent pointer-events-none z-10" />
+        <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#010302] via-[#010302]/70 to-transparent pointer-events-none z-10" />
 
         {/* BOTTOM FADE */}
-        <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-[#0a0008] via-[#0a0008]/50 to-transparent pointer-events-none z-10" />
+        <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-[#010302] via-[#010302]/50 to-transparent pointer-events-none z-10" />
       </div>
       
       {/* Styles - copied from Rays.tsx */}

@@ -40,10 +40,10 @@ const Rays = ({ className }: RaysProps) => {
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[100%] h-[70%] bg-gradient-to-t from-pink-600/40 via-pink-500/20 to-transparent blur-[100px]" />
 
       {/* TOP FADE */}
-      <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#0a0008] via-[#0a0008]/70 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#010302] via-[#010302]/70 to-transparent pointer-events-none z-10" />
 
       {/* BOTTOM FADE */}
-      <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-[#0a0008] via-[#0a0008]/50 to-transparent pointer-events-none z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-[#010302] via-[#010302]/50 to-transparent pointer-events-none z-10" />
 
       <style jsx>{`
         .rays-container {

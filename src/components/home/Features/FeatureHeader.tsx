@@ -4,7 +4,7 @@ import { AnimatedHeartPetals } from "./AnimatedHeartPetals";
 
 export const FeatureHeader = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 lg:px-8 text-center relative mb-14">
+    <div className="max-w-4xl mx-auto px-4 lg:px-8 text-center relative mb-14 select-none">
       <motion.h2
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -13,7 +13,21 @@ export const FeatureHeader = () => {
         className="text-6xl md:text-[4.25rem] font-bold text-gray-900 tracking-[-0.01em]"
       >
         Where{" "}
-        <span className="font-retro text-[#FF148A] font-normal tracking-normal">Caring</span>
+        <span className="relative inline-block">
+          <motion.span 
+            className="font-retro font-normal tracking-normal bg-clip-text text-transparent inline-block py-4 -my-2 relative z-0"
+            style={{ 
+              backgroundImage: "linear-gradient(20deg, #FF148A 50%, #111827 50%)",
+              backgroundSize: "250% 100%",
+            }}
+            initial={{ backgroundPosition: "100% 0" }}
+            whileInView={{ backgroundPosition: "0% 0" }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            viewport={{ once: true }}
+          >
+            Caring
+          </motion.span>
+        </span>
         {" "}gets{" "}
         <span className="relative inline-block">
           easier
