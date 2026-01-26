@@ -7,7 +7,7 @@ export const featureCards = [
         description: "Important dates, preferences, and the little details are kept safe in one place -",
         highlight: "so the people you care about always feel remembered.",
         gradient: "bg-[linear-gradient(104deg,_#DE0371_-1.62%,_#670138_18.3%,_#420126_31.79%,_#270119_50.85%,_#080A0A_74.33%,_#000_91.17%)] [box-shadow:0_18.599px_37.818px_0_rgba(0,_0,_0,_0.22)]",
-        accentColor: "#DE0371", 
+        accentColor: "#FF0080", 
         gradientStartColor: "#FFB3D9",
     },
     {
@@ -40,7 +40,7 @@ export const featureCards = [
         description: "Get thoughtful gift ideas inspired by what they love and your shared moments -",
         highlight: "so gifting feels easy, not stressful.",
         gradient: "bg-[linear-gradient(104deg,_#EDB320_0.22%,_#936206_16.55%,_#523704_36.66%,_#352405_49.66%,_#271902_59%,_#000_91.17%)] [box-shadow:0_18.599px_37.818px_0_rgba(0,_0,_0,_0.22)]",
-        accentColor: "#EDB320",
+        accentColor: "#FEBF67",
         gradientStartColor: "#FDE68A",
     },
 ];
