@@ -5,7 +5,7 @@ import { FeatureTabs } from "./FeatureTabs";
 
 const Features = () => {
   return (
-    <section className="relative w-full bg-white pt-24 pb-20 md:pt-44 md:pb-32 overflow-visible">
+    <section className="relative w-full bg-white pt-0 pb-0 md:pt-34 md:pb-32 overflow-x-clip md:overflow-visible -mt-1">
       <FeatureTabs />
     </section>
   );

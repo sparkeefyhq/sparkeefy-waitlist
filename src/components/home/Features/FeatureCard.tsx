@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { featureCards } from "./data";
+import { useMediaQuery } from "react-responsive";
 
 export interface FeatureCardProps {
   card: typeof featureCards[0];
@@ -12,11 +13,12 @@ export interface FeatureCardProps {
 }
 
 export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, totalCards, variant = "default" }: FeatureCardProps) => {
+  const isMobile = useMediaQuery({ maxWidth: 768 });
   // Config
   const step = 0.25;
   const holdDuration = 0.15;
   const isLast = index === totalCards - 1;
-  const baseTilt = 5; // Uniform Clockwise Tilt
+  const baseTilt = isMobile ? 4 : 5; // Uniform Clockwise Tilt
 
   // Timeline Points
   // enterStart: When prev card finishes holding (starts exiting)
@@ -74,7 +76,7 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
 
   return (
     <motion.div
-      className={`absolute left-0 w-full h-full rounded-3xl p-8 md:px-24 md:py-20 ${card.gradient} shadow-2xl origin-bottom`}
+      className={`absolute left-0 w-full h-full rounded-2xl md:rounded-3xl p-5 py-10 md:p-8 md:px-24 md:py-20 ${card.gradient} shadow-2xl origin-bottom`}
       style={{
         x: variant === "tilted" && !isLast ? x : 0,
         y: variant === "tilted" && !isLast ? y : 0,
@@ -82,11 +84,10 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
         opacity: variant === "tilted" ? opacity : 1,
         scale: variant === "tilted" ? scale : 1,
         zIndex: totalCards - index,
-        top: index * 12, // Consistent styling offset
+        top: index * 1,
         pointerEvents: index === 0 ? "auto" : pointerEvents,
       }}
     >
-
       {/* Sun Ray Overlay */}
         <div 
           className="absolute inset-0 rounded-3xl pointer-events-none"
@@ -95,12 +96,12 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
           }}
         />
 
-      <div className="max-w-[38rem]">
-        <h3 className="text-2xl md:text-5xl font-bold text-white mb-1">
+      <div className="max-w-[38rem] md:text-left text-center">
+        <h3 className="text-2xl md:text-5xl font-bold text-white mb-1 leading-none">
           {card.title}
         </h3>
         <h3 
-          className="text-2xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-white"
+          className="text-2xl md:text-5xl font-bold mb-3 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-white md:py-0.5"
           style={{ 
             // Using CSS variable or direct style for dynamic color
             backgroundImage: `linear-gradient(90deg, ${card.gradientStartColor} 0%, #FFFFFF 55%)`
@@ -108,12 +109,12 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
         >
           {card.subtitle}
         </h3>
-        <p className="text-white/70 text-lg md:text-2xl leading-tight mb-14 font-normal">
+        <p className="text-white/70 text-sm md:text-2xl leading-relaxed md:leading-tight mb-5 md:mb-14 font-normal">
           {card.description}{" "}
           <span className="font-semibold">{card.highlight}</span>
         </p>
         <button
-          className="group relative cursor-pointer inline-flex items-center justify-center overflow-hidden px-6 py-3 rounded-full text-black bg-white text-base font-medium hover:border-white/50 transition-all min-w-[140px]"
+          className="group relative cursor-pointer inline-flex items-center justify-center overflow-hidden px-4 md:px-6 py-2 md:py-3 rounded-full text-black bg-white text-sm md:text-base font-medium hover:border-white/50 transition-all min-w-[120px] md:min-w-[140px]"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >

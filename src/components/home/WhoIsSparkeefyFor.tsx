@@ -6,14 +6,74 @@ import Image from "next/image";
 
 const WhoIsSparkeefyFor = () => {
   return (
-    <section className="relative w-full bg-[#010302] pt-8 pb-28 mt-32">
+    <section className="relative w-full bg-[#010302] pt-10 md:pt-8 pb-10 md:pb-28 mt-20 md:mt-32 px-4 lg:px-0 -mb-1">
       {/* Top Curve - Sitting above the section to overlap previous white section */}
-      <div className="absolute top-0 left-0 right-0 h-56 -translate-y-[95%] z-10 w-full overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-20 md:h-56 -translate-y-[90%] md:-translate-y-[95%] z-10 w-full overflow-hidden">
+        {/* Mobile curve - gentler/flatter arc */}
+        <svg
+          viewBox="0 0 1440 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full overflow-visible block md:hidden"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient
+              id="curveGradientTopMobile"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="0%"
+            >
+              <stop offset="0%">
+                <animate
+                  attributeName="stop-color"
+                  values="#00C9D2;#F4B763;#FF66B2;#00C9D2"
+                  dur="6s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset="50%">
+                <animate
+                  attributeName="stop-color"
+                  values="#F4B763;#FF66B2;#00C9D2;#F4B763"
+                  dur="6s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset="100%">
+                <animate
+                  attributeName="stop-color"
+                  values="#FF66B2;#00C9D2;#F4B763;#FF66B2"
+                  dur="6s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+            </linearGradient>
+          </defs>
+
+          {/* Dark Hill Fill - gentler curve for mobile */}
+          <path
+            d="M-100 90 Q720 30 1540 90 L1540 100 L-100 100 Z"
+            fill="#010302"
+          />
+
+          {/* Gradient Stroke on the Curve - gentler curve */}
+          <path
+            d="M-100 90 Q720 30 1540 90"
+            stroke="url(#curveGradientTopMobile)"
+            strokeWidth="14"
+            strokeLinecap="round"
+            fill="none"
+          />
+        </svg>
+
+        {/* Desktop curve - deeper arc */}
         <svg
           viewBox="0 0 1440 220"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full overflow-visible"
+          className="w-full h-full overflow-visible hidden md:block"
           preserveAspectRatio="none"
         >
           <defs>
@@ -79,13 +139,13 @@ const WhoIsSparkeefyFor = () => {
               backgroundPosition: { duration: 2.0, ease: "easeInOut", delay: 0.2 } 
             }}
             viewport={{ once: true }}
-            className="text-[2rem] font-bold leading-none tracking-tight bg-clip-text text-transparent"
+            className="text-2xl md:text-[2rem] font-semibold md:font-bold md:leading-none md:tracking-tight bg-clip-text text-transparent mb-1 md:mb-0"
              style={{ 
               backgroundImage: "linear-gradient(91deg, #FFF 4%, #FDE 25%, #FFF 48%, #FFFFFF 50%, #FFFFFF 100%)",
               backgroundSize: "200% 100%",
             }}
           >
-            Every <span className="italic font-bold text-white">story</span> starts with a{" "}
+            Every <span className="italic font-semibold md:font-bold text-white">story</span> starts with a{" "}
             <span className="font-retro font-normal tracking-normal text-white">
               Spark
             </span>
@@ -98,16 +158,16 @@ const WhoIsSparkeefyFor = () => {
             viewport={{ once: true }}
             className="relative inline-block"
           >
-            <p className="text-[2rem] font-medium text-white">
+            <p className="text-2xl md:text-[2rem] font-medium text-white">
               Some sparks are{" "}
               <span className="relative inline-block">
                 <span className="relative inline-block">
                   {/* Base Layer: White Text */}
-                  <span className="text-white font-bold">never meant to fade.</span>
+                  <span className="text-white font-medium md:font-bold">never meant to fade.</span>
                   
                   {/* Overlay Layer: Smooth Gradient Fade In */}
                   <motion.span 
-                    className="absolute top-0 left-0 w-full font-bold bg-clip-text text-transparent bg-[linear-gradient(90deg,_#FFC5E2_0%,_#FF43A2_100%)]"
+                    className="absolute top-0 left-0 w-full font-medium md:font-bold bg-clip-text text-transparent bg-[linear-gradient(90deg,_#FFC5E2_0%,_#FF43A2_100%)]"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
@@ -173,25 +233,25 @@ const WhoIsSparkeefyFor = () => {
       </div>
 
       {/* Content Section - Cards */}
-      <div className="mt-20">
+      <div className="mt-14 md:mt-20">
         <div className="text-center mb-7">
-          <h2 className="text-[2.5rem] font-bold text-white mb-1.5">
+          <h2 className="text-[2rem] md:text-[2.5rem] font-semibold md:font-bold text-white mb-1.5">
             Who is Sparkeefy for?
           </h2>
-          <p className="text-white/70 text-2xl font-medium">
+          <p className="text-white/70 text-xl md:text-2xl font-medium">
             For the <span className="font-semibold">people</span> you care about
             and the relationships that matter most.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[69rem] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-4 max-w-[69rem] mx-auto md:text-left text-center">
           {/* Couples Card */}
           <motion.div 
             whileHover={{ y: -10, backgroundColor: "#222", boxShadow: "0 15px 40px -5px rgba(255, 255, 255, 0.15)" }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="bg-[#1A1919] rounded-3xl px-6 py-8"
           >
-            <div className="mb-3">
+            <div className="mb-3 flex justify-center md:justify-start">
              <Image
                 src="/img/couples.png"
                 alt="Couples"
@@ -215,7 +275,7 @@ const WhoIsSparkeefyFor = () => {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="bg-[#1A1919] rounded-3xl px-6 py-8"
           >
-            <div className="mb-3">
+            <div className="mb-3 flex justify-center md:justify-start">
               <Image
                 src="/img/friends.png"
                 alt="Friends"
@@ -239,7 +299,7 @@ const WhoIsSparkeefyFor = () => {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="bg-[#1A1919] rounded-3xl px-6 py-8"
           >
-            <div className="mb-3">
+            <div className="mb-3 flex justify-center md:justify-start">
              <Image
                 src="/img/family-members.png"
                 alt="Family Members"

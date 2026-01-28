@@ -5,7 +5,7 @@
 @font-face {
   font-family: 'Deli';
   src: url('/fonts/deli/Deli-Regular.woff2') format('woff2'),
-       url('/fonts/deli/Deli-Regular.woff') format('woff');
+    url('/fonts/deli/Deli-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -185,6 +185,15 @@
 
   .animate-border-spin {
     animation: border-spin 3s linear infinite;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
