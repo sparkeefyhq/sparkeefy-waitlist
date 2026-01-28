@@ -31,34 +31,17 @@ const CustomSignalIcon = ({ className }: { className?: string }) => (
 
 const CustomWhatsAppIcon = ({ className }: { className?: string }) => (
   <svg
-    width="26"
-    height="28"
-    viewBox="0 0 26 28"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    <rect width="26" height="28" fill="url(#pattern0_256_1014)" />
-    <defs>
-      <pattern
-        id="pattern0_256_1014"
-        patternContentUnits="objectBoundingBox"
-        width="1"
-        height="1"
-      >
-        <use
-          xlinkHref="#image0_256_1014"
-          transform="matrix(0.0111111 0 0 0.0103175 0 0.0357143)"
-        />
-      </pattern>
-      <image
-        id="image0_256_1014"
-        width="90"
-        height="90"
-        preserveAspectRatio="none"
-        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFGElEQVR4nO2dW4hWVRTHT1laWAopTdGFsoKgIHHM6KZSFlERFVkx3YgyAzUtKagogiAskMSKrIeK6qUHs8bILvRg9BAxNel0h8oudnGY6UY501x+sWgNfOb0fed41t5nn3P2D+ZlcM5e+z/f7LP2Wv+9TZJIJBKJRCKRSCQSiaQDmACcDNwAPAS8BGwFvgT6gUH96tfvbdV/86D+zGx5Rsrh6gVwOLAC2Aj8Rn5+BTqB5cBhSZ0B9geuAd4ERnDHMPAGcDWwX1IXgAP0k7Yd/+wA7gOmJlUF2Be4HeijeCSGlRJTUiWAM4EewuMzYEFSdmRNBB4DRgkXiW0tMCkpI8BRwLuUh/eBY5MyIX+ORmmabyQtPCspA8AlwE7KyyBwRRIywE2Oc2JfyBwWJSECXKybg6owAlyehISsa8AA1WMQODcJAeC4kr74srwgjyla5EmaFlWdrkLzbN2M1IW1RW6rQ97xWSNznedb5H2ALdSPHq+FKK3C1ZVbfYl8oFGp83fgHmA+0K5L0ZOET6/U1H0IfYdRytQ+zrP3At4hfFb6aD/9ZPBSOb/JGBcRPj84bYtpjy8v61J0wbcRPle5FFoaqXnYCbSlGOdOwuc1l5aAvJW59SnHOrgEtRMpoB3qQmjxXeRlaYbxnid8lroQWswteVmQYbzTCJ8NLnaCkpLlZXbGcT8ibPpN7WfqhbNgbsZxXyF82i2FFvOg15SIf1++Zeg9Xm8ptLg6LXgkw1L1OuVglaXQLxsFtU222SnGe5Ty8KKl0JYl0bktxrqOctFtKfTXhoF1thhL3J5l4itLoa0doPOajDUF+Jby0GsptLTdLeluln9KdY/yMGAp9JCDAO9qMeY6aij0Hw4CHALmtDCub6ZmS8ePjoL8RJoJLap4H1Ojl6Gsqa54usXYbYGLbZreua45LG4x/kHApgzPewGYDpwHvEWJNiwPOw7271ZmQmBv4P4UzYeu/y5HwCm6ux0NfQtuVVRqhhglZ6aIZU4Tv580jo9o8rMnakNhKNSi0iz8eSZOShHPBD2g2XjSS3L9M1LOZwbwjFHMs0xEbpiYReHfTOwGH8iFwLNiU9iDea0npMK/YSsri4vpf70fhnN6ilBehA1BLcZ/l3mF+UR2nVPejGSJi6DaCjqj8qqLGwp055lnORQtDrGOayy4oroefdIGS9M0yDCXC3LGtMkqlvGCu4xi+QC4VHLqnPOYCnyaM5YOO2V3D3Ai8B3F0wPcDEzbgznMMOgYbXd+94eRY8lyRynlgQ5gcooPyRKjJsZtTkXWgCc7rObl4S/gbdkS6zFpOft4qi41qw0dqr2tfqmWYi+iviz3InLDTtFFMyB0PhTPiU+hj6d+jBZx/G0Z9WONV5ELqHuEwHuStfgWeWLN1udfgKO9iqxCy7nAujAInONdZBX6AerBCLCwEJFVaOnJVZ1h4MYiRZ5ekTuTmjFQ+BU/wJVU/8U3v1CRjVo/IdNV+JU+YwDfU80d3xrveXILT0TV2AKcnoSEXAiSIxfdDNyrz/iG4unVO6z9FYjSktH7JnfvPyF5qDj4k92botcCn+Ofn/Xoxi4xhXY98Z9NJvAF8Lj2FKdlOOK2ULwRjs8TDuuHpCP4q+eBs8e5GOQ58Z0BRxo8f4reBdJpdFmhOIg2aOvKjSXABcDd6sa8BTjBQ1NhphorV2tPsFvbZyLg2Lrfp0tUt/5VrNJfvPgE438PEolEIpFIJBKJRCJJSv4BTVJGZgtlT7YAAAAASUVORK5CYII="
-      />
-    </defs>
+    <path
+      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+      fill="currentColor"
+    />
   </svg>
 );
 
@@ -68,7 +51,7 @@ const Footer = () => {
     {
       Icon: CustomWhatsAppIcon,
       link: "#",
-      iconClass: "w-6 h-6",
+      iconClass: "w-4.5 h-4.5",
       hoverColor: "hover:bg-[#25D366]",
     },
     { Icon: FaRedditAlien, link: "#", hoverColor: "hover:bg-[#FF4500]" },
@@ -108,28 +91,28 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="relative w-full bg-[#010302] pt-10 pb-0 overflow-hidden">
+    <footer className="relative w-full bg-[#010302] pt-4 md:pt-10 pb-0 overflow-hidden">
       <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
-        className="max-w-[69rem] mx-auto  relative z-10"
+        className="max-w-[69rem] px-4 md:px-0 mx-auto relative z-10"
       >
-        <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-24">
+        <div className="flex flex-col lg:flex-row justify-between gap-8 lg:gap-24">
           {/* Left Side: Brand & Socials */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col gap-4 max-w-md"
+            className="flex flex-col gap-5 md:gap-4 max-w-md"
           >
-            <div className="flex flex-col gap-3 select-none">
+            <div className="flex flex-col max-md:items-center gap-2 md:gap-3 select-none">
               <Link href="/" className="group">
                 <motion.span
                   initial="initial"
                   whileInView="visible"
                   whileHover="hover"
                   viewport={{ once: true }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2.5 md:gap-2"
                 >
                   <motion.div
                     variants={{
@@ -153,7 +136,7 @@ const Footer = () => {
                         },
                       },
                     }}
-                    className="relative w-8 h-8"
+                    className="relative w-10 h-10 md:w-8 md:h-8"
                   >
                     <Image
                       src="/logo-heart.svg"
@@ -162,7 +145,7 @@ const Footer = () => {
                       className="object-contain"
                     />
                   </motion.div>
-                  <div className="relative h-6 w-24 md:h-10 md:w-28">
+                  <div className="relative h-12 w-32 md:h-10 md:w-28">
                     <Image
                       src="/logo-text.svg"
                       alt="Sparkeefy Text"
@@ -172,13 +155,13 @@ const Footer = () => {
                   </div>
                 </motion.span>
               </Link>
-              <p className="text-white/80 text-sm font-normal">
+              <p className="text-white/80 text-base md:text-sm font-normal">
                 Helps you keep the spark alive.
               </p>
             </div>
 
             {/* Social Icons */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap max-md:justify-center gap-2 max-md:hidden">
               {socialDatabase.map((item, index) => (
                 <Link
                   key={index}
@@ -197,7 +180,7 @@ const Footer = () => {
             </div>
 
             {/* App Store Buttons */}
-            <div className="flex flex-wrap gap-3 mt-2">
+            <div className="flex flex-wrap gap-3 mt-2 max-md:justify-center max-md:hidden">
               <Link
                 href="#"
                 className="hover:scale-105 transition-all duration-300"
@@ -226,12 +209,12 @@ const Footer = () => {
           {/* Right Side: Navigation */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-wrap gap-12 text-white"
+            className="flex flex-col text-xl md:text-base md:flex-row flex-wrap gap-6 md:gap-12 text-white max-md:items-center mb-4 md:mb-0"
           >
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col max-md:items-center gap-3">
               <Link
                 href="#"
-                className="font-bold hover:text-pink-300 text-white"
+                className="font-semibold md:font-bold hover:text-pink-300 text-white max-md:mb-2"
               >
                 Home
               </Link>
@@ -246,12 +229,12 @@ const Footer = () => {
               </Link>
             </div>
             <div className="flex flex-col gap-3">
-              {/* <Link href="#" className="font-bold">
+              {/* <Link href="#" className="font-semibold md:font-bold">
                 Privacy
               </Link> */}
               <Link
                 href="#"
-                className="font-bold hover:text-pink-300 text-white"
+                className="font-semibold md:font-bold hover:text-pink-300 text-white"
               >
                 About
               </Link>
@@ -259,9 +242,60 @@ const Footer = () => {
             <div className="flex flex-col gap-4 lg:ms-8">
               <Link
                 href="#"
-                className="text-[#FF0080] font-bold hover:text-pink-400"
+                className="text-[#FF0080] font-semibold md:font-bold hover:text-pink-400"
               >
                 Join Waitlist
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* For Mobile */}
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col gap-5 md:gap-4 max-w-md md:hidden"
+          >
+            {/* Social Icons */}
+            <div className="flex flex-wrap max-md:justify-center gap-2">
+              {socialDatabase.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.link}
+                  className={`w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white transition-all duration-300 group ${
+                    item.hoverColor || "hover:bg-white/30"
+                  }`}
+                >
+                  <item.Icon
+                    className={`${
+                      item.iconClass || "w-5 h-5"
+                    } group-hover:scale-110 transition-all duration-300`}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* App Store Buttons */}
+            <div className="flex flex-wrap gap-3 mt-2 max-md:justify-center">
+              <Link
+                href="#"
+                className="hover:scale-105 transition-all duration-300"
+              >
+                <Image
+                  src="/img/app-store.png"
+                  alt="Download on the App Store"
+                  width={145}
+                  height={45}
+                />
+              </Link>
+              <Link
+                href="#"
+                className="hover:scale-105 transition-all duration-300"
+              >
+                <Image
+                  src="/img/google-play.png"
+                  alt="Get it on Google Play"
+                  width={145}
+                  height={45}
+                />
               </Link>
             </div>
           </motion.div>
@@ -271,7 +305,7 @@ const Footer = () => {
       {/* Large Text & Gradient Background */}
       <div
         className={`relative w-full flex justify-center items-end pointer-events-none 
-        ${isTallScreen ? "h-[34rem] -mt-60" : "h-[28rem] -mt-34"}
+        ${isTallScreen ? "h-[38rem] -mt-60" : "h-[20.875rem] md:h-[28rem] -mt-48 md:-mt-34"}
       `}
       >
         {/* Gradient Image */}
@@ -283,11 +317,21 @@ const Footer = () => {
             objectFit="cover"
             objectPosition={`${isTallScreen ? "top" : "bottom"}`}
             priority
+            className="hidden md:block"
+          />
+          <Image
+            src="/img/footer-gradient-bg-mobile.png"
+            alt="Gradient Background"
+            layout="fill"
+            objectFit="cover"
+            objectPosition="top"
+            priority
+            className="md:hidden"
           />
         </div>
 
         {/* Text */}
-        <h1 className="relative z-10 text-[11rem] font-deli text-[rgba(255,255,255,0.12)] tracking-tight -mb-3 leading-none select-none">
+        <h1 className="relative max-md:mb-4 z-10 text-[3.25rem] md:text-[11rem] font-deli text-[rgba(255,255,255,0.12)] md:tracking-tight leading-none select-none">
           #SPARKITUP
         </h1>
       </div>

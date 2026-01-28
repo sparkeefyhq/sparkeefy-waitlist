@@ -22,20 +22,28 @@ const Sparkle = ({ size, className }: { size: number; className?: string }) => (
   </svg>
 );
 
-// Generate random sparkles - mix of left and right, with more on right
+// Generate random sparkles - distributed evenly closer to content
 const generateSparkles = (count: number) => {
   return Array.from({ length: count }).map((_, i) => {
-    // First half biased to left (0-50%), second half biased to right (40-100%)
-    const isRightSide = i >= count / 2;
+    // Stratified vertical positioning
+    const verticalSlotSize = 70 / count; 
+    const topBase = 20 + (i * verticalSlotSize);
+    
+    // Alternating Left/Right
+    const isRightSide = i % 2 === 0;
+
     return {
       id: i,
-      top: `${Math.random() * 100}%`,
+      top: `${topBase + Math.random() * (verticalSlotSize * 0.8)}%`,
+      
+      // Zones closer to content (5-30% and 70-95%)
       left: isRightSide 
-        ? `${40 + Math.random() * 60}%`  // Right side: 40-100%
-        : `${Math.random() * 50}%`,       // Left side: 0-50%
-      size: Math.floor(Math.random() * 12) + 4, // 4px to 16px
-      delay: Math.random() * 8,
-      duration: Math.random() * 6 + 8, // 8s to 14s (very slow)
+        ? `${70 + Math.random() * 25}%` 
+        : `${5 + Math.random() * 25}%`,
+        
+      size: 4 + (i % 3) * 2.5, // Deterministic mix: 4px, 6.5px, 9px
+      delay: Math.random() * 5,
+      duration: Math.random() * 5 + 7, 
     };
   });
 };
@@ -48,7 +56,8 @@ const StarsBackground = () => {
   const y = useTransform(scrollY, [0, 500], [0, 150]); // Stars move slower than scroll
 
   useEffect(() => {
-    setSparkles(generateSparkles(10)); // 5 left, 5 right (more on right visually)
+    // Increased count slightly since visual area is reduced
+    setSparkles(generateSparkles(7)); 
   }, []);
 
   return (
@@ -63,9 +72,12 @@ const StarsBackground = () => {
           style={{
             top: sparkle.top,
             left: sparkle.left,
+            // Back glow effect
+            filter: "drop-shadow(0 0 4px rgba(255, 255, 255, 0.5))"
           }}
           animate={{
-            opacity: [0, 0.8, 0],
+            // Duller max opacity (0.4)
+            opacity: [0, 0.5, 0],
             scale: [0.8, 1, 0.8],
           }}
           transition={{

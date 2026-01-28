@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const bgImages = [
   "/img/about-hero-bg-1.png",
-  "/img/about-hero-bg-1.png", 
-  "/img/about-hero-bg-1.png", 
-  "/img/about-hero-bg-1.png", 
+  "/img/about-hero-bg-2.png", 
+  "/img/about-hero-bg-3.png", 
+  "/img/about-hero-bg-4.png", 
 ];
 
 const tabs = [
@@ -208,7 +208,7 @@ const AboutHero = () => {
                 className="w-full absolute inset-0 flex flex-col justify-center"
               >
                 <div>
-                  <h1 className="text-[2.5rem] font-bold mb-2 leading-tight text-white">
+                  <h1 className="text-5xl font-bold mb-3 leading-[1.15] text-white">
                     {content[activeTab].headline}
                   </h1>
                   <p className="text-xl lg:text-2xl text-white/70 mb-5 font-normal leading-relaxed">
@@ -219,7 +219,7 @@ const AboutHero = () => {
                     {content[activeTab].list.map((item, i) => (
                       <li
                         key={i}
-                        className="flex gap-4 items-start text-base text-white"
+                        className="flex gap-4 items-start text-lg text-white"
                       >
                         <span className="mt-1 flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm [&_svg]:size-3">
                           <svg

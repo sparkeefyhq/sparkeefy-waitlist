@@ -8,7 +8,7 @@ const faqs = [
     question: "Is Sparkeefy only for romantic relationships?",
     answer: (
       <>
-        No. Sparkeefy works for anyone you care about—partners, friends, and
+        No. Sparkeefy works for anyone you care about-partners, friends, and
         family.
         <br /> Anywhere remembering and showing up matters, Sparkeefy fits.
       </>
@@ -19,7 +19,7 @@ const faqs = [
     answer: (
       <>
         Yes. Your data is private by default and never shared.
-        <br /> Sparkeefy is built to support your relationships—not monitor or
+        <br /> Sparkeefy is built to support your relationships-not monitor or
         monetize them.
       </>
     ),
@@ -28,7 +28,7 @@ const faqs = [
     question: "How does Sparkeefy actually work?",
     answer: (
       <>
-        Sparkeefy helps you keep track of important moments and preferences—so
+        Sparkeefy helps you keep track of important moments and preferences-so
         you don&apos;t have to rely on memory alone. When helpful, it offers
         gentle suggestions for replies or plans. You&apos;re always in control.
       </>
@@ -54,18 +54,18 @@ const FAQ = () => {
   };
 
   return (
-    <section className="relative w-full bg-[#010302] select-none">
+    <section className="relative w-full bg-[#010302] select-none py-1 md:py-0">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col lg:flex-row lg:justify-between gap-12 max-w-[69rem] mx-auto">
           {/* Left Side - Title */}
-          <div>
-            <h2 className="text-[2.375rem] font-bold text-white leading-tight relative inline-block">
+          <div className="text-center md:text-start mb-6 md:mb-0">
+            <h2 className="text-4xl md:text-[2.375rem] font-semibold md:font-bold text-white leading-tight relative inline-block">
               <span className="text-[#BDF7F9]">F</span>requently <br />
               <span className="text-[#BDF7F9]">A</span>sked <br />
               <span className="text-[#BDF7F9]">Q</span>uestions
               {/* Underline/Sparkle SVG - User provided */}
               <svg
-                className="absolute -bottom-19  w-[100%] h-auto pointer-events-none"
+                className="absolute md:-bottom-19  w-[100%] h-auto pointer-events-none"
                 viewBox="0 0 245 103"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -109,8 +109,8 @@ const FAQ = () => {
                 className="bg-[rgba(26,25,25,0.60)] rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-white/20 transition-all duration-300"
                 onClick={() => toggleFAQ(index)}
               >
-                <div className="p-6 py-5 flex justify-between items-center bg-[rgba(26,25,25,0.60)] z-10 relative">
-                  <h3 className="text-[1.375rem] font-semibold text-white pr-4">
+                <div className="p-5 md:p-6 py-5 flex justify-between items-center bg-[rgba(26,25,25,0.60)] z-10 relative">
+                  <h3 className="text-xl md:text-[1.375rem] font-medium md:font-semibold text-white pr-4">
                     {faq.question}
                   </h3>
                   {/* Icon Wrapper */}
@@ -145,7 +145,7 @@ const FAQ = () => {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <div className="px-6 pb-6 text-white/80 text-lg leading-tight bg-[rgba(26,25,25,0.60)]">
+                      <div className="px-4 md:px-6 pb-6 text-white/80 text-base md:text-lg leading-tight bg-[rgba(26,25,25,0.60)]">
                         {faq.answer}
                       </div>
                     </motion.div>
