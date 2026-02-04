@@ -82,7 +82,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="snap-y snap-proximity scroll-smooth">
+    <html lang="en" data-theme="dark" className="snap-y snap-proximity scroll-smooth">
       <body className={`${sfProDisplay.variable} ${retroVintage.variable} antialiased overflow-x-hidden`}>
         {children}
       </body>
