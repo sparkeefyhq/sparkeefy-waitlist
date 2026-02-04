@@ -5,7 +5,7 @@ import Image from "next/image";
 import StarsBackground from "@/components/home/StarsBackground";
 import { motion } from "framer-motion";
 
-const PRIVACY_BG = "/img/about-hero-bg-1.png";
+const PRIVACY_BG = "/img/about-hero-bg-2.png";
 
 const privacyPoints = [
   {
