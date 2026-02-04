@@ -158,7 +158,7 @@ const WhoIsSparkeefyFor = () => {
             viewport={{ once: true }}
             className="relative inline-block"
           >
-            <p className="text-2xl md:text-[2rem] font-medium text-white">
+            <p className="text-xl md:text-[2rem] font-medium text-white">
               Some sparks are{" "}
               <span className="relative inline-block">
                 <span className="relative inline-block">

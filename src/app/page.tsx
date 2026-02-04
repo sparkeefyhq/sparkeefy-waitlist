@@ -10,11 +10,11 @@ import Footer from "@/components/home/Footer";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-dvh flex-col">
       <Navbar />
       
       {/* Sticky Hero */}
-      <section className="sticky top-0 h-screen z-0 w-full">
+      <section className="sticky top-0 h-dvh z-0 w-full">
         <Hero />
       </section>
 

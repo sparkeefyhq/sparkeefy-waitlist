@@ -161,7 +161,7 @@ const Footer = () => {
             </div>
 
             {/* Social Icons */}
-            <div className="flex flex-wrap max-md:justify-center gap-2 max-md:hidden">
+            {/* <div className="flex flex-wrap max-md:justify-center gap-2 max-md:hidden">
               {socialDatabase.map((item, index) => (
                 <Link
                   key={index}
@@ -177,7 +177,7 @@ const Footer = () => {
                   />
                 </Link>
               ))}
-            </div>
+            </div> */}
 
             {/* App Store Buttons */}
             <div className="flex flex-wrap gap-3 mt-2 max-md:justify-center max-md:hidden">
@@ -241,7 +241,7 @@ const Footer = () => {
             </div>
             <div className="flex flex-col gap-4 lg:ms-8">
               <Link
-                href="#"
+                href="/join"
                 className="text-[#FF0080] font-semibold md:font-bold hover:text-pink-400"
               >
                 Join Waitlist
@@ -255,7 +255,7 @@ const Footer = () => {
             className="flex flex-col gap-5 md:gap-4 max-w-md md:hidden"
           >
             {/* Social Icons */}
-            <div className="flex flex-wrap max-md:justify-center gap-2">
+            {/* <div className="flex flex-wrap max-md:justify-center gap-2">
               {socialDatabase.map((item, index) => (
                 <Link
                   key={index}
@@ -271,7 +271,7 @@ const Footer = () => {
                   />
                 </Link>
               ))}
-            </div>
+            </div> */}
 
             {/* App Store Buttons */}
             <div className="flex flex-wrap gap-3 mt-2 max-md:justify-center">

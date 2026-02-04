@@ -5,8 +5,8 @@ import StarsBackground from "@/components/home/StarsBackground";
 import { motion, AnimatePresence } from "framer-motion";
 
 const bgImages = [
-  "/img/about-hero-bg-1.png",
-  "/img/about-hero-bg-2.png", 
+  "/img/about-hero-bg-2.png",
+  "/img/about-hero-bg-1.png", 
   "/img/about-hero-bg-3.png", 
   "/img/about-hero-bg-4.png", 
 ];
@@ -21,7 +21,7 @@ const tabs = [
         <strong>{" "}effortlessly</strong>
       </>
     ),
-    color: "#00C4CC", // Cyan
+    color: "#DE0371", // Pink
   },
   {
     id: 1,
@@ -31,7 +31,8 @@ const tabs = [
         <br /> when it matters
       </>
     ),
-    color: "#DE0371", // Pink
+    color: "#00C4CC", // Cyan
+
   },
   {
     id: 2,
@@ -65,7 +66,7 @@ const content = [
       "Designed to work quietly in the background, with notifications only when they matter.",
       "Gentle reminders help meaningful moments from slipping away.",
     ],
-    image: "/img/about-1.png",
+    image: "/img/feature-card-img-1.png",
   },
   {
     id: 1,
@@ -76,7 +77,7 @@ const content = [
       "Support for difficult conversations.",
       "Never miss a chance to reach out.",
     ],
-    image: "/img/about-2.png",
+    image: "/img/feature-card-img-2.png",
   },
   {
     id: 2,
@@ -87,7 +88,7 @@ const content = [
       "Planning tools that take the stress out.",
       "Memories that last a lifetime.",
     ],
-    image: "/img/about-3.png",
+    image: "/img/feature-card-img-3.png",
   },
   {
     id: 3,
@@ -98,7 +99,7 @@ const content = [
       "Reminders for key gifting occasions.",
       "Track what you've given to avoid repeats.",
     ],
-    image: "/img/about-4.png",
+    image: "/img/feature-card-img-4.png",
   },
 ];
 
@@ -157,7 +158,7 @@ const AboutHero = () => {
   };
 
   return (
-    <div className="w-full bg-[#010302] text-white relative h-screen flex flex-col justify-between overflow-hidden px-6 lg:px-12">
+    <div className="max-md:hidden w-full bg-[#010302] text-white relative h-dvh flex flex-col justify-between overflow-hidden px-6 lg:px-12">
       {/* Background Images with Crossfade */}
       <div 
         className="absolute top-[48%] -left-[29%] right-0 h-full -translate-y-1/2 z-0 pointer-events-none"
