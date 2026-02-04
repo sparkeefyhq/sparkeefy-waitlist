@@ -162,14 +162,16 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button
-              size="sm"
-              className={`rounded-full bg-[#FF4AA5] hover:bg-pink-500 font-semibold text-sm px-4 py-1 shadow-lg shadow-pink-500/25 transition-all hover:shadow-pink-500/40 select-none
+            <Link href="/join">
+              <Button
+                size="sm"
+                className={`rounded-full bg-[#FF4AA5] hover:bg-pink-500 font-semibold text-sm px-4 py-1 shadow-lg shadow-pink-500/25 transition-all hover:shadow-pink-500/40 select-none
                 ${!isScrolled ? "text-black" : "text-white"}
               `}
-            >
-              Get Early Access
-            </Button>
+              >
+                Get Early Access
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu */}
@@ -264,12 +266,14 @@ const Navbar = () => {
                           ease: "linear",
                         }}
                       />
-                      <Button
-                        size="lg"
-                        className="relative w-full rounded-full bg-[linear-gradient(90deg,_rgba(60,_11,_36,_0.90)_0%,_rgba(0,_0,_0,_0.90)_100%)] backdrop-blur-lg text-base text-white font-medium"
-                      >
-                        Get Early Access
-                      </Button>
+                      <Link href="/join" className="relative w-full">
+                        <Button
+                          size="lg"
+                          className="relative w-full rounded-full bg-[linear-gradient(90deg,_rgba(60,_11,_36,_0.90)_0%,_rgba(0,_0,_0,_0.90)_100%)] backdrop-blur-lg text-base text-white font-medium"
+                        >
+                          Get Early Access
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

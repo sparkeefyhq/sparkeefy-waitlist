@@ -1,6 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Force light mode regardless of system preference */
+:root {
+  color-scheme: dark only;
+}
+
+/* Autofill override for dark inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: white !important;
+  caret-color: white !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
 /* Deli Font */
 @font-face {
   font-family: 'Deli';

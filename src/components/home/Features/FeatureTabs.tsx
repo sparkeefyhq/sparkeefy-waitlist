@@ -154,7 +154,7 @@ export const FeatureTabs = () => {
 
         {/* Cards Stack Container */}
         <div className="px-4 md:px-0">
-          <div className="max-w-7xl mx-auto relative h-[27.375rem] md:h-[29rem]">
+          <div className="max-w-7xl mx-auto relative h-[32.375rem] md:h-[29rem]">
             {featureCards.map((card, index) => (
               <FeatureCard
                 key={card.id}
