@@ -72,6 +72,7 @@ const CTA = () => {
                 hover: { scale: 1.05 },
                 tap: { scale: 0.95 }
               }}
+              onClick={() => window.open("/join")}
               className="w-full md:w-auto bg-white text-black text-lg font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
             >
               Get Early Access
