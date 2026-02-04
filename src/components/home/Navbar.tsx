@@ -115,7 +115,7 @@ const Navbar = () => {
                   className="object-contain"
                 />
               </motion.div>
-              <div className="relative h-10 w-28">
+              <div className="relative h-10 w-26 translate-y-1">
                 <Image
                   src="/logo-text.svg"
                   alt="Sparkeefy Text"
