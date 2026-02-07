@@ -2552,10 +2552,15 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL PRIVILEGES ON DATABASE sparkeefy_waitlist TO postgres;
 ALTER DATABASE sparkeefy_waitlist OWNER TO postgres;
 
+CREATE DATABASE sparkeefy_waitlist;
+
 # If you created a custom user (e.g., 'sparkeefy')
 GRANT ALL ON SCHEMA public TO sparkeefy;
 GRANT ALL PRIVILEGES ON DATABASE sparkeefy_waitlist TO sparkeefy;
 ALTER DATABASE sparkeefy_waitlist OWNER TO sparkeefy;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO sparkeefy;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO sparkeefy;
 
 # Grant usage on public schema
 GRANT USAGE, CREATE ON SCHEMA public TO postgres;
