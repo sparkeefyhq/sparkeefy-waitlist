@@ -33,9 +33,6 @@ const prisma = new PrismaClient({
   log: [
     { level: "error", emit: "event" },
     { level: "warn", emit: "event" },
-    process.env.NODE_ENV === "development"
-      ? { level: "query", emit: "event" }
-      : { level: "query", emit: "event" },
   ],
   datasources: {
     db: {
