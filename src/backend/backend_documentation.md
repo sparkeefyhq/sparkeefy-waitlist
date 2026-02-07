@@ -3,7 +3,7 @@
 **Version:** 1.0  
 **Environment:** Node.js 20  
 **Framework:** tRPC + Express  
-**Database:** PostgreSQL/MySQL  
+**Database:** Supabase (postgresql hosted)  
 **Real-time Transport:** SSE (Server-Sent Events)  
 **Observability:** Winston + Sentry  
 **Last Updated:** January 2026
@@ -1895,7 +1895,7 @@ throw new TRPCError({
 
 ### Database Error Mapping
 
-Common PostgreSQL/MySQL error codes mapped to user-friendly messages:
+Common Supabase (postgresql hosted) error codes mapped to user-friendly messages:
 
 | Database Error Code | Meaning | tRPC Error | Message |
 |-------------------|---------|-----------|---------|
