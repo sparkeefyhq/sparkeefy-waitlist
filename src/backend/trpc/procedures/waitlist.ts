@@ -100,7 +100,7 @@ const joinWaitlistInput = z.object({
  * Slack Access Survey Input Schema
  */
 const slackAccessInput = z.object({
-  q1Answer: z.enum(["A", "B", "C", "D"]),
+  q1Answer: z.enum(["A", "B", "C", "D"]), // todo: update with actual options
   q2Answer: z.string().min(10, "Answer must be at least 10 characters").max(2000),
 });
 
