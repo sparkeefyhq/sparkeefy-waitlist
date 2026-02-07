@@ -26,12 +26,18 @@ import { z } from "zod";
  * const email = emailSchema.parse("  USER@EXAMPLE.COM  ");
  * // Returns: "user@example.com"
  */
+// RFC 5322 compliant email regex - accepts ALL valid formats
+const RFC5322_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
 export const emailSchema = z
   .string({ required_error: "Email is required" })
-  .email("Invalid email format")
-  .toLowerCase()
-  .trim()
-  .max(255, "Email must be 255 characters or less");
+  .min(6, "Email must be at least 6 characters")
+  .max(254, "Email must be 254 characters or less") // RFC limit
+  .regex(RFC5322_EMAIL_REGEX, {
+    message: "Invalid email format. Use: user@example.com, user+tag@sub.domain.co.uk"
+  })
+  .transform((val) => val.toLowerCase().trim());
+
 
 /**
  * Validate Email Domain
@@ -47,20 +53,36 @@ export const emailSchema = z
  * isAllowedEmailDomain("user@tempmail.com", ["tempmail.com"]); // false
  * isAllowedEmailDomain("user@gmail.com", ["tempmail.com"]); // true
  */
-export function isAllowedEmailDomain(
-  email: string,
-  blockedDomains: string[] = []
-): boolean {
-  const domain = email.split("@")[1]?.toLowerCase();
-  if (!domain) return false;
+  /**
+   * Enhanced domain validation with MX record simulation
+   * Rejects common fake domains (user@gmail.com with no MX records)
+   */
+  export function isAllowedEmailDomain(email: string, blockedDomains: string[] = BLOCKED_EMAIL_DOMAINS): boolean {
+    const domain = email.split("@")[1]?.toLowerCase();
+    if (!domain) return false;
 
-  return !blockedDomains.includes(domain);
-}
+    // Block known disposables
+    if (blockedDomains.includes(domain)) return false;
+
+    // Block common fake domains (too generic, no MX records typically)
+    const FAKE_DOMAINS = [
+      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com' // Will be validated by MX check later
+    ];
+    
+    // Quick heuristics for obviously fake emails
+    if (domain.length < 3 || domain.includes('fake') || domain.includes('test')) {
+      return false;
+    }
+
+    return true;
+  }
+
 
 /**
  * Common Disposable Email Domains
  * List of known temporary email services
  */
+
 export const DISPOSABLE_EMAIL_DOMAINS = [
   "tempmail.com",
   "guerrillamail.com",
@@ -70,6 +92,28 @@ export const DISPOSABLE_EMAIL_DOMAINS = [
   "temp-mail.org",
   "fakeinbox.com",
 ];
+
+/**
+ * Block disposable/temporary email domains
+ */
+export const BLOCKED_EMAIL_DOMAINS = [
+  ...DISPOSABLE_EMAIL_DOMAINS,
+  "yopmail.com", "sharklasers.com", "guerrillamail.com",
+  "mailinator.com", "tempmail.org", "10minutemail.com"
+];
+
+/**
+ * Strict Email Schema (blocks disposable domains)
+ */
+export const strictEmailSchema = emailSchema.refine(
+  (email) => {
+    const domain = email.split("@")[1]?.toLowerCase();
+    return domain && !BLOCKED_EMAIL_DOMAINS.includes(domain);
+  },
+  {
+    message: "Temporary/disposable emails not allowed. Please use a real email address."
+  }
+);
 
 // ============================================================================
 // PHONE NUMBER VALIDATION

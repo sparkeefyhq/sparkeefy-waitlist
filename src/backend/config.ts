@@ -27,7 +27,7 @@ const envSchema = z.object({
   PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("3000"),
 
   // Database Configuration
-  // DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().url(),
 
   // // Frontend Configuration
   // FRONTEND_URL: z.string().url(),

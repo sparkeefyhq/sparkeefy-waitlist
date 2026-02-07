@@ -17,7 +17,7 @@ services:
 volumes:
   postgres_data:
 
-# # Start PostgreSQL
+# # Start Supabase (postgresql hosted)
 # docker-compose up -d
 
 # # Check status
