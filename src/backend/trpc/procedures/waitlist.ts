@@ -97,6 +97,15 @@ const joinWaitlistInput = z.object({
 });
 
 /**
+ * Slack Access Survey Input Schema
+ */
+const slackAccessInput = z.object({
+  q1Answer: z.enum(["A", "B", "C", "D"]),
+  q2Answer: z.string().min(10, "Answer must be at least 10 characters").max(2000),
+});
+
+
+/**
  * Get My Stats Input Schema
  * No parameters required (authenticated via session)
  */
@@ -871,6 +880,46 @@ const authenticateWithMagicLink = publicProcedure
     }
   });
 
+// ============================================================================
+// PROCEDURE 5: waitlist.slackAccess
+// Submit Slack Access Survey (protected)
+// ============================================================================
+const slackAccess = protectedProcedure
+  .input(slackAccessInput)
+  .mutation(async ({ input, ctx }) => {
+    const requestId = ctx.requestId as string;
+    const userId = ctx.user!.id;
+    
+    logger.info("Slack access survey submission", { 
+      userId, 
+      q1Answer: input.q1Answer,
+      requestId 
+    });
+    
+    const waitlistService = new WaitlistService(db);
+    
+    const result = await waitlistService.submitSlackAccess(userId, input);
+    
+    logger.info("Slack survey processed", { userId, requestId });
+    
+    return result;
+  });
+
+/**
+ * PROCEDURE 6: waitlist.getSlackAccessStatus
+ * Get Slack Access Survey Status (protected)
+ */
+const getSlackAccessStatus = protectedProcedure
+  .query(async ({ ctx }) => {
+    const requestId = ctx.requestId as string;
+    const userId = ctx.user!.id;
+    
+    logger.debug("Getting Slack survey status", { userId, requestId });
+    
+    const waitlistService = new WaitlistService(db);
+    
+    return await waitlistService.getSlackAccessStatus(userId);
+  });
 
 // ============================================================================
 // EXPORT WAITLIST ROUTER
@@ -885,7 +934,10 @@ export const waitlistRouter = router({
   getMyStats,
   validateReferralCode,
   authenticateWithMagicLink,
+  slackAccess,
+  getSlackAccessStatus,
 });
+
 
 // Type export for frontend type-safety
 export type WaitlistRouter = typeof waitlistRouter;
