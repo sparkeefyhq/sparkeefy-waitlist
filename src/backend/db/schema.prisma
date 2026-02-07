@@ -14,7 +14,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // or "mysql"
+  provider = "postgresql" // Supabase (postgresql hosted)
   url      = env("DATABASE_URL")
 }
 

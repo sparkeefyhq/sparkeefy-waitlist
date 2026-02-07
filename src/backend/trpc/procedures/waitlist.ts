@@ -29,7 +29,8 @@ import type {
   ReferralCodeValidationResponse 
 } from "../../types/index";
 import { router, publicProcedure } from '../base.js';
-
+import { emailService } from "../../services/EmailService.js";
+import { BLOCKED_EMAIL_DOMAINS, strictEmailSchema, isAllowedEmailDomain } from "@/backend/utils/validators";
 
 // ============================================================================
 // INPUT VALIDATION SCHEMAS
@@ -43,12 +44,13 @@ const rateLimitedProcedure = publicProcedure.use(rateLimit);
  * Validates all inputs for waitlist.join procedure
  */
 const joinWaitlistInput = z.object({
-  email: z
-    .string({ required_error: "Email is required" })
-    .email("Invalid email format")
-    .toLowerCase()
-    .trim()
-    .max(255, "Email must be 255 characters or less"),
+  // email: z
+  //   .string({ required_error: "Email is required" })
+  //   .email("Invalid email format")
+  //   .toLowerCase()
+  //   .trim()
+  //   .max(255, "Email must be 255 characters or less"),
+  email: strictEmailSchema, // Uses RFC5322 + blocks disposables
 
   username: z
     .string()
@@ -172,6 +174,21 @@ const join = rateLimitedProcedure
 
       // Step 1: Check if email already exists
       const existingUser = await waitlistService.findUserByEmail(input.email);
+      
+      // ✅ VALIDATE REAL EMAIL (catches gmail.com with no MX records)
+      if (!isAllowedEmailDomain(input.email, BLOCKED_EMAIL_DOMAINS)) {
+        logger.warn("Disposable email blocked", {
+          email: input.email.substring(0, 5) + "***",
+          domain: input.email.split("@")[1],
+          requestId,
+        });
+        
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Please use a real email address (no temporary/disposable emails)",
+        });
+      }
+
 
       let user;
       let newReferralCreated = false;
@@ -343,8 +360,32 @@ const join = rateLimitedProcedure
             hasMarketing: input.marketingOptIn,
             requestId,
           });
+          
+          try {
+            const { emailService } = await import("../../services/EmailService.js");
+            
+            await emailService.sendMagicLinkEmail({
+              email: user.email,
+              magicLinkUrl: buildMagicLinkUrl(user.magicLinkToken),
+              referralCode: user.referralCode,
+              referralLink: buildReferralLink(user.referralCode),
+            });
 
-
+            logger.info("Magic link email sent successfully", {
+              userId: user.id,
+              email: input.email.substring(0, 5) + "***",
+              requestId,
+            });
+          } catch (emailError) {
+            // Log error but don't fail the signup
+            logger.error("Failed to send magic link email", {
+              error: emailError instanceof Error ? emailError.message : String(emailError),
+              userId: user.id,
+              email: input.email.substring(0, 5) + "***",
+              requestId,
+            });
+          }
+          
           // If referral code provided, create referral relationship
           if (input.referralCode) {
             try {
