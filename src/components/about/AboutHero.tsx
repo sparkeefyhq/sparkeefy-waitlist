@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const bgImages = [
   "/img/about-hero-bg-2.png",
-  "/img/about-hero-bg-1.png", 
-  "/img/about-hero-bg-3.png", 
-  "/img/about-hero-bg-4.png", 
+  "/img/about-hero-bg-1.png",
+  "/img/about-hero-bg-3.png",
+  "/img/about-hero-bg-4.png",
 ];
 
 const tabs = [
@@ -17,11 +17,10 @@ const tabs = [
     title: (
       <>
         Remember what
-        <br /> matters,
-        <strong>{" "}effortlessly</strong>
+        <br /> matters, effortlessly
       </>
     ),
-    color: "#DE0371", // Pink
+    color: "#FF0080", // Synchronized with Stay Thoughtful
   },
   {
     id: 1,
@@ -31,18 +30,17 @@ const tabs = [
         <br /> when it matters
       </>
     ),
-    color: "#00C4CC", // Cyan
-
+    color: "#06B0B7", // Synchronized with Say it better
   },
   {
     id: 2,
     title: (
       <>
-        Dates that don&apos;t
-        <br /> feel generic
+        Plan moments
+        <br /> without the stress
       </>
     ),
-    color: "#955BF0", // Purple
+    color: "#955BF0", // Synchronized with Plan with ease
   },
   {
     id: 3,
@@ -52,14 +50,17 @@ const tabs = [
         <br /> feel personal
       </>
     ),
-    color: "#F7C96B", // Orange
+    color: "#FEBF67", // Synchronized with Gift thoughtfully
   },
 ];
 
 const content = [
   {
     id: 0,
-    headline: "Remember what matters, effortlessly",
+    title: "Remember what matters,",
+    subtitle: "effortlessly",
+    accentColor: "#FF0080",
+    gradientStartColor: "#FFB3D9",
     subheadline: "So the people you care about feel genuinely cared for.",
     list: [
       "Important dates, preferences, and moments saved in one private place",
@@ -70,7 +71,10 @@ const content = [
   },
   {
     id: 1,
-    headline: "Know what to say, when it matters",
+    title: "Know what to say,",
+    subtitle: "when it matters",
+    accentColor: "#06B0B7",
+    gradientStartColor: "#99F6E4",
     subheadline: "Helping you find the right words.",
     list: [
       "Suggestions for messages that sound like you.",
@@ -81,7 +85,10 @@ const content = [
   },
   {
     id: 2,
-    headline: "Dates that don't feel generic",
+    title: "Plan moments",
+    subtitle: "without the stress",
+    accentColor: "#955BF0",
+    gradientStartColor: "#E9D5FF",
     subheadline: "Plan moments that are truly special.",
     list: [
       "Tailored date ideas based on shared interests.",
@@ -92,7 +99,10 @@ const content = [
   },
   {
     id: 3,
-    headline: "Give gifts that feel personal",
+    title: "Give gifts that",
+    subtitle: "feel personal",
+    accentColor: "#FEBF67",
+    gradientStartColor: "#FDE68A",
     subheadline: "Thoughtful gifting made simple.",
     list: [
       "Gift ideas inspired by past conversations.",
@@ -160,29 +170,26 @@ const AboutHero = () => {
   return (
     <div className="max-md:hidden w-full bg-[#010302] text-white relative h-dvh flex flex-col justify-between overflow-hidden px-6 lg:px-12">
       {/* Background Images with Crossfade */}
-      <div 
-        className="absolute top-[48%] -left-[29%] right-0 h-full -translate-y-1/2 z-0 pointer-events-none"
-        
-      >
+      <div className="absolute top-[48%] -left-[29%] right-0 h-full -translate-y-1/2 z-0 pointer-events-none">
         <AnimatePresence mode="popLayout">
-           <motion.div
-             key={activeTab}
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             transition={{ duration: 1 }}
-             className="absolute inset-0 w-full h-full"
-           >
-             <Image
-               src={bgImages[activeTab]}
-               alt="Background"
-               fill
-               className="object-contain" 
-               priority
-             />
-           </motion.div>
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+            className="absolute inset-0 w-full h-full"
+          >
+            <Image
+              src={bgImages[activeTab]}
+              alt="Background"
+              fill
+              className="object-contain"
+              priority
+            />
+          </motion.div>
         </AnimatePresence>
-        
+
         {/* Gradient Overlay for Readability */}
         {/* <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80" /> */}
       </div>
@@ -210,7 +217,16 @@ const AboutHero = () => {
               >
                 <div>
                   <h1 className="text-5xl font-bold mb-3 leading-[1.15] text-white">
-                    {content[activeTab].headline}
+                    {content[activeTab].title}
+                    <br />
+                    <span 
+                      className="bg-clip-text text-transparent"
+                      style={{ 
+                        backgroundImage: `linear-gradient(90deg, ${content[activeTab].gradientStartColor} 0%, #FFFFFF 100%)`
+                      }}
+                    >
+                      {content[activeTab].subtitle}
+                    </span>
                   </h1>
                   <p className="text-xl lg:text-2xl text-white/70 mb-5 font-normal leading-relaxed">
                     {content[activeTab].subheadline}
@@ -317,7 +333,7 @@ const AboutHero = () => {
                   className="absolute top-0 left-0 w-full bg-current z-0"
                   variants={{
                     idle: { height: "0%" },
-                    active: { height: "100%" }
+                    active: { height: "100%" },
                   }}
                   style={{ backgroundColor: tab.color }}
                   transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
