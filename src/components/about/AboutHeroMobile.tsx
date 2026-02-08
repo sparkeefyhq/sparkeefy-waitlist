@@ -12,16 +12,19 @@ const bgImages = [
 ];
 
 const tabs = [
-  { id: 0, color: "#DE0371" },
-  { id: 1, color: "#00C4CC" },
-  { id: 2, color: "#955BF0" },
-  { id: 3, color: "#F7C96B" },
+  { id: 0, color: "#FF0080" }, // Synchronized with Stay Thoughtful
+  { id: 1, color: "#06B0B7" }, // Synchronized with Say it better
+  { id: 2, color: "#955BF0" }, // Synchronized with Plan with ease
+  { id: 3, color: "#FEBF67" }, // Synchronized with Gift thoughtfully
 ];
 
 const content = [
   {
     id: 0,
-    headline: "Remember what matters, effortlessly",
+    title: "Remember what matters,",
+    subtitle: "effortlessly",
+    accentColor: "#FF0080",
+    gradientStartColor: "#FFB3D9",
     subheadline: "So the people you care about feel genuinely cared for.",
     list: [
       "Important dates, preferences, and moments saved in one private place",
@@ -32,7 +35,10 @@ const content = [
   },
   {
     id: 1,
-    headline: "Know what to say, when it matters",
+    title: "Know what to say,",
+    subtitle: "when it matters",
+    accentColor: "#06B0B7",
+    gradientStartColor: "#99F6E4",
     subheadline: "Helping you find the right words.",
     list: [
       "Suggestions for messages that sound like you.",
@@ -43,7 +49,10 @@ const content = [
   },
   {
     id: 2,
-    headline: "Dates that don't feel generic",
+    title: "Plan moments",
+    subtitle: "without the stress",
+    accentColor: "#955BF0",
+    gradientStartColor: "#E9D5FF",
     subheadline: "Plan moments that are truly special.",
     list: [
       "Tailored date ideas based on shared interests.",
@@ -54,7 +63,10 @@ const content = [
   },
   {
     id: 3,
-    headline: "Give gifts that feel personal",
+    title: "Give gifts that",
+    subtitle: "feel personal",
+    accentColor: "#FEBF67",
+    gradientStartColor: "#FDE68A",
     subheadline: "Thoughtful gifting made simple.",
     list: [
       "Gift ideas inspired by past conversations.",
@@ -225,7 +237,16 @@ export const AboutHeroMobile = () => {
               >
                 <div className="pr-4">
                   <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight text-white drop-shadow-lg">
-                    {content[activeTab].headline}
+                    {content[activeTab].title}
+                    <br />
+                    <span 
+                      className="bg-clip-text text-transparent"
+                      style={{ 
+                        backgroundImage: `linear-gradient(90deg, ${content[activeTab].gradientStartColor} 0%, #FFFFFF 100%)`
+                      }}
+                    >
+                      {content[activeTab].subtitle}
+                    </span>
                   </h1>
                   <p className="text-lg text-white/80 mb-5 font-medium leading-relaxed max-w-lg">
                     {content[activeTab].subheadline}
