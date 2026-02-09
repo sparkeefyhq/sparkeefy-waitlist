@@ -25,35 +25,37 @@ datasource db {
 /// Central user registry storing all waitlist entries, referral codes, and session tokens
 model WaitlistUser {
   // Primary Key
-  id                String   @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
   // User Information
-  email             String   @unique @db.VarChar(255)
-  username          String?  @db.VarChar(100)
-  firstName         String?  @map("first_name") @db.VarChar(100)
-  lastName          String?  @map("last_name") @db.VarChar(100)
-  phoneNumber       String?  @map("phone_number") @db.VarChar(20)
-  marketingOptIn    Boolean  @default(false) @map("marketing_opt_in")
-  additionalRemarks String?  @map("additional_remarks") @db.Text
+  email             String  @unique @db.VarChar(255)
+  username          String? @db.VarChar(100)
+  firstName         String? @map("first_name") @db.VarChar(100)
+  lastName          String? @map("last_name") @db.VarChar(100)
+  phoneNumber       String? @map("phone_number") @db.VarChar(20)
+  marketingOptIn    Boolean @default(false) @map("marketing_opt_in")
+  additionalRemarks String? @map("additional_remarks") @db.Text
 
   // Referral System
-  referralCode      String   @unique @map("referral_code") @db.VarChar(8)
+  referralCode String @unique @map("referral_code") @db.VarChar(8)
 
   // Session Management
-  sessionToken      String   @unique @map("session_token") @db.VarChar(64)
-  sessionExpiresAt  DateTime @map("session_expires_at")
+  sessionToken     String   @unique @map("session_token") @db.VarChar(64)
+  sessionExpiresAt DateTime @map("session_expires_at")
 
   // Timestamps
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relationships
   referralsGiven    Referral[] @relation("ReferralsGiven")
   referralsReceived Referral[] @relation("ReferralsReceived")
 
   // Magic Link Authentication
-  magicLinkToken    String   @unique @map("magic_link_token") @db.VarChar(64)
-  
+  magicLinkToken String @unique @map("magic_link_token") @db.VarChar(64)
+
+  slackAccessSurvey SlackAccessSurvey? @relation("SlackAccessSurvey_User")
+
   @@index([email])
   @@index([referralCode])
   @@index([sessionToken])
@@ -68,21 +70,46 @@ model WaitlistUser {
 /// Tracks referrer-referee relationships for referral counting and analytics
 model Referral {
   // Primary Key
-  id          String   @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
   // Referral Relationship
-  referrerId  String   @map("referrer_id") @db.Uuid
-  refereeId   String   @map("referee_id") @db.Uuid
+  referrerId String @map("referrer_id") @db.Uuid
+  refereeId  String @map("referee_id") @db.Uuid
 
   // Timestamp
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relationships
-  referrer    WaitlistUser @relation("ReferralsGiven", fields: [referrerId], references: [id], onDelete: Cascade)
-  referee     WaitlistUser @relation("ReferralsReceived", fields: [refereeId], references: [id], onDelete: Cascade)
+  referrer WaitlistUser @relation("ReferralsGiven", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee  WaitlistUser @relation("ReferralsReceived", fields: [refereeId], references: [id], onDelete: Cascade)
 
   @@unique([referrerId, refereeId], name: "unique_referral")
   @@index([referrerId])
   @@index([refereeId])
   @@map("referrals")
+}
+
+// ============================================================================
+// SLACK ACCESS SURVEY
+// ============================================================================
+
+/// Stores optional Slack access survey responses.
+/// One response per user (optional feature).
+model SlackAccessSurvey {
+  // Primary Key (links to WaitlistUser)
+  userId String @id @db.Uuid
+
+  // Survey Questions
+  q1Answer String  @db.VarChar(1) // "A", "B", "C", "D" (MCQ) // TODO: Replace with actual question options
+  q2Answer String? @db.Text // Long text response
+
+  // Timestamps
+  submittedAt DateTime @default(now()) @map("submitted_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationship (one-to-one with WaitlistUser)
+  user WaitlistUser @relation("SlackAccessSurvey_User", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId]) // One survey per user
+  @@map("slack_access_surveys")
 }
