@@ -116,7 +116,6 @@ export async function disconnectDatabase(): Promise<void> {
  */
 export class DatabaseClient {
   private prisma: PrismaClient;
-  waitlistUser: any;
 
   constructor(prismaClient: PrismaClient = prisma) {
     this.prisma = prismaClient;
@@ -168,9 +167,10 @@ export class DatabaseClient {
    */
     async findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null> {
       try {
-        return await prisma.waitlistUser.findUnique({
+        return await this.prisma.waitlistUser.findUnique({
           where: { magicLinkToken: token },
-        });
+        }) as WaitlistUser | null;
+
       } catch (error) {
         logger.error("Database error: findUserByMagicLinkToken", { 
           error, 
@@ -200,9 +200,9 @@ export class DatabaseClient {
    */
   async findUserById(userId: string): Promise<WaitlistUser | null> {
     try {
-      return await prisma.waitlistUser.findUnique({
+      return await this.prisma.waitlistUser.findUnique({
         where: { id: userId },
-      });
+      }) as WaitlistUser | null;
     } catch (error) {
       logger.error("Database error: findUserById", { error, userId });
       throw error;
@@ -337,6 +337,33 @@ export class DatabaseClient {
       orderBy: { createdAt: "asc" },
     }) as Referral[];
   }
+
+  /**
+ * Submit Slack Access Survey
+ */
+async submitSlackAccessSurvey(
+  userId: string,
+  data: { q1Answer: string; q2Answer?: string }
+): Promise<any> {
+  return await this.prisma.slackAccessSurvey.upsert({
+    where: { userId },
+    update: data,
+    create: {
+      userId,
+      q1Answer: data.q1Answer,
+      q2Answer: data.q2Answer || null,
+    },
+  });
+}
+
+/**
+ * Get Slack Access Survey
+ */
+async getSlackAccessSurvey(userId: string): Promise<any | null> {
+  return await this.prisma.slackAccessSurvey.findUnique({
+    where: { userId },
+  });
+}
 
   // ==========================================================================
   // HEALTH CHECK

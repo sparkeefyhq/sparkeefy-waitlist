@@ -13,7 +13,9 @@ import type {
   WaitlistUser, 
   CreateUserInput, 
   JoinWaitlistInput,
-  UserStatsResponse 
+  UserStatsResponse, 
+  SlackAccessResponse,
+  SlackAccessInput
 } from "../types";
 import { db } from "../db/client";
 import { logger } from "../logging/logger";
@@ -50,6 +52,8 @@ export interface DatabaseClient {
   createUser(data: CreateUserInput): Promise<WaitlistUser>;
   updateUser(id: string, data: Partial<WaitlistUser>): Promise<WaitlistUser>;
   countUserReferrals(userId: string): Promise<number>;
+  submitSlackAccessSurvey(userId: string, data: { q1Answer: string; q2Answer?: string }): Promise<any>;
+  getSlackAccessSurvey(userId: string): Promise<any | null>;
 }
 
 // ============================================================================
@@ -332,7 +336,7 @@ export class WaitlistService {
           email: user.email,
           username: user.username,
           referralCode: user.referralCode,
-          createdAt: user.createdAt.toISOString(),  // ✅ Convert to string
+          createdAt: user.createdAt.toISOString(),  // Convert to string
         },
         referralStats: {
           actualReferralCount,
@@ -340,7 +344,7 @@ export class WaitlistService {
           tier,
           tierLabel: tierInfo.label,
           tierDescription: tierInfo.description,
-          nextTierAt: nextTierAt ?? undefined,  // ✅ Convert null to undefined
+          nextTierAt: nextTierAt ?? undefined,  // Convert null to undefined
         },
         referralLink,
       };
@@ -459,7 +463,7 @@ export class WaitlistService {
         return null;
       }
 
-      // ✅ FIXED: Call the proper db method
+      // Call the proper db method
       return await this.db.findUserByMagicLinkToken(magicLinkToken);
     } catch (error) {
       logger.error("Error finding user by magic link token", { 
@@ -592,6 +596,72 @@ export class WaitlistService {
     } catch (error) {
       logger.error("Error checking referral code existence", { error, code });
       return false;
+    }
+  }
+  
+  /**
+   * Submit Slack Access Survey
+   * 
+   * @param userId - Authenticated user ID
+   * @param input - Survey answers
+   * @returns SlackAccessResponse
+   */
+  async submitSlackAccess(userId: string, input: SlackAccessInput): Promise<SlackAccessResponse> {
+    try {
+      logger.info("Submitting Slack access survey", { userId });
+      
+      const survey = await this.db.submitSlackAccessSurvey(userId, {
+        q1Answer: input.q1Answer,
+        q2Answer: input.q2Answer,
+      });
+
+      logger.info("Slack survey submitted", { userId, q1Answer: input.q1Answer });
+      
+      return {
+        success: true,
+        submitted: true,
+        q1Answer: survey.q1Answer,
+        q2Answer: survey.q2Answer || undefined,
+        submittedAt: survey.submittedAt.toISOString(),
+        message: "Slack access survey submitted successfully!",
+      };
+    } catch (error) {
+      logger.error("Error submitting Slack survey", { error, userId });
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to submit survey",
+        cause: error,
+      });
+    }
+  }
+
+  /**
+   * Get Slack Access Survey Status
+   * 
+   * @param userId - Authenticated user ID
+   * @returns SlackAccessResponse
+   */
+  async getSlackAccessStatus(userId: string): Promise<SlackAccessResponse> {
+    try {
+      const survey = await this.db.getSlackAccessSurvey(userId);
+      
+      return {
+        success: true,
+        submitted: !!survey,
+        ...(survey && {
+          q1Answer: survey.q1Answer,
+          q2Answer: survey.q2Answer || undefined,
+          submittedAt: survey.submittedAt.toISOString(),
+        }),
+        message: survey ? "Survey already submitted" : "No survey submitted yet",
+      };
+    } catch (error) {
+      logger.error("Error getting Slack survey status", { error, userId });
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to retrieve survey status",
+        cause: error,
+      });
     }
   }
 

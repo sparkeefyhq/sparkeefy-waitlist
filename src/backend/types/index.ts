@@ -555,3 +555,30 @@ export type {
   // SSEEvent,
   AppConfig as Config,
 };
+
+// ============================================================================
+// SLACK ACCESS SURVEY TYPES
+// ============================================================================
+
+export interface SlackAccessSurvey {
+  userId: string;
+  q1Answer: string;
+  q2Answer: string | null;
+  submittedAt: Date;
+  updatedAt: Date;
+}
+
+export interface SlackAccessInput {
+  q1Answer: "A" | "B" | "C" | "D"; // TODO: Replace with actual question options
+  q2Answer: string;
+}
+
+export interface SlackAccessResponse {
+  success: boolean;
+  submitted: boolean;
+  q1Answer?: string;
+  q2Answer?: string;
+  submittedAt?: string;
+  message: string;
+}
+

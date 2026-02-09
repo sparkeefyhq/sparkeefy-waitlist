@@ -483,19 +483,19 @@ export class EmailService {
    */
   private buildMagicLinkPlainText(data: MagicLinkEmailData): string {
     return `
-🎉 Welcome to Sparkeefy!
+Welcome to Sparkeefy!
 
-Hi there! 👋
+Hi there!
 
 You've successfully joined the Sparkeefy waitlist. We're thrilled to have you on board!
 
-🔐 ACCESS YOUR DASHBOARD
+ACCESS YOUR DASHBOARD
 Click this magic link to access your stats anytime:
 ${data.magicLinkUrl}
 
 Note: This link never expires and works on any device. Bookmark it for easy access!
 
-🚀 INVITE FRIENDS & EARN REWARDS
+INVITE FRIENDS & EARN REWARDS
 Share your unique referral link and unlock exclusive perks:
 
 Your Referral Code: ${data.referralCode}
@@ -504,7 +504,7 @@ Your Referral Link: ${data.referralLink}
 REFERRAL REWARDS:
 • 3 referrals → 1 month free premium
 • 6 referrals → 3 months free premium  
-• 10+ referrals → Lifetime Founder Seat 🎖️
+• 10+ referrals → Lifetime Founder Seat
 
 ---
 Questions? Reply to this email or visit: https://sparkeefy.com/support
