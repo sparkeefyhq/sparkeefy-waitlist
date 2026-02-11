@@ -6,6 +6,7 @@
  * 
  * @module index
  */
+loadDotenv({ path: resolve(process.cwd(), ".env") });
 
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
@@ -24,9 +25,6 @@ import { sseReferralUpdatesHandler } from "./sse/handler";
 
 import { config as loadDotenv } from "dotenv";
 import { resolve } from "path";
-
-
-loadDotenv({ path: resolve(process.cwd(), ".env") });
 
 // ============================================================================
 // SENTRY INITIALIZATION

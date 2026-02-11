@@ -7,6 +7,9 @@
  * @module db/client
  */
 
+import dotenv from "dotenv";
+dotenv.config(); // MUST be before PrismaClient
+
 import { PrismaClient } from "@prisma/client";
 import type {
   WaitlistUser,
@@ -30,16 +33,17 @@ import * as Sentry from "@sentry/node";
  * - Error logging in all environments
  */
 const prisma = new PrismaClient({
-  log: [
-    { level: "error", emit: "event" },
-    { level: "warn", emit: "event" },
-  ],
+  log: process.env.NODE_ENV === "development"
+  ? ["query", "info", "warn", "error"]
+  : ["warn", "error"],
+
   datasources: {
     db: {
       url: process.env.DATABASE_URL,
     },
   },
 });
+
 
 // ============================================================================
 // PRISMA EVENT LOGGING
@@ -149,7 +153,7 @@ export class DatabaseClient {
         where: {
           referralCode: {
             equals: code,
-            mode: 'insensitive', // ✅ Case-insensitive
+            mode: 'insensitive', // Case-insensitive
           },
         },
       }) as WaitlistUser | null;
