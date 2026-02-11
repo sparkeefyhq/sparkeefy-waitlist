@@ -8,6 +8,8 @@
  */
 
 import { z } from "zod";
+import dotenv from "dotenv";
+dotenv.config(); // MUST be before PrismaClient
 
 // ============================================================================
 // ENVIRONMENT SCHEMA
@@ -24,10 +26,10 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("3000"),
+  PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("4000"),
 
   // Database Configuration
-  // DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().url(),
 
   // // Frontend Configuration
   // FRONTEND_URL: z.string().url(),
