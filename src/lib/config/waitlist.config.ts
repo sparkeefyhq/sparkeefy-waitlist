@@ -83,6 +83,42 @@ export const successContent = {
   },
 } as const;
 
+export const referralContent = {
+  congratulations: "Congratulations",
+  subtitle: {
+    highlight: "You're In",
+    text: ". Early Access Confirmed",
+  },
+  leftSection: {
+    heading: {
+      text: "Unlock more by inviting people who'd love ",
+      brandRetro: "Sparkee",
+      brandBold: "fy",
+    },
+    description: "Invite friends who'd genuinely find this helpful - and unlock exclusive benefits along the way.",
+    rewards: [
+      { invites: "3 invites", reward: "1 month", rewardBrand: "Sparkeefy", rewardSuffix: "Pro", isGold: false },
+      { invites: "6 invites", reward: "3 months", rewardBrand: "Sparkeefy", rewardSuffix: "Pro", isGold: false },
+      { invites: "10 invites", reward: "Founder Seat", rewardBrand: "", rewardSuffix: "", isGold: true },
+    ],
+    founderNote: {
+      prefix: "Lifetime ",
+      underlined: "Founder pricing",
+      suffix: ", early feature access, and a real voice in shaping Sparkeefy.",
+    },
+  },
+  rightSection: {
+    heading: "Invite & Earn",
+    subtitle: {
+      text: "Invite others. ",
+      bold: "Unlock exclusive access",
+    },
+    copyButton: "Copy",
+    placeholderUrl: "https://sparkeefy.com/ref/abc123...",
+  },
+} as const;
+
 export type WaitlistContent = typeof waitlistContent;
 export type SuccessContent = typeof successContent;
+export type ReferralContent = typeof referralContent;
 export type SocialLink = (typeof socialLinks)[number];
