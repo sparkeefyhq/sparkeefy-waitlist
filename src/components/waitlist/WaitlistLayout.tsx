@@ -13,6 +13,7 @@ interface WaitlistLayoutProps {
   mobileChildren?: React.ReactNode;
   variant?: "join" | "success" | "referral" | "beta-access";
   banner?: React.ReactNode;
+  mobileBanner?: React.ReactNode;
   showBanner?: boolean;
 }
 
@@ -21,6 +22,7 @@ export default function WaitlistLayout({
   mobileChildren,
   variant = "join",
   banner,
+  mobileBanner,
   showBanner = false,
 }: WaitlistLayoutProps) {
   const router = useRouter();
@@ -44,7 +46,7 @@ export default function WaitlistLayout({
   return (
     <div className="relative h-svh w-full bg-[rgb(13,13,13)] overflow-hidden">
       {/* ===== MOBILE LAYOUT (< md) ===== */}
-      <div className="md:hidden relative min-h-svh w-full flex items-center justify-center px-5 py-8">
+      <div className={`md:hidden relative h-svh w-full flex flex-col items-center px-5 ${showBanner ? "justify-start pt-10 pb-4" : "justify-center py-8"}`}>
         {/* Mobile background gradients */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Top overlay — green for join, pink for success */}
@@ -97,10 +99,17 @@ export default function WaitlistLayout({
             </button>
           )}
 
-          <div className="flex flex-col items-center text-center px-6 pt-8 pb-12">
+          <div className={`flex flex-col items-center text-center px-6 ${showBanner ? "pt-6 pb-6" : "pt-8 pb-12"}`}>
             {mobileChildren}
           </div>
         </div>
+
+        {/* Mobile Banner below the card */}
+        {mobileBanner && showBanner && (
+          <div className="w-full mt-3 flex-shrink-0">
+            {mobileBanner}
+          </div>
+        )}
       </div>
 
       {/* ===== DESKTOP LAYOUT (≥ md) ===== */}

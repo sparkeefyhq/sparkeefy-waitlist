@@ -92,34 +92,36 @@ export default function BetaAccessPage() {
 
   /* ===== Mobile content ===== */
   const mobileContent = (
-    <div className="flex flex-col items-center w-full pt-4">
-      {/* Header */}
-      <div className="relative">
-        <p className="font-retro text-[32px] text-white tracking-[-1.28px] text-center">
-          <span>A couple of </span>
-          <span className="text-[#ffcbe5]">Questions</span>
+    <div className="flex flex-col items-center w-full pt-2">
+      {/* Header - two lines */}
+      <div className="relative text-center">
+        <p className="font-retro text-[28px] text-white tracking-[-1px] leading-tight">
+          A couple of
         </p>
-        <div className="absolute right-0 -bottom-1 w-[100px] h-[5px]">
+        <p className="font-retro text-[28px] text-[#ffcbe5] tracking-[-1px] leading-tight">
+          Questions
+        </p>
+        <div className="absolute right-[10%] -bottom-1 w-[80px] h-[4px]">
           {animatedUnderline}
         </div>
       </div>
 
-      <div className="w-full mt-8">
+      <div className="w-full mt-5">
         {/* Question 1 */}
-        <p className="font-medium text-[16px] text-white tracking-[-0.64px]">
+        <p className="font-medium text-[14px] text-white tracking-[-0.56px]">
           Who would you primarily use Sparkeefy for?
         </p>
-        <p className="text-[12px] text-white/40 mt-2">
+        <p className="text-[11px] text-white/40 mt-1">
           <span className="text-red-400/40">*</span>Select one or more options
         </p>
 
-        {/* Options */}
-        <div className="flex flex-col gap-3 mt-4">
+        {/* Options - 2x2 grid */}
+        <div className="grid grid-cols-2 gap-2 mt-3">
           {primaryUseOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => toggleOption(option.id)}
-              className={`h-[50px] rounded-full border transition-all text-[16px] font-semibold tracking-[-0.48px] ${
+              className={`h-[40px] rounded-full border transition-all text-[13px] font-semibold tracking-[-0.39px] ${
                 selectedOptions.includes(option.id)
                   ? "bg-white/10 border-[#ff68b4] text-white"
                   : "bg-white/10 border-transparent text-white hover:border-white/30"
@@ -131,7 +133,7 @@ export default function BetaAccessPage() {
         </div>
 
         {/* Question 2 */}
-        <p className="font-medium text-[16px] text-white tracking-[-0.64px] mt-6">
+        <p className="font-medium text-[14px] text-white tracking-[-0.56px] mt-4">
           {question2.question}
         </p>
 
@@ -140,7 +142,7 @@ export default function BetaAccessPage() {
           value={textAnswer}
           onChange={(e) => setTextAnswer(e.target.value)}
           placeholder={question2.placeholder}
-          className="w-full mt-4 h-[100px] bg-white/10 rounded-[16px] p-4 text-[14px] text-white placeholder:text-white/40 resize-none focus:outline-none focus:ring-1 focus:ring-white/30"
+          className="w-full mt-2 h-[80px] bg-white/10 rounded-[12px] p-3 text-[12px] text-white placeholder:text-white/40 resize-none focus:outline-none focus:ring-1 focus:ring-white/30"
         />
       </div>
 
@@ -148,14 +150,14 @@ export default function BetaAccessPage() {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className={`mt-8 flex items-center gap-2 px-6 py-3 rounded-full font-bold text-[16px] transition-all ${
+        className={`mt-5 flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[14px] transition-all ${
           canSubmit
             ? "bg-white text-black hover:bg-white/90"
             : "bg-white/30 text-white/50 cursor-not-allowed"
         }`}
       >
         <span>Submit</span>
-        <ArrowRight className="w-5 h-5" />
+        <ArrowRight className="w-4 h-4" />
       </button>
     </div>
   );

@@ -12,6 +12,7 @@ export default function ReferralPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [currentInvites, setCurrentInvites] = useState(0);
   const popupRef = useRef<HTMLDivElement>(null);
+  const mobilePopupRef = useRef<HTMLDivElement>(null);
 
   // Load invites from localStorage on mount
   useEffect(() => {
@@ -29,7 +30,14 @@ export default function ReferralPage() {
   // Close popup on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isOutsideDesktop = popupRef.current && !popupRef.current.contains(target);
+      const isOutsideMobile = mobilePopupRef.current && !mobilePopupRef.current.contains(target);
+
+      // Only close if click is outside both refs (whichever is rendered)
+      if ((popupRef.current && isOutsideDesktop && !mobilePopupRef.current) ||
+          (mobilePopupRef.current && isOutsideMobile && !popupRef.current) ||
+          (popupRef.current && mobilePopupRef.current && isOutsideDesktop && isOutsideMobile)) {
         setShowPopup(false);
       }
     };
@@ -110,26 +118,26 @@ export default function ReferralPage() {
 
   /* ===== Mobile card content ===== */
   const mobileContent = (
-    <div className="flex flex-col items-center w-full pt-4">
+    <div className="flex flex-col items-center w-full pt-2">
       {/* Header */}
-      <p className="font-retro text-[34px] text-[#ffcce5] tracking-[-0.68px] leading-tight text-center">
+      <p className="font-retro text-[30px] text-[#ffcce5] tracking-[-0.6px] leading-tight text-center">
         {referralContent.congratulations}
       </p>
-      <p className="font-bold text-[12px] text-white tracking-[-0.24px] text-center mt-2">
+      <p className="font-bold text-[11px] text-white tracking-[-0.22px] text-center mt-1">
         <span className="text-[#ffcbe5]">{referralContent.subtitle.highlight}</span>
         <span>{referralContent.subtitle.text}</span>
       </p>
 
       {/* Unlock section with rewards */}
-      <div className="w-full mt-8">
-        <p className="font-bold text-[18px] text-white leading-normal text-center">
+      <div className="w-full mt-5">
+        <p className="font-bold text-[16px] text-white leading-normal text-center">
           <span>{referralContent.leftSection.heading.text}</span>
           <span className="font-retro font-normal">{referralContent.leftSection.heading.brandRetro}</span>
           <span>{referralContent.leftSection.heading.brandBold}</span>
         </p>
 
         {/* Rewards table */}
-        <div className="flex gap-[10px] mt-4 justify-center">
+        <div className="flex gap-[10px] mt-3 justify-center">
           {/* Invites column */}
           <div className="flex flex-col gap-[8px] font-bold text-[15px] text-white">
             {referralContent.leftSection.rewards.map((reward, idx) => (
@@ -168,17 +176,17 @@ export default function ReferralPage() {
       </div>
 
       {/* Divider */}
-      <div className="w-full h-[1px] bg-white/20 my-5" />
+      <div className="w-full h-[1px] bg-white/20 my-3" />
 
       {/* Invite & Earn section */}
       <div className="w-full">
-        <p className="font-bold text-[18px] text-white tracking-[-0.36px] text-center">
+        <p className="font-bold text-[16px] text-white tracking-[-0.32px] text-center">
           {referralContent.rightSection.heading}
         </p>
 
         {/* Invite text + Copy button row */}
-        <div className="flex gap-[15px] items-center justify-center mt-5">
-          <div className="text-white/80 opacity-70">
+        <div className="flex gap-[12px] items-center justify-center mt-3">
+          <div className="text-white/80 opacity-70 text-left">
             <p className="text-[14px]">{referralContent.rightSection.subtitle.text}</p>
             <p className="font-bold text-[12px]">{referralContent.rightSection.subtitle.bold}</p>
           </div>
@@ -198,30 +206,30 @@ export default function ReferralPage() {
         </div>
 
         {/* Or divider */}
-        <p className="text-[12px] text-white/40 text-center mt-4 tracking-[-0.24px]">or</p>
+        <p className="text-[11px] text-white/40 text-center mt-2 tracking-[-0.22px]">or</p>
 
         {/* Share text */}
-        <p className="text-[12px] text-white/40 text-center mt-2">Share your invite link via</p>
+        <p className="text-[11px] text-white/40 text-center mt-1">Share your invite link via</p>
 
         {/* Social icons - only 3 for mobile */}
-        <div className="flex gap-[11px] items-center justify-center mt-4">
+        <div className="flex gap-[8px] items-center justify-center mt-2">
           {/* Instagram */}
-          <button onClick={handleSocialClick} className="flex items-center justify-center w-[40px] h-[40px] bg-black rounded-full hover:bg-black/80 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={handleSocialClick} className="flex items-center justify-center w-[36px] h-[36px] bg-black rounded-full hover:bg-black/80 transition-colors">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2"/>
               <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2"/>
               <circle cx="18" cy="6" r="1.5" fill="white"/>
             </svg>
           </button>
           {/* WhatsApp */}
-          <button onClick={handleSocialClick} className="flex items-center justify-center w-[40px] h-[40px] bg-black rounded-full hover:bg-black/80 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={handleSocialClick} className="flex items-center justify-center w-[36px] h-[36px] bg-black rounded-full hover:bg-black/80 transition-colors">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
             </svg>
           </button>
           {/* Reddit */}
-          <button onClick={handleSocialClick} className="flex items-center justify-center w-[40px] h-[40px] bg-black rounded-full hover:bg-black/80 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={handleSocialClick} className="flex items-center justify-center w-[36px] h-[36px] bg-black rounded-full hover:bg-black/80 transition-colors">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
             </svg>
           </button>
@@ -229,12 +237,12 @@ export default function ReferralPage() {
       </div>
 
       {/* Progress bar at bottom */}
-      <div className="w-full mt-6">
+      <div className="w-full mt-4">
         {/* Bar container */}
-        <div className="relative w-full h-[20px] border-[1.7px] border-white rounded-full">
+        <div className="relative w-full h-[18px] border-[1.5px] border-white rounded-full">
           {/* Fill - animated */}
           <motion.div
-            className="absolute left-[3px] top-1/2 -translate-y-1/2 h-[14px] rounded-full bg-gradient-to-r from-white to-[#ff0080]"
+            className="absolute left-[3px] top-1/2 -translate-y-1/2 h-[12px] rounded-full bg-gradient-to-r from-white to-[#ff0080]"
             initial={{ width: 0 }}
             animate={{ width: `${Math.min((currentInvites / 10) * 100, 100)}%` }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -242,36 +250,22 @@ export default function ReferralPage() {
           />
         </div>
 
-        {/* Milestones */}
-        <div className="relative mt-2 h-[40px]">
-          {/* 3 invites milestone */}
-          <div className="absolute left-[20%] flex flex-col items-center">
-            <div className={`w-[6px] h-[6px] rounded-full transition-colors duration-300 ${currentInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
-            <p className={`mt-1 text-[10px] transition-colors duration-300 ${currentInvites >= 3 ? "text-white" : "text-white/50"}`}>3 invites</p>
-          </div>
-
-          {/* 6 invites milestone */}
-          <div className="absolute left-[50%] -translate-x-1/2 flex flex-col items-center">
-            <div className={`w-[6px] h-[6px] rounded-full transition-colors duration-300 ${currentInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
-            <p className={`mt-1 text-[10px] transition-colors duration-300 ${currentInvites >= 6 ? "text-white" : "text-white/50"}`}>6 invites</p>
-          </div>
-
-          {/* 10 invites milestone */}
-          <div className="absolute right-[5%] flex flex-col items-center">
-            <div className={`w-[6px] h-[6px] rounded-full transition-colors duration-300 ${currentInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
-            <p
-              className="mt-1 font-bold text-[10px] bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
-              style={{ WebkitTextFillColor: "transparent" }}
-            >
-              10 invites
-            </p>
-          </div>
+        {/* Milestones - inline */}
+        <div className="flex justify-between mt-1.5 px-2">
+          <p className={`text-[9px] transition-colors duration-300 ${currentInvites >= 3 ? "text-white" : "text-white/50"}`}>3 invites</p>
+          <p className={`text-[9px] transition-colors duration-300 ${currentInvites >= 6 ? "text-white" : "text-white/50"}`}>6 invites</p>
+          <p
+            className="font-bold text-[9px] bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
+            style={{ WebkitTextFillColor: "transparent" }}
+          >
+            10 invites
+          </p>
         </div>
       </div>
     </div>
   );
 
-  // Beta Access Banner (separate element below card)
+  // Beta Access Banner - Desktop (separate element below card)
   const betaBanner = (
     <div
       ref={popupRef}
@@ -286,6 +280,25 @@ export default function ReferralPage() {
       <Link
         href="/join/beta-access"
         className="px-8 py-4 bg-white text-black font-medium text-[16px] rounded-full hover:bg-white/90 transition-colors whitespace-nowrap border border-black/10"
+      >
+        Request Access
+      </Link>
+    </div>
+  );
+
+  // Beta Access Banner - Mobile
+  const mobileBetaBanner = (
+    <div
+      ref={mobilePopupRef}
+      className="bg-[rgba(0,0,0,0.6)] backdrop-blur-xl rounded-[22px] shadow-[0px_5.54px_29.453px_0px_rgba(0,0,0,0.56)] px-5 py-4 flex flex-col items-center text-center"
+    >
+      <h3 className="font-bold text-[16px] text-white">Private Beta Access</h3>
+      <p className="text-[11px] text-white/60 mt-1.5 leading-relaxed">
+        We&apos;re onboarding a small group of beta testers to refine Sparkeefy. Feedback from this group will directly influence how the product evolves.
+      </p>
+      <Link
+        href="/join/beta-access"
+        className="mt-3 px-5 py-2.5 bg-white text-black font-medium text-[13px] rounded-full hover:bg-white/90 transition-colors"
       >
         Request Access
       </Link>
@@ -534,6 +547,7 @@ export default function ReferralPage() {
       variant="referral"
       mobileChildren={mobileContent}
       banner={betaBanner}
+      mobileBanner={mobileBetaBanner}
       showBanner={showPopup}
     >
       {desktopContent}
