@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const DESIGN_W = 1920;
 const DESIGN_H = 1080;
@@ -10,7 +11,7 @@ const DESIGN_H = 1080;
 interface WaitlistLayoutProps {
   children: React.ReactNode;
   mobileChildren?: React.ReactNode;
-  variant?: "join" | "success";
+  variant?: "join" | "success" | "referral";
 }
 
 export default function WaitlistLayout({
@@ -32,7 +33,8 @@ export default function WaitlistLayout({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const isSuccess = variant === "success";
+  const isSuccess = variant === "success" || variant === "referral";
+  const isReferral = variant === "referral";
 
   return (
     <div className="relative h-svh w-full bg-[rgb(13,13,13)] overflow-hidden">
@@ -66,13 +68,22 @@ export default function WaitlistLayout({
         </div>
 
         <div className="relative w-full bg-[rgba(0,0,0,0.45)] backdrop-blur-xl rounded-[22px] shadow-[0px_5.54px_29.453px_0px_rgba(0,0,0,0.56)] overflow-clip">
-          <button
-            onClick={() => router.back()}
-            className="absolute right-4 top-4 text-white/70 hover:text-white transition-opacity z-10"
-          >
-            <X className="size-5" />
-            <span className="sr-only">Close</span>
-          </button>
+          {isReferral ? (
+            <Link
+              href="/"
+              className="absolute left-4 top-4 z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[36px] h-[36px] bg-white rounded-full"
+            >
+              <Home className="w-5 h-5 text-black" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.back()}
+              className="absolute right-4 top-4 text-white/70 hover:text-white transition-opacity z-10"
+            >
+              <X className="size-5" />
+              <span className="sr-only">Close</span>
+            </button>
+          )}
 
           <div className="flex flex-col items-center text-center px-6 pt-8 pb-12">
             {mobileChildren}
@@ -178,14 +189,23 @@ export default function WaitlistLayout({
           className="absolute bg-[rgba(0,0,0,0.45)] backdrop-blur-xl rounded-[48px] shadow-[0px_12px_63.8px_0px_rgba(0,0,0,0.56)] overflow-clip"
           style={{ left: 270, top: 145, width: 1380, height: 787 }}
         >
-          {/* Close button */}
-          <button
-            onClick={() => router.back()}
-            className="absolute rounded-full p-0.5 md:p-1.5 hover:bg-white/20 right-8 top-8 text-white/70 hover:text-white transition-all z-10 cursor-pointer"
-          >
-            <X className="size-5 md:size-6" />
-            <span className="sr-only">Close</span>
-          </button>
+          {/* Home button for referral, Close button for others */}
+          {isReferral ? (
+            <Link
+              href="/"
+              className="absolute left-[29px] top-[26px] z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[48px] h-[48px] bg-white rounded-full"
+            >
+              <Home className="w-6 h-6 text-black" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.back()}
+              className="absolute rounded-full p-0.5 md:p-1.5 hover:bg-white/20 right-8 top-8 text-white/70 hover:text-white transition-all z-10 cursor-pointer"
+            >
+              <X className="size-5 md:size-6" />
+              <span className="sr-only">Close</span>
+            </button>
+          )}
 
           {children}
         </div>
