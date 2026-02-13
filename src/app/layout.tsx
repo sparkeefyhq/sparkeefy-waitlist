@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { trpcClient } from "@/lib/trpc";
+import { Providers } from "@/app/providers";
 
 const sfProDisplay = localFont({
   src: [
@@ -84,7 +86,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" className="snap-y snap-proximity scroll-smooth">
       <body className={`${sfProDisplay.variable} ${retroVintage.variable} antialiased overflow-x-hidden`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

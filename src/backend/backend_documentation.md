@@ -458,7 +458,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/waitlist_db"
 
 # Server Configuration
 NODE_ENV="development"          # or "production"
-PORT=3000                        # HTTP server port
+PORT=4000                        # HTTP server port
 HOST="0.0.0.0"                   # Bind to all interfaces
 
 # Frontend Origin (CORS + referral link base)
@@ -511,7 +511,7 @@ All environment variables must be validated on application startup using Zod. Th
 |----------|-------------|-----------|-------|
 | `DATABASE_URL` | Local PostgreSQL/MySQL | RDS/Cloud SQL endpoint | Required; no default |
 | `NODE_ENV` | development | production | Controls security settings (secure cookies, HTTPS enforcement) |
-| `PORT` | 3000 | 3000 (behind reverse proxy typically) | Configurable per deployment |
+| `PORT` | 4000 | 4000 (behind reverse proxy typically) | Configurable per deployment |
 | `FRONTEND_URL` | http://localhost:3000 | https://app.com | Used for CORS and referral link generation |
 | `COOKIE_SECRET` | any random string | MUST be strong random string | Change regularly in production |
 | `SESSION_TTL_DAYS` | 30 (or 1 for testing) | 30 | Can be reduced for security, increased for convenience |
@@ -2551,7 +2551,7 @@ psql -U postgres
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL PRIVILEGES ON DATABASE sparkeefy_waitlist TO postgres;
 ALTER DATABASE sparkeefy_waitlist OWNER TO postgres;
-
+ALTER ROLE sparkeefy CREATEDB;
 CREATE DATABASE sparkeefy_waitlist;
 
 # If you created a custom user (e.g., 'sparkeefy')
@@ -2564,6 +2564,15 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO sparkeefy;
 
 # Grant usage on public schema
 GRANT USAGE, CREATE ON SCHEMA public TO postgres;
+
+# STEP 1: Push schema WITHOUT shadow database
+npx prisma db push
+
+# STEP 2: Generate client
+npx prisma generate
+
+# STEP 3: Test connection
+npx prisma db pull
 
 # Exit
 \q

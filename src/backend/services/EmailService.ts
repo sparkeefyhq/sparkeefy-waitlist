@@ -364,119 +364,117 @@ export class EmailService {
    * Build Magic Link HTML Email
    */
   private buildMagicLinkHTML(data: MagicLinkEmailData): string {
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to Sparkeefy</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111;">
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
     <tr>
-      <td align="center" style="padding: 40px 0;">
-        <table role="presentation" style="width: 600px; max-width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          
-          <!-- Header -->
+      <td align="center" style="padding:40px 20px;">
+
+        <!-- Main Container -->
+        <table role="presentation" width="640" style="max-width:100%;border-collapse:collapse;">
+
+          <!-- Logo / Brand -->
           <tr>
-            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px 8px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700;">🎉 Welcome to Sparkeefy!</h1>
+            <td style="padding-bottom:30px;">
+              <div style="font-size:26px;font-weight:700;">
+                ✦ Sparkeefy
+              </div>
             </td>
           </tr>
 
-          <!-- Body -->
+          <!-- Headline -->
           <tr>
-            <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #18181b; font-size: 16px; line-height: 1.6;">
-                Hi there! 👋
-              </p>
-              <p style="margin: 0 0 20px; color: #18181b; font-size: 16px; line-height: 1.6;">
-                You've successfully joined the <strong>Sparkeefy waitlist</strong>! We're thrilled to have you on board.
-              </p>
-              
-              <!-- CTA Button -->
-              <table role="presentation" style="width: 100%; margin: 30px 0;">
-                <tr>
-                  <td align="center">
-                    <a href="${data.magicLinkUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                      🔐 Access My Dashboard
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 20px 0; color: #71717a; font-size: 14px; line-height: 1.6;">
-                <strong>Note:</strong> This magic link never expires and works on any device. Bookmark it for easy access!
-              </p>
-
-              <!-- Referral Section -->
-              <table role="presentation" style="width: 100%; margin: 30px 0; padding: 20px; background-color: #f4f4f5; border-radius: 6px;">
-                <tr>
-                  <td>
-                    <h2 style="margin: 0 0 15px; color: #18181b; font-size: 18px; font-weight: 600;">
-                      🚀 Invite Friends & Earn Rewards
-                    </h2>
-                    <p style="margin: 0 0 15px; color: #52525b; font-size: 14px; line-height: 1.6;">
-                      Share your unique referral link and unlock exclusive perks:
-                    </p>
-                    <table role="presentation" style="width: 100%; margin: 15px 0;">
-                      <tr>
-                        <td style="padding: 12px; background-color: #ffffff; border-radius: 4px; border: 1px solid #e4e4e7;">
-                          <p style="margin: 0; color: #71717a; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                            Your Referral Code
-                          </p>
-                          <p style="margin: 5px 0 0; color: #18181b; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace;">
-                            ${data.referralCode}
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                    <p style="margin: 15px 0 0; color: #52525b; font-size: 13px; line-height: 1.6;">
-                      <strong>Share your link:</strong><br>
-                      <a href="${data.referralLink}" style="color: #667eea; text-decoration: none; word-break: break-all;">${data.referralLink}</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Rewards Tiers -->
-              <table role="presentation" style="width: 100%; margin: 20px 0;">
-                <tr>
-                  <td>
-                    <p style="margin: 0 0 10px; color: #18181b; font-size: 14px; font-weight: 600;">
-                      Referral Rewards:
-                    </p>
-                    <ul style="margin: 0; padding-left: 20px; color: #52525b; font-size: 14px; line-height: 1.8;">
-                      <li><strong>1 referrals</strong> → 1 month free premium</li>
-                      <li><strong>3 referrals</strong> → 3 months free premium</li>
-                      <li><strong>10+ referrals</strong> → Lifetime Founder Seat 🎖️</li>
-                    </ul>
-                  </td>
-                </tr>
-              </table>
+            <td style="padding-bottom:25px;">
+              <h1 style="margin:0;font-size:40px;line-height:1.2;font-weight:700;">
+                Thank you for signing up!
+              </h1>
             </td>
+          </tr>
+
+          <!-- Intro Text -->
+          <tr>
+            <td style="padding-bottom:25px;font-size:18px;line-height:1.6;color:#444;">
+              Welcome! You’re officially on the <strong>Sparkeefy Waitlist</strong>.  
+              Use your personal magic link below to access your dashboard and track your progress.
+            </td>
+          </tr>
+
+          <!-- Magic Link -->
+          <tr>
+            <td style="padding-bottom:35px;font-size:16px;line-height:1.6;">
+              <a href="${data.magicLinkUrl}" 
+                 style="color:#1a73e8;text-decoration:underline;word-break:break-all;">
+                ${data.magicLinkUrl}
+              </a>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="border-top:1px solid #e5e5e5;padding:30px 0;"></td>
+          </tr>
+
+          <!-- Referral Section -->
+          <tr>
+            <td style="padding-bottom:20px;font-size:20px;font-weight:600;">
+              Share your referral link to move up the waitlist:
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding-bottom:15px;font-size:16px;">
+              Your referral code:
+              <div style="margin-top:6px;font-size:22px;font-weight:700;letter-spacing:1px;">
+                ${data.referralCode}
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding-bottom:30px;font-size:16px;">
+              <a href="${data.referralLink}" 
+                 style="color:#1a73e8;text-decoration:underline;word-break:break-all;">
+                ${data.referralLink}
+              </a>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="border-top:1px solid #e5e5e5;padding:30px 0;"></td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="padding: 30px 40px; background-color: #fafafa; border-radius: 0 0 8px 8px; text-align: center;">
-              <p style="margin: 0 0 10px; color: #71717a; font-size: 12px; line-height: 1.6;">
-                Questions? Reply to this email or visit our <a href="https://sparkeefy.com/support" style="color: #667eea; text-decoration: none;">support center</a>.
-              </p>
-              <p style="margin: 0; color: #a1a1aa; font-size: 11px; line-height: 1.6;">
-                © ${new Date().getFullYear()} Sparkeefy. All rights reserved.
-              </p>
+            <td style="font-size:14px;color:#666;line-height:1.6;">
+              Need help? Reply to this email and we’ll take care of you.
             </td>
           </tr>
+
+          <tr>
+            <td style="padding-top:10px;font-size:13px;color:#999;">
+              © ${new Date().getFullYear()} Sparkeefy. All rights reserved.
+            </td>
+          </tr>
+
         </table>
       </td>
     </tr>
   </table>
+
 </body>
 </html>
-    `.trim();
-  }
+  `.trim();
+}
 
   /**
    * Build Magic Link Plain Text Email
