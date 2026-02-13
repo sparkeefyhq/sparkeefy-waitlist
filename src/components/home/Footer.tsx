@@ -84,7 +84,7 @@ const Footer = () => {
 
   // Robust Media Query via react-responsive (Handles scaling/zoom better)
   const [mounted, setMounted] = React.useState(false);
-  const isTallScreen = useMediaQuery({ minHeight: 800 });
+  // We keep mounted for other client-only logic, but avoid it for layout-critical classes
 
   React.useEffect(() => {
     setMounted(true);
@@ -304,9 +304,10 @@ const Footer = () => {
 
       {/* Large Text & Gradient Background */}
       <div
-        className={`relative w-full flex justify-center items-end pointer-events-none 
-        ${isTallScreen ? "h-[38rem] -mt-60" : "h-[20.875rem] md:h-[28rem] -mt-48 md:-mt-34"}
-      `}
+        className="relative w-full flex justify-center items-end pointer-events-none 
+        h-[20.875rem] md:h-[28rem] -mt-48 md:-mt-34
+        lg:[@media(min-height:900px)]:h-[38rem] lg:[@media(min-height:900px)]:-mt-60
+      "
       >
         {/* Gradient Image */}
         <div className="absolute bottom-0 left-0 w-full h-full z-0 opacity-100 mix-blend-normal">
@@ -315,9 +316,8 @@ const Footer = () => {
             alt="Gradient Background"
             layout="fill"
             objectFit="cover"
-            objectPosition={`${isTallScreen ? "top" : "bottom"}`}
             priority
-            className="hidden md:block"
+            className="hidden md:block object-bottom lg:[@media(min-height:900px)]:object-top"
           />
           <Image
             src="/img/footer-gradient-bg-mobile.png"

@@ -11,7 +11,7 @@
     "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\"",
     "dev:frontend": "next dev",
     "dev:backend": "tsx watch src/backend/index.ts",
-    "build": "tsc",
+    "build": "next build && tsc",
     "start": "tsx --env-file=.env src/backend/index.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

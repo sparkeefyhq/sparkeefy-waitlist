@@ -30,7 +30,7 @@ const tabs = [
         <br /> when it matters
       </>
     ),
-    color: "#06B0B7", // Synchronized with Say it better
+    color: "#81F5FA", // Synchronized with Say it better
   },
   {
     id: 2,
@@ -63,9 +63,9 @@ const content = [
     gradientStartColor: "#FFB3D9",
     subheadline: "So the people you care about feel genuinely cared for.",
     list: [
-      "Important dates, preferences, and moments saved in one private place",
-      "Designed to work quietly in the background, with notifications only when they matter.",
-      "Gentle reminders help meaningful moments from slipping away.",
+      "Important dates, preferences, and moments <b class='text-white'>saved in one private place</b>",
+      "Designed to work quietly in the background, with notifications <b class='text-white'>only when they matter.</b>",
+      "Gentle reminders help meaningful moments from <b class='text-white'>slipping away.</b>",
     ],
     image: "/img/feature-card-img-1.png",
   },
@@ -75,11 +75,13 @@ const content = [
     subtitle: "when it matters",
     accentColor: "#06B0B7",
     gradientStartColor: "#99F6E4",
-    subheadline: "Helping you find the right words.",
+    subheadline: <>
+      So conversations feel natural - even when words<br /> don&apos;t come easily.
+    </>,
     list: [
-      "Suggestions for messages that sound like you.",
-      "Support for difficult conversations.",
-      "Never miss a chance to reach out.",
+      "<b class='text-white'>Gentle support</b> for messages and check-ins when you're unsure how to respond. <span class='text-[#81F5FA]'>You stay in control - nothing is sent without you choosing it</span>",
+      "Suggestions you can shape and send in your own words - <b class='text-white'>especially in sensitive moments</b>",
+      "<b class='text-white'>Communicate clearly</b> - without sounding scripted or forced",
     ],
     image: "/img/feature-card-img-2.png",
   },
@@ -89,11 +91,13 @@ const content = [
     subtitle: "without the stress",
     accentColor: "#955BF0",
     gradientStartColor: "#E9D5FF",
-    subheadline: "Plan moments that are truly special.",
+    subheadline: <>
+      So spending time together feels intentional, not<br /> last-minute.
+    </>,
     list: [
-      "Tailored date ideas based on shared interests.",
-      "Planning tools that take the stress out.",
-      "Memories that last a lifetime.",
+      "<b class='text-white'>Ideas</b> for spending time together shaped around what you both enjoy.",
+      "<b class='text-white'>Suggestions</b> that consider your mood, budget and their preferences.",
+      "Helps you narrow things down and decide faster.",
     ],
     image: "/img/feature-card-img-3.png",
   },
@@ -103,11 +107,11 @@ const content = [
     subtitle: "feel personal",
     accentColor: "#FEBF67",
     gradientStartColor: "#FDE68A",
-    subheadline: "Thoughtful gifting made simple.",
+    subheadline: "So gifting feels thoughtful - not stressful",
     list: [
-      "Gift ideas inspired by past conversations.",
-      "Reminders for key gifting occasions.",
-      "Track what you've given to avoid repeats.",
+      "Suggestions shaped around your shared moments and upcoming occasions",
+      "<b class='text-white'>Gift ideas</b> that reflect their tastes, interests, and the little details",
+      "<b class='text-white'>Helps you decide</b> with confidence, without second-guessing",
     ],
     image: "/img/feature-card-img-4.png",
   },
@@ -216,7 +220,7 @@ const AboutHero = () => {
                 className="w-full absolute inset-0 flex flex-col justify-center"
               >
                 <div>
-                  <h1 className="text-5xl font-bold mb-3 leading-[1.15] text-white">
+                  <h1 className="text-[2.75rem] font-bold mb-3 leading-[1.15] text-white">
                     {content[activeTab].title}
                     <br />
                     <span 
@@ -228,15 +232,15 @@ const AboutHero = () => {
                       {content[activeTab].subtitle}
                     </span>
                   </h1>
-                  <p className="text-xl lg:text-2xl text-white/70 mb-5 font-normal leading-relaxed">
+                  <p className="text-xl lg:text-[1.375rem] text-white/70 mb-5 font-normal tracking-wide max-w-[33rem]">
                     {content[activeTab].subheadline}
                   </p>
 
-                  <ul className="flex flex-col gap-5">
+                  <ul className="flex flex-col gap-5 max-w-[32.5rem]">
                     {content[activeTab].list.map((item, i) => (
                       <li
                         key={i}
-                        className="flex gap-4 items-start text-lg text-white"
+                        className="flex gap-4 items-start text-base text-white"
                       >
                         <span className="mt-1 flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm [&_svg]:size-3">
                           <svg
@@ -258,10 +262,7 @@ const AboutHero = () => {
                         <span
                           className="leading-snug"
                           dangerouslySetInnerHTML={{
-                            __html: item.replace(
-                              /(saved in one private place|only when they matter)/g,
-                              '<b class="text-white">$1</b>',
-                            ),
+                            __html: item,
                           }}
                         ></span>
                       </li>
