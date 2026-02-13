@@ -74,11 +74,7 @@ async function hydrateUser(sessionToken: string | undefined): Promise<any | unde
 
   try {
     // Query database for user with matching session token
-    const user = await db.waitlistUser.findUnique({
-      where: {
-        sessionToken: sessionToken,
-      },
-    });
+    const user = await db.findUserBySessionToken(sessionToken);
 
     // Check if user exists and session is not expired
     if (!user) {
