@@ -13,6 +13,7 @@
     "dev:backend": "tsx watch src/backend/index.ts",
     "build": "next build && tsc",
     "start": "tsx --env-file=.env src/backend/index.ts",
+    "start:prod": "tsx src/backend/index.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
