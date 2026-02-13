@@ -119,7 +119,7 @@ const PrivacyHeroDesktop = () => {
                       key={point.title}
                       className="flex gap-4 items-start group flex-shrink-0 pt-6 first:pt-8"
                     >
-                      <span className="mt-1 flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md shadow-pink-500/20 group-hover:scale-110 transition-transform duration-300">
+                      <span className="mt-1 flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md shadow-pink-500/20 transition-transform duration-300">
                         <svg
                           width="12"
                           height="12"
