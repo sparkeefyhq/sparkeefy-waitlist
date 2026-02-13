@@ -9,11 +9,15 @@ import { useState } from "react";
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
+  const apiPort = process.env.NEXT_PUBLIC_API_PORT || "4000";
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || `http://localhost:${apiPort}/trpc`;
+
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://localhost:4000/trpc",
+          url: apiUrl,
           transformer: superjson,
           fetch(url, opts) {
             return fetch(url, {
