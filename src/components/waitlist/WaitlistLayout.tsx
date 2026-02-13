@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Home, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const DESIGN_W = 1920;
 const DESIGN_H = 1080;
@@ -10,13 +11,19 @@ const DESIGN_H = 1080;
 interface WaitlistLayoutProps {
   children: React.ReactNode;
   mobileChildren?: React.ReactNode;
-  variant?: "join" | "success";
+  variant?: "join" | "success" | "referral" | "beta-access";
+  banner?: React.ReactNode;
+  mobileBanner?: React.ReactNode;
+  showBanner?: boolean;
 }
 
 export default function WaitlistLayout({
   children,
   mobileChildren,
   variant = "join",
+  banner,
+  mobileBanner,
+  showBanner = false,
 }: WaitlistLayoutProps) {
   const router = useRouter();
   const [scale, setScale] = useState<number | null>(null);
@@ -32,12 +39,14 @@ export default function WaitlistLayout({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const isSuccess = variant === "success";
+  const isSuccess = variant === "success" || variant === "referral" || variant === "beta-access";
+  const isReferral = variant === "referral";
+  const isBetaAccess = variant === "beta-access";
 
   return (
     <div className="relative h-svh w-full bg-[rgb(13,13,13)] overflow-hidden">
       {/* ===== MOBILE LAYOUT (< md) ===== */}
-      <div className="md:hidden relative min-h-svh w-full flex items-center justify-center px-5 py-8">
+      <div className={`md:hidden relative h-svh w-full flex flex-col items-center px-5 ${showBanner ? "justify-start pt-10 pb-4" : "justify-center py-8"}`}>
         {/* Mobile background gradients */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Top overlay — green for join, pink for success */}
@@ -65,19 +74,42 @@ export default function WaitlistLayout({
           </div>
         </div>
 
-        <div className="relative w-full bg-[rgba(0,0,0,0.45)] backdrop-blur-xl rounded-[22px] shadow-[0px_5.54px_29.453px_0px_rgba(0,0,0,0.56)] overflow-clip">
-          <button
-            onClick={() => router.back()}
-            className="absolute right-4 top-4 text-white/70 hover:text-white transition-opacity z-10"
-          >
-            <X className="size-5" />
-            <span className="sr-only">Close</span>
-          </button>
+        <div className={`relative w-full backdrop-blur-xl rounded-[22px] shadow-[0px_5.54px_29.453px_0px_rgba(0,0,0,0.56)] overflow-clip ${isBetaAccess ? "bg-[rgba(0,0,0,0.6)]" : "bg-[rgba(0,0,0,0.45)]"}`}>
+          {isBetaAccess ? (
+            <Link
+              href="/join/referral"
+              className="absolute left-4 top-4 z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[36px] h-[36px] bg-white rounded-full"
+            >
+              <ArrowLeft className="w-5 h-5 text-black" />
+            </Link>
+          ) : isReferral ? (
+            <Link
+              href="/"
+              className="absolute left-4 top-4 z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[36px] h-[36px] bg-white rounded-full"
+            >
+              <Home className="w-5 h-5 text-black" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.back()}
+              className="absolute right-4 top-4 text-white/70 hover:text-white transition-opacity z-10"
+            >
+              <X className="size-5" />
+              <span className="sr-only">Close</span>
+            </button>
+          )}
 
-          <div className="flex flex-col items-center text-center px-6 pt-8 pb-12">
+          <div className={`flex flex-col items-center text-center px-6 ${showBanner ? "pt-6 pb-6" : "pt-8 pb-12"}`}>
             {mobileChildren}
           </div>
         </div>
+
+        {/* Mobile Banner below the card */}
+        {mobileBanner && showBanner && (
+          <div className="w-full mt-3 flex-shrink-0">
+            {mobileBanner}
+          </div>
+        )}
       </div>
 
       {/* ===== DESKTOP LAYOUT (≥ md) ===== */}
@@ -175,20 +207,56 @@ export default function WaitlistLayout({
 
         {/* Glassmorphic card */}
         <div
-          className="absolute bg-[rgba(0,0,0,0.45)] backdrop-blur-xl rounded-[48px] shadow-[0px_12px_63.8px_0px_rgba(0,0,0,0.56)] overflow-clip"
-          style={{ left: 270, top: 145, width: 1380, height: 787 }}
+          className={`absolute backdrop-blur-xl rounded-[48px] shadow-[0px_12px_63.8px_0px_rgba(0,0,0,0.56)] overflow-clip transition-all duration-400 ease-out ${isBetaAccess ? "bg-[rgba(0,0,0,0.6)]" : "bg-[rgba(0,0,0,0.45)]"}`}
+          style={{
+            left: 270,
+            top: isBetaAccess ? 192 : (showBanner ? 65 : 145),
+            width: 1380,
+            height: isBetaAccess ? 695 : 787
+          }}
         >
-          {/* Close button */}
-          <button
-            onClick={() => router.back()}
-            className="absolute rounded-full p-0.5 md:p-1.5 hover:bg-white/20 right-8 top-8 text-white/70 hover:text-white transition-all z-10 cursor-pointer"
-          >
-            <X className="size-5 md:size-6" />
-            <span className="sr-only">Close</span>
-          </button>
+          {/* Back button for beta-access, Home button for referral, Close button for others */}
+          {isBetaAccess ? (
+            <Link
+              href="/join/referral"
+              className="absolute left-[29px] top-[26px] z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[48px] h-[48px] bg-white rounded-full"
+            >
+              <ArrowLeft className="w-6 h-6 text-black" />
+            </Link>
+          ) : isReferral ? (
+            <Link
+              href="/"
+              className="absolute left-[29px] top-[26px] z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[48px] h-[48px] bg-white rounded-full"
+            >
+              <Home className="w-6 h-6 text-black" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.back()}
+              className="absolute rounded-full p-0.5 md:p-1.5 hover:bg-white/20 right-8 top-8 text-white/70 hover:text-white transition-all z-10 cursor-pointer"
+            >
+              <X className="size-5 md:size-6" />
+              <span className="sr-only">Close</span>
+            </button>
+          )}
 
           {children}
         </div>
+
+        {/* Banner below the card (separate element) */}
+        {banner && (
+          <div
+            className="absolute transition-all duration-400 ease-out"
+            style={{
+              left: 270,
+              top: showBanner ? 878 : 1100,
+              opacity: showBanner ? 1 : 0,
+              width: 1380,
+            }}
+          >
+            {banner}
+          </div>
+        )}
       </div>
     </div>
   );
