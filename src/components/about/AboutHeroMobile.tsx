@@ -236,7 +236,7 @@ export const AboutHeroMobile = () => {
                 className="w-full absolute top-0"
               >
                 <div className="pr-4">
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight text-white drop-shadow-lg">
+                  <h1 className="text-2xl md:text-4xl font-bold mb-3 leading-tight text-white drop-shadow-lg">
                     {content[activeTab].title}
                     <br />
                     <span 
@@ -248,34 +248,34 @@ export const AboutHeroMobile = () => {
                       {content[activeTab].subtitle}
                     </span>
                   </h1>
-                  <p className="text-lg text-white/80 mb-5 font-medium leading-relaxed max-w-lg">
+                  <p className="text-base text-white/80 mb-4 font-medium max-w-lg">
                     {content[activeTab].subheadline}
                   </p>
 
-                  <ul className="flex flex-col gap-5">
+                  <ul className="flex flex-col gap-3">
                     {content[activeTab].list.map((item, i) => (
                       <li
                         key={i}
-                        className="flex gap-3 items-start text-base text-white"
+                        className="flex gap-2.5 items-start text-base text-white"
                       >
-                        <span className="mt-0.5 flex-shrink-0 w-4.5 h-4.5 bg-white rounded-full flex items-center justify-center shadow-md">
+                        <span className="mt-0.5 flex-shrink-0 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-md">
                           <svg
-                            width="14"
-                            height="14"
+                            width="12"
+                            height="12"
                             viewBox="0 0 12 12"
                             fill="none"
                           >
                             <path
                               d="M10 3L4.5 8.5L2 6"
                               stroke="black"
-                              strokeWidth="2.5"
+                              strokeWidth="2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             />
                           </svg>
                         </span>
                         <span
-                          className="leading-snug pt-0.5"
+                          className="leading-snug"
                           dangerouslySetInnerHTML={{
                             __html: item,
                           }}
@@ -298,10 +298,10 @@ export const AboutHeroMobile = () => {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="relative w-full h-full max-w-[320px]"
+                className="relative w-full h-full max-w-[280px]"
               >
                 <motion.div
-                  animate={{ y: [0, -10, 0] }}
+                  animate={{ y: [0, -8, 0] }}
                   transition={{
                     duration: 4,
                     repeat: Infinity,
