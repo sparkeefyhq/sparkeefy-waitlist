@@ -139,7 +139,7 @@ const WhoIsSparkeefyFor = () => {
               backgroundPosition: { duration: 2.0, ease: "easeInOut", delay: 0.2 } 
             }}
             viewport={{ once: true }}
-            className="text-2xl md:text-[2rem] font-semibold md:font-bold md:leading-none md:tracking-tight bg-clip-text text-transparent mb-1 md:mb-0"
+            className="text-xl md:text-[2rem] font-semibold md:font-bold md:leading-none md:tracking-tight bg-clip-text text-transparent mb-1 md:mb-0"
              style={{ 
               backgroundImage: "linear-gradient(91deg, #FFF 4%, #FDE 25%, #FFF 48%, #FFFFFF 50%, #FFFFFF 100%)",
               backgroundSize: "200% 100%",
@@ -158,7 +158,7 @@ const WhoIsSparkeefyFor = () => {
             viewport={{ once: true }}
             className="relative inline-block"
           >
-            <p className="text-xl md:text-[2rem] font-medium text-white">
+            <p className="text-lg md:text-[2rem] font-medium text-white">
               Some sparks are{" "}
               <span className="relative inline-block">
                 <span className="relative inline-block">
@@ -235,10 +235,10 @@ const WhoIsSparkeefyFor = () => {
       {/* Content Section - Cards */}
       <div className="mt-14 md:mt-20">
         <div className="text-center mb-7">
-          <h2 className="text-[2rem] md:text-[2.5rem] font-semibold md:font-bold text-white mb-1.5">
+          <h2 className="text-[1.75rem] md:text-[2.5rem] font-semibold md:font-bold text-white mb-1.5">
             Who is Sparkeefy for?
           </h2>
-          <p className="text-white/70 text-xl md:text-2xl font-medium">
+          <p className="text-white/70 text-lg md:text-2xl font-medium">
             For the <span className="font-semibold">people</span> you care about
             and the relationships that matter most.
           </p>

@@ -23,14 +23,24 @@ interface FeatureTabsMobileProps {
 export const FeatureTabsMobile = ({ effect = "creative" }: FeatureTabsMobileProps) => {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Auto-scroll tabs container to show active tab
   React.useEffect(() => {
-    if (tabRefs.current[activeIndex]) {
-      tabRefs.current[activeIndex]?.scrollIntoView({
+    const container = containerRef.current;
+    const activeTab = tabRefs.current[activeIndex];
+
+    if (container && activeTab) {
+      const containerWidth = container.offsetWidth;
+      const tabOffsetLeft = activeTab.offsetLeft;
+      const tabWidth = activeTab.offsetWidth;
+
+      // Calculate scroll position to center the active tab
+      const scrollLeft = tabOffsetLeft - (containerWidth / 2) + (tabWidth / 2);
+
+      container.scrollTo({
+        left: scrollLeft,
         behavior: "smooth",
-        block: "nearest",
-        inline: "center",
       });
     }
   }, [activeIndex]);
@@ -47,7 +57,10 @@ export const FeatureTabsMobile = ({ effect = "creative" }: FeatureTabsMobileProp
       </div>
 
       {/* Tab Pills */}
-      <div className="flex gap-2 px-4 mb-6 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
+      <div 
+        ref={containerRef}
+        className="flex gap-2 px-4 mb-6 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory"
+      >
         {featureCards.map((card, index) => (
           <motion.button
             key={card.id}

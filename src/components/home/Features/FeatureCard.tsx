@@ -74,8 +74,7 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
   const opacity = useSpring(opacityRaw, springConfig);
   const scale = useSpring(scaleRaw, springConfig);
 
-  // Track hover state for button animation
-  const [isHovered, setIsHovered] = React.useState(false);
+
 
   // Pointer Events: Auto only when Active (Straight)
   const pointerEvents = useTransform(
@@ -126,37 +125,15 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
             <span className="font-semibold">{card.highlight}</span>
           </p>
           <button
-            className="group relative cursor-pointer inline-flex items-center justify-center overflow-hidden px-4 md:px-6 py-2 md:py-3 rounded-full text-black bg-white text-sm md:text-base font-medium hover:border-white/50 transition-all min-w-[120px] md:min-w-[140px]"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            className="group relative cursor-pointer inline-flex items-center justify-center overflow-hidden px-4 md:px-6 py-2 md:py-3 rounded-full text-black bg-white text-sm md:text-base font-medium hover:bg-gray-50 transition-all min-w-[120px] md:min-w-[140px]"
             onClick={() => window.open("/about")}
           >
-            <div className="grid grid-cols-1 grid-rows-1 place-items-center">
-              {/* Know More - Slides Up */}
-              <motion.span
-                className="col-start-1 row-start-1 flex items-center gap-2 whitespace-nowrap"
-                animate={{ y: isHovered ? "-150%" : "0%" }}
-                transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
-              >
-                Know More
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M6.11279 16.7836L10.9128 11.9836L6.11279 7.18359M12.8328 16.7836L17.6328 11.9836L12.8328 7.18359" stroke="currentColor" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </motion.span>
-              
-              {/* Get Started - Slides Up from Bottom */}
-              <motion.span
-                className="col-start-1 row-start-1 flex items-center gap-2 whitespace-nowrap"
-                initial={{ y: "150%" }}
-                animate={{ y: isHovered ? "0%" : "150%" }}
-                transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
-              >
-                Get Started
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M6.11279 16.7836L10.9128 11.9836L6.11279 7.18359M12.8328 16.7836L17.6328 11.9836L12.8328 7.18359" stroke="currentColor" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </motion.span>
-            </div>
+            <span className="flex items-center gap-2 whitespace-nowrap">
+              Know More
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M6.11279 16.7836L10.9128 11.9836L6.11279 7.18359M12.8328 16.7836L17.6328 11.9836L12.8328 7.18359" stroke="currentColor" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
           </button>
         </div>
 
