@@ -15,7 +15,6 @@ export const FeatureTabs = () => {
 
   // Robust Media Query via react-responsive (Handles scaling/zoom better)
   const [mounted, setMounted] = React.useState(false);
-  const isTallScreen = useMediaQuery({ minHeight: 800 });
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
   React.useEffect(() => {
@@ -108,16 +107,16 @@ export const FeatureTabs = () => {
         ))}
       </div>
 
-      {/* Section Header - outside sticky for non-tall desktop screens */}
-      {mounted && !isTallScreen && !isMobile && (
+      {/* Section Header - outside sticky for non-tall desktop screens (height < 900) */}
+      <div className="hidden [@media(min-height:901px)]:md:hidden md:block">
         <FeatureHeader activeColor={featureCards[activeIndex].accentColor} />
-      )}
+      </div>
 
       {/* Sticky Container */}
       <div className="sticky top-6 md:top-8 px-4 bg-white">
-        {/* Header inside sticky for mobile and tall screens */}
-        {mounted && (isMobile || isTallScreen) && (
-          <div className={isTallScreen ? "pt-4 md:pt-10" : ""}>
+        {/* Header inside sticky for mobile and tall screens (height >= 900) */}
+        <div className="md:hidden lg:[@media(min-height:900px)]:block hidden">
+          <div className="lg:[@media(min-height:900px)]:pt-10">
             {isMobile ? (
               <FeatureHeaderMbile activeColor={featureCards[activeIndex].accentColor} />
             ) : (
@@ -126,8 +125,8 @@ export const FeatureTabs = () => {
               />
             )}
           </div>
-        )}
-        <div className="flex md:flex-wrap md:justify-center gap-2 md:gap-5 mb-6 md:mb-14 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide snap-x snap-mandatory">
+        </div>
+        <div className="flex md:flex-wrap md:justify-center gap-2 md:gap-5 mb-6 md:mb-16 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide snap-x snap-mandatory">
           {featureCards.map((card, index) => (
             <motion.button
               key={card.id}
