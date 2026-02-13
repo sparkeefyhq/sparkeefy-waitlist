@@ -339,8 +339,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
  */
 async function startServer() {
   try {
-    // Connect to database
-    logger.info("Connecting to database...");
+    logger.info("Connecting to database...", {
+      databaseUrl: process.env.DATABASE_URL,
+    });
     await connectDatabase();
     logger.info("Database connected successfully");
 
