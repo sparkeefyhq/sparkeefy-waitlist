@@ -30,7 +30,10 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@sentry/node": "^7.119.0",
     "@sentry/profiling-node": "^7.119.0",
-    "@trpc/server": "^10.45.2",
+    "@tanstack/react-query": "^5.90.21",
+    "@trpc/client": "^11.10.0",
+    "@trpc/react-query": "^11.10.0",
+    "@trpc/server": "^11.10.0",
     "@types/react-responsive": "^9.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -54,7 +57,7 @@
     "swiper": "^12.1.0",
     "tailwind-merge": "^3.4.0",
     "winston": "^3.14.2",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.15.8",
