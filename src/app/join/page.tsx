@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -105,7 +106,9 @@ export default function JoinPage() {
             </p>
           </div>
           <div className="w-full">
-            <EmailForm onSubmit={handleEmailSubmit} />
+            <Suspense fallback={<div className="h-[52px] rounded-full bg-white/10 animate-pulse" />}>
+              <EmailForm onSubmit={handleEmailSubmit} />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -157,7 +160,9 @@ export default function JoinPage() {
           </p>
         </div>
         <div className="w-full">
-          <EmailForm onSubmit={handleEmailSubmit} />
+          <Suspense fallback={<div className="h-[52px] rounded-full bg-white/10 animate-pulse" />}>
+            <EmailForm onSubmit={handleEmailSubmit} />
+          </Suspense>
         </div>
       </div>
     </>
