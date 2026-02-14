@@ -1,0 +1,16 @@
+# Render Blueprint: Express backend only (free tier).
+# Set all env vars in Render Dashboard → Service → Environment.
+# See DEPLOY.md for the full list.
+
+services:
+  - type: web
+    name: waitlist-api
+    runtime: node
+    plan: free
+
+    buildCommand: pnpm install && pnpm prisma generate
+    startCommand: pnpm run start:prod
+    preDeployCommand: pnpm prisma migrate deploy
+
+    # Env vars (add in Dashboard): DATABASE_URL, CORS_ORIGIN, FRONTEND_URL,
+    # SESSION_*, SMTP_*, SENTRY_*, RATE_LIMIT_*, etc. Copy from .env.example.
