@@ -2,7 +2,6 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { 
   EffectCards, 
@@ -165,11 +164,11 @@ export const FeatureCardMobile = ({
         }}
         onSlideChange={handleSlideChange}
         speed={500}
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: true,
-          pauseOnMouseEnter: true,
-        }}
+        // autoplay={{
+        //   delay: 5000,
+        //   disableOnInteraction: true,
+        //   pauseOnMouseEnter: true,
+        // }}
       >
         {featureCards.map((card, index) => (
           <SwiperSlide 
