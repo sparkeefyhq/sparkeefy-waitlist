@@ -37,7 +37,7 @@ initializeSentry();
 // ============================================================================
 
 const app = express();
-
+app.set("trust proxy", 1);
 // ============================================================================
 // SECURITY MIDDLEWARE
 // ============================================================================
@@ -171,7 +171,7 @@ const globalLimiter = rateLimit({
  */
 const joinLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // 5 requests per hour
+  max: 20, // 5 requests per hour
   message: "Too many signup attempts, please try again later",
   skipSuccessfulRequests: false,
   handler: (req: Request, res: Response) => {

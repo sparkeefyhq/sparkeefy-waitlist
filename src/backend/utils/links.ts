@@ -23,7 +23,7 @@ export const REFERRAL_QUERY_PARAM = "ref";
  * Default Frontend URL
  * Fallback if FRONTEND_URL environment variable not set
  */
-const DEFAULT_FRONTEND_URL = "http://localhost:3000";
+const DEFAULT_FRONTEND_URL = "http://localhost:5173";
 
 // ============================================================================
 // LINK CONSTRUCTION

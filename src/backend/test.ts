@@ -9,7 +9,7 @@ async function testEmail() {
 
   try {
     await emailService.sendMagicLinkEmail({
-      email: "khwaisharora28@gmail.com", // ✅ CHANGE THIS TO YOUR EMAIL
+      email: "sparkeefy@gmail.com", // !! CHANGE THIS TO YOUR EMAIL
       magicLinkUrl: "https://sparkeefy.com/auth/magic?token=abc123def456",
       referralCode: "TEST1234",
       referralLink: "https://sparkeefy.com?ref=TEST1234",
