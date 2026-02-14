@@ -157,7 +157,7 @@ type ValidateReferralCodeInput = z.infer<typeof validateReferralCodeInput>;
  * 
  * @mutation
  * @public
- * @rateLimit 5 requests per IP per hour
+ * @rateLimit 20 requests per IP per hour
  * @realtime Triggers SSE event if referral credited
  */
 const join = rateLimitedProcedure
@@ -184,7 +184,7 @@ const join = rateLimitedProcedure
       // Step 1: Check if email already exists
       const existingUser = await waitlistService.findUserByEmail(input.email);
       
-      // ✅ VALIDATE REAL EMAIL (catches gmail.com with no MX records)
+      // VALIDATE REAL EMAIL (catches gmail.com with no MX records)
       if (!isAllowedEmailDomain(input.email, BLOCKED_EMAIL_DOMAINS)) {
         logger.warn("Disposable email blocked", {
           email: input.email.substring(0, 5) + "***",
