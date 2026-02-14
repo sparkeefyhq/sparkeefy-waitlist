@@ -56,7 +56,7 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.string().transform(Number).pipe(z.number().min(1000)).default("900000"), // 15 minutes
   RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).pipe(z.number().min(1)).default("100"),
   JOIN_RATE_LIMIT_WINDOW_MS: z.string().transform(Number).pipe(z.number().min(1000)).default("3600000"), // 1 hour
-  JOIN_RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).pipe(z.number().min(1)).default("5"),
+  JOIN_RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).pipe(z.number().min(1)).default("20"),
 });
 
 // ============================================================================

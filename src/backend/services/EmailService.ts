@@ -127,7 +127,7 @@ export class EmailService {
 
     await this.sendEmail({
       to: data.email,
-      subject: "🎉 Welcome to Sparkeefy - Your Magic Link Inside!",
+      subject: "Welcome to Sparkeefy",
       html,
       text,
     });
@@ -366,149 +366,124 @@ export class EmailService {
   private buildMagicLinkHTML(data: MagicLinkEmailData): string {
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Sparkeefy</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sparkeefy</title>
 </head>
 
-<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111;">
+<body style="margin:0;padding:0;background:#f3f3f3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111;">
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-    <tr>
-      <td align="center" style="padding:40px 20px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding:50px 20px;">
 
-        <!-- Main Container -->
-        <table role="presentation" width="640" style="max-width:100%;border-collapse:collapse;">
+<!-- White Card Container -->
+<table role="presentation" width="640" style="max-width:100%;background:#ffffff;padding:50px;border:1px solid #e5e5e5;">
 
-          <!-- Logo / Brand -->
-          <tr>
-            <td style="padding-bottom:30px;">
-              <div style="font-size:26px;font-weight:700;">
-                ✦ Sparkeefy
-              </div>
-            </td>
-          </tr>
+<!-- Logo -->
+<tr>
+<td style="padding-bottom:40px;">
+  <img src="https://sparkeefy.com/logo.svg"
+       alt="Sparkeefy"
+       width="160"
+       style="display:block;border:0;margin-bottom:10px;" />
+</td>
+</tr>
 
-          <!-- Headline -->
-          <tr>
-            <td style="padding-bottom:25px;">
-              <h1 style="margin:0;font-size:40px;line-height:1.2;font-weight:700;">
-                Thank you for signing up!
-              </h1>
-            </td>
-          </tr>
+<!-- Heading -->
+<tr>
+<td style="padding-bottom:30px;">
+  <h1 style="margin:0;font-size:42px;font-weight:700;line-height:1.2;">
+    You’re on the list.
+  </h1>
+</td>
+</tr>
 
-          <!-- Intro Text -->
-          <tr>
-            <td style="padding-bottom:25px;font-size:18px;line-height:1.6;color:#444;">
-              Welcome! You’re officially on the <strong>Sparkeefy Waitlist</strong>.  
-              Use your personal magic link below to access your dashboard and track your progress.
-            </td>
-          </tr>
+<!-- Body Text -->
+<tr>
+<td style="padding-bottom:20px;font-size:18px;line-height:1.7;color:#555;">
+  You’re officially on the Sparkeefy waitlist.<br/>
+  Early access opens soon.
+</td>
+</tr>
 
-          <!-- Magic Link -->
-          <tr>
-            <td style="padding-bottom:35px;font-size:16px;line-height:1.6;">
-              <a href="${data.magicLinkUrl}" 
-                 style="color:#1a73e8;text-decoration:underline;word-break:break-all;">
-                ${data.magicLinkUrl}
-              </a>
-            </td>
-          </tr>
+<!-- Referral Label -->
+<tr>
+<td style="padding-top:25px;padding-bottom:8px;font-size:16px;font-weight:600;">
+  Your referral link
+</td>
+</tr>
 
-          <!-- Divider -->
-          <tr>
-            <td style="border-top:1px solid #e5e5e5;padding:30px 0;"></td>
-          </tr>
+<!-- Referral Link -->
+<tr>
+<td style="padding-bottom:35px;font-size:16px;">
+  <a href="${data.referralLink}"
+     style="color:#1a73e8;text-decoration:underline;word-break:break-all;">
+     ${data.referralLink}
+  </a>
+</td>
+</tr>
 
-          <!-- Referral Section -->
-          <tr>
-            <td style="padding-bottom:20px;font-size:20px;font-weight:600;">
-              Share your referral link to move up the waitlist:
-            </td>
-          </tr>
+<!-- CTA Button -->
+<tr>
+<td style="padding-bottom:40px;">
+  <a href="${data.magicLinkUrl}"
+     style="display:inline-block;padding:14px 28px;background:#111;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;border-radius:3px;">
+     View your progress
+  </a>
+</td>
+</tr>
 
-          <tr>
-            <td style="padding-bottom:15px;font-size:16px;">
-              Your referral code:
-              <div style="margin-top:6px;font-size:22px;font-weight:700;letter-spacing:1px;">
-                ${data.referralCode}
-              </div>
-            </td>
-          </tr>
+</table>
 
-          <tr>
-            <td style="padding-bottom:30px;font-size:16px;">
-              <a href="${data.referralLink}" 
-                 style="color:#1a73e8;text-decoration:underline;word-break:break-all;">
-                ${data.referralLink}
-              </a>
-            </td>
-          </tr>
+<!-- Footer -->
+<table role="presentation" width="640" style="max-width:100%;margin-top:25px;">
+<tr>
+<td align="center" style="font-size:14px;color:#777;padding-top:20px;">
+  No spam. No unnecessary notifications. Just thoughtful updates.
+</td>
+</tr>
 
-          <!-- Divider -->
-          <tr>
-            <td style="border-top:1px solid #e5e5e5;padding:30px 0;"></td>
-          </tr>
+<tr>
+<td align="center" style="font-size:12px;color:#aaa;padding-top:8px;">
+  © ${new Date().getFullYear()} Sparkeefy
+</td>
+</tr>
+</table>
 
-          <!-- Footer -->
-          <tr>
-            <td style="font-size:14px;color:#666;line-height:1.6;">
-              Need help? Reply to this email and we’ll take care of you.
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding-top:10px;font-size:13px;color:#999;">
-              © ${new Date().getFullYear()} Sparkeefy. All rights reserved.
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
+</td>
+</tr>
+</table>
 
 </body>
 </html>
-  `.trim();
+`.trim();
 }
+
 
   /**
    * Build Magic Link Plain Text Email
    */
   private buildMagicLinkPlainText(data: MagicLinkEmailData): string {
-    return `
-Welcome to Sparkeefy!
+  return `
+You’re on the list.
 
-Hi there!
+You’re officially on the Sparkeefy waitlist.
+Early access opens soon.
 
-You've successfully joined the Sparkeefy waitlist. We're thrilled to have you on board!
+Your referral link:
+${data.referralLink}
 
-ACCESS YOUR DASHBOARD
-Click this magic link to access your stats anytime:
+View your progress:
 ${data.magicLinkUrl}
 
-Note: This link never expires and works on any device. Bookmark it for easy access!
+No spam. No unnecessary notifications. Just thoughtful updates.
 
-INVITE FRIENDS & EARN REWARDS
-Share your unique referral link and unlock exclusive perks:
-
-Your Referral Code: ${data.referralCode}
-Your Referral Link: ${data.referralLink}
-
-REFERRAL REWARDS:
-• 3 referrals → 1 month free premium
-• 6 referrals → 3 months free premium  
-• 10+ referrals → Lifetime Founder Seat
-
----
-Questions? Reply to this email or visit: https://sparkeefy.com/support
-© ${new Date().getFullYear()} Sparkeefy. All rights reserved.
-    `.trim();
-  }
+© ${new Date().getFullYear()} Sparkeefy
+`.trim();
+}
 }
 
 // ============================================================================

@@ -33,7 +33,7 @@ const rateLimitStore = new Map<string, RateLimitEntry>();
  */
 const RATE_LIMIT_CONFIG = {
   windowMs: 60 * 60 * 1000, // 1 hour in milliseconds
-  maxRequests: 5,
+  maxRequests: 20,
   enabled: process.env.NODE_ENV === "production", // Disabled in development
 };
 
