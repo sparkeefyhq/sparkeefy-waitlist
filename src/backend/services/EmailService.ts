@@ -127,7 +127,7 @@ export class EmailService {
 
     await this.sendEmail({
       to: data.email,
-      subject: "🎉 Welcome to Sparkeefy - Your Magic Link Inside!",
+      subject: "Welcome to Sparkeefy",
       html,
       text,
     });

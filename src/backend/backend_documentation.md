@@ -132,7 +132,7 @@ The following are explicitly NOT included in backend implementation:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│           Express.js HTTP Server (Port 3000)             │
+│           Express.js HTTP Server                         │
 ├──────────────────────────────────────────────────────────┤
 │  Middleware Layer                                        │
 │  ├─ CORS Configuration                                   │
@@ -462,7 +462,7 @@ PORT=4000                        # HTTP server port
 HOST="0.0.0.0"                   # Bind to all interfaces
 
 # Frontend Origin (CORS + referral link base)
-FRONTEND_URL="http://localhost:3000"  # Development
+FRONTEND_URL="http://localhost:5173"  # Development
 # or "https://app.com"                 # Production
 
 # Security & Sessions
@@ -474,7 +474,7 @@ RATE_LIMIT_WINDOW_MS=3600000    # 1 hour in milliseconds
 RATE_LIMIT_MAX_REQUESTS=5       # Max requests per IP in window
 
 # CORS Configuration
-CORS_ORIGIN="http://localhost:3000"  # Frontend domain
+CORS_ORIGIN="http://localhost:5173"  # Frontend domain
 # Multiple origins separated by comma: "http://localhost:3000,https://app.com"
 
 # Observability
@@ -512,7 +512,7 @@ All environment variables must be validated on application startup using Zod. Th
 | `DATABASE_URL` | Local PostgreSQL/MySQL | RDS/Cloud SQL endpoint | Required; no default |
 | `NODE_ENV` | development | production | Controls security settings (secure cookies, HTTPS enforcement) |
 | `PORT` | 4000 | 4000 (behind reverse proxy typically) | Configurable per deployment |
-| `FRONTEND_URL` | http://localhost:3000 | https://app.com | Used for CORS and referral link generation |
+| `FRONTEND_URL` | http://localhost:5173 | https://app.com | Used for CORS and referral link generation |
 | `COOKIE_SECRET` | any random string | MUST be strong random string | Change regularly in production |
 | `SESSION_TTL_DAYS` | 30 (or 1 for testing) | 30 | Can be reduced for security, increased for convenience |
 | `SENTRY_DSN` | Optional (skip locally) | REQUIRED | Essential for production error tracking |
