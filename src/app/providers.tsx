@@ -19,6 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         httpBatchLink({
           url: apiUrl,
           transformer: superjson,
+          methodOverride: "POST",
           fetch(url, opts) {
             return fetch(url, {
               ...opts,
