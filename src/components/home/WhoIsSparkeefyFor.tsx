@@ -251,12 +251,13 @@ const WhoIsSparkeefyFor = () => {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="bg-[#1A1919] rounded-3xl px-6 py-8"
           >
-            <div className="mb-3 flex justify-center md:justify-start">
+            <div className="mb-3 flex justify-center md:justify-start h-28">
              <Image
                 src="/img/couples.png"
                 alt="Couples"
                 width={100}
                 height={100}
+                className="object-contain"
               />
             </div>
             <h3 className="text-[1.625rem] font-bold text-white mb-2">Couples</h3>
@@ -275,12 +276,13 @@ const WhoIsSparkeefyFor = () => {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="bg-[#1A1919] rounded-3xl px-6 py-8"
           >
-            <div className="mb-3 flex justify-center md:justify-start">
+            <div className="mb-3 flex justify-center md:justify-start h-28">
               <Image
                 src="/img/friends.png"
                 alt="Friends"
-                width={100}
-                height={100}
+                width={96}
+                height={96}
+                className="object-contain"
               />
             </div>
             <h3 className="text-[1.625rem] font-bold text-white mb-2">Friends</h3>
@@ -299,12 +301,13 @@ const WhoIsSparkeefyFor = () => {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="bg-[#1A1919] rounded-3xl px-6 py-8"
           >
-            <div className="mb-3 flex justify-center md:justify-start">
+            <div className="mb-3 flex justify-center md:justify-start h-28">
              <Image
                 src="/img/family-members.png"
                 alt="Family Members"
-                width={100}
-                height={100}
+                width={104}
+                height={104}
+                className="object-contain"
               />
             </div>
             <h3 className="text-[1.625rem] font-bold text-white mb-2">
