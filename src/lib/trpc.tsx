@@ -14,6 +14,7 @@ export const trpcClient = trpc.createClient({
     httpBatchLink({
       url: trpcUrl,
       transformer: superjson,
+      methodOverride: "POST",
     }),
   ],
 });
