@@ -367,6 +367,60 @@ export function buildSharingLinks(
   };
 }
 
+export type ReferralShareService =
+  | "instagram"
+  | "whatsapp"
+  | "reddit"
+  | "snapchat"
+  | "discord"
+  | "linkedin"
+  | "x";
+
+export interface ReferralSharePayload {
+  message: string;
+  url: string;
+  text: string;
+  links: Record<ReferralShareService, string | null>;
+  nativeSharePreferredServices: ReferralShareService[];
+}
+
+const DEFAULT_REFERRAL_SHARE_MESSAGE =
+  "I just joined Sparkeefy early access. Use my referral link to join:";
+
+/**
+ * Build sharing payload for referral page actions.
+ *
+ * Returns a normalized set of links and native-share preferences so the UI can
+ * decide the best interaction per platform and device.
+ */
+export function buildReferralSharePayload(
+  referralLink: string,
+  message: string = DEFAULT_REFERRAL_SHARE_MESSAGE
+): ReferralSharePayload {
+  const encodedLink = encodeURIComponent(referralLink);
+  const encodedMessage = encodeURIComponent(message);
+  const encodedText = encodeURIComponent(`${message} ${referralLink}`);
+
+  return {
+    message,
+    url: referralLink,
+    text: `${message} ${referralLink}`,
+    links: {
+      // Instagram has no reliable web intent for pre-filled share content.
+      instagram: null,
+      whatsapp: `https://wa.me/?text=${encodedText}`,
+      reddit: `https://reddit.com/submit?url=${encodedLink}&title=${encodedMessage}`,
+      // Snapchat web sharing is inconsistent; native sheet is preferred.
+      snapchat: null,
+      // Discord has no prefilled web compose endpoint.
+      discord: "https://discord.com/channels/@me",
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedLink}`,
+      x: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedLink}`,
+    },
+    nativeSharePreferredServices: ["instagram", "snapchat"],
+  };
+}
+
 // ============================================================================
 // URL UTILITIES
 // ============================================================================

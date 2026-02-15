@@ -7,14 +7,19 @@ import { motion } from "framer-motion";
 import { waitlistContent, successContent } from "@/lib/config/waitlist.config";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 
-const WAIT_SECONDS = 2;
-const FADE_DURATION = 0.5;
+const WAIT_SECONDS = 0.35;
+const FADE_DURATION = 0.2;
 
 function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [isExiting, setIsExiting] = useState(false);
+  const referralPath = token ? `/join/referral?token=${encodeURIComponent(token)}` : "/join/referral";
+
+  useEffect(() => {
+    router.prefetch(referralPath);
+  }, [referralPath, router]);
 
   useEffect(() => {
     const waitTimer = setTimeout(() => {
@@ -27,11 +32,10 @@ function SuccessContent() {
   useEffect(() => {
     if (!isExiting) return;
     const redirectTimer = setTimeout(() => {
-      const query = token ? `?token=${encodeURIComponent(token)}` : "";
-      router.replace(`/join/referral${query}`);
+      router.replace(referralPath);
     }, FADE_DURATION * 1000);
     return () => clearTimeout(redirectTimer);
-  }, [isExiting, router, token]);
+  }, [isExiting, referralPath, router]);
   const animatedUnderline = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
