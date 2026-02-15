@@ -48,7 +48,7 @@ Trade-off: first request after idle can take ~30–60 seconds while Render and/o
    | `SESSION_COOKIE_NAME` | `sparkeefy_session` (or keep default) |
    | `SESSION_DURATION_DAYS` | `30` |
 
-   Optional: `SMTP_*` for emails, `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `RATE_LIMIT_*`, `JOIN_RATE_LIMIT_*` (see `.env.example`).
+   Optional: `SMTP_*` for emails (see `.env.example`).
 
 7. **Advanced** → **Pre-deploy command** (optional; runs migrations before each deploy):  
    `pnpm prisma migrate deploy`  

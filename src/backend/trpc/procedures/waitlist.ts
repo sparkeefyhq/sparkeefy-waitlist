@@ -15,7 +15,7 @@ import {
 import { buildReferralLink, buildAbsoluteReferralLink, buildMagicLinkUrl } from "../../utils/links.js";  // UPDATE this line
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { requireAuth, rateLimit } from "../middleware";
+import { requireAuth } from "../middleware";
 import { WaitlistService } from "../../services/WaitlistService";
 import { ReferralService } from "../../services/ReferralService";
 import { SessionService } from "../../services/SessionService";
@@ -36,7 +36,6 @@ import { BLOCKED_EMAIL_DOMAINS, strictEmailSchema, isAllowedEmailDomain } from "
 // ============================================================================
 
 const protectedProcedure = publicProcedure.use(requireAuth);
-const rateLimitedProcedure = publicProcedure.use(rateLimit);
 
 /**
  * Join Waitlist Input Schema
@@ -156,10 +155,8 @@ type ValidateReferralCodeInput = z.infer<typeof validateReferralCodeInput>;
  * 
  * @mutation
  * @public
- * @rateLimit 20 requests per IP per hour
  */
-const join = rateLimitedProcedure
-  .use(rateLimit)
+const join = publicProcedure
   .input(joinWaitlistInput)
   .mutation(async ({ input, ctx }): Promise<WaitlistJoinResponse> => {
     const startTime = Date.now();

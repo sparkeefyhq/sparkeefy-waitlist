@@ -13,23 +13,14 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
-import rateLimit from "express-rate-limit";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { config } from "./config";
 import { appRouter } from "./trpc/router";
 import { createContext } from "./trpc/context";
 import { connectDatabase, disconnectDatabase } from "./db/client";
 import { logger } from "./logging/logger";
-import { initializeSentry, sentryErrorHandler } from "./logging/sentry";
-
 import { config as loadDotenv } from "dotenv";
 import { resolve } from "path";
-
-// ============================================================================
-// SENTRY INITIALIZATION
-// ============================================================================
-
-initializeSentry();
 
 // ============================================================================
 // EXPRESS APP SETUP
@@ -130,59 +121,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // ============================================================================
-// RATE LIMITING
-// ============================================================================
-
-/**
- * Global Rate Limiter
- * 
- * Limits: 100 requests per 15 minutes per IP
- * Applies to all endpoints except health check
- */
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per window
-  message: "Too many requests from this IP, please try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req: Request, res: Response) => {
-    logger.warn("Rate limit exceeded", {
-      ip: req.ip,
-      url: req.url,
-    });
-    res.status(429).json({
-      error: "Too many requests",
-      message: "Please try again later",
-    });
-  },
-});
-
-/**
- * Waitlist Join Rate Limiter
- * 
- * Limits: 5 requests per hour per IP
- * Prevents spam signups
- */
-const joinLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // 5 requests per hour
-  message: "Too many signup attempts, please try again later",
-  skipSuccessfulRequests: false,
-  handler: (req: Request, res: Response) => {
-    logger.warn("Join rate limit exceeded", {
-      ip: req.ip,
-    });
-    res.status(429).json({
-      error: "Too many signup attempts",
-      message: "Please try again in an hour",
-    });
-  },
-});
-
-// Apply global rate limiter
-app.use(globalLimiter);
-
-// ============================================================================
 // HEALTH CHECK ENDPOINT
 // ============================================================================
 
@@ -275,14 +213,6 @@ app.use((req: Request, res: Response) => {
 // ============================================================================
 // ERROR HANDLER
 // ============================================================================
-
-/**
- * Sentry Error Handler
- * 
- * Captures all unhandled errors and sends to Sentry.
- * Must be registered before other error handlers.
- */
-app.use(sentryErrorHandler);
 
 /**
  * Global Error Handler

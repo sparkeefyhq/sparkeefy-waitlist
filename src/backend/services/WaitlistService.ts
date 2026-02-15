@@ -19,7 +19,6 @@ import type {
 } from "../types";
 import { db } from "../db/client";
 import { logger } from "../logging/logger";
-import * as Sentry from "@sentry/node";
 import { 
   generateReferralCode, 
   generateUniqueCode 
@@ -237,21 +236,6 @@ export class WaitlistService {
       // The procedure in waitlist.ts will call ReferralService.createReferral()
       // after user creation to maintain separation of concerns
 
-      // ======================================================================
-      // STEP 8: TRACK SUCCESS IN SENTRY
-      // ======================================================================
-
-      Sentry.addBreadcrumb({
-        category: "waitlist",
-        message: "User joined waitlist",
-        level: "info",
-        data: {
-          userId: newUser.id,
-          email: newUser.email,
-          hasReferrer: !!referrerUser,
-        },
-      });
-
       return newUser;
     } catch (error) {
       // Log error with context
@@ -259,20 +243,6 @@ export class WaitlistService {
         error,
         email: input.email,
         correlationId,
-      });
-
-      // Track error in Sentry
-      Sentry.captureException(error, {
-        tags: {
-          operation: "join_waitlist",
-          email: input.email,
-        },
-        contexts: {
-          waitlist: {
-            email: input.email,
-            hasReferralCode: !!input.referralCode,
-          },
-        },
       });
 
       // Re-throw if already TRPCError
@@ -386,7 +356,6 @@ export class WaitlistService {
       return await this.db.findUserByEmail(email.toLowerCase());
     } catch (error) {
       logger.error("Error finding user by email", { error, email });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Database error while checking email",
@@ -406,7 +375,6 @@ export class WaitlistService {
       return await this.db.findUserByReferralCode(code.toUpperCase());
     } catch (error) {
       logger.error("Error finding user by referral code", { error, code });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Database error while validating referral code",
@@ -426,7 +394,6 @@ export class WaitlistService {
       return await this.db.findUserBySessionToken(token);
     } catch (error) {
       logger.error("Error finding user by session token", { error });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Database error during authentication",
@@ -470,7 +437,6 @@ export class WaitlistService {
         error: error instanceof Error ? error.message : String(error),
         tokenPrefix: magicLinkToken.substring(0, 8) + "***" 
       });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Database error during magic link authentication",
@@ -497,7 +463,6 @@ export class WaitlistService {
       return await (this.db as any).findUserById(userId);
     } catch (error) {
       logger.error("Error finding user by ID", { error, userId });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Database error while fetching user",
@@ -517,7 +482,6 @@ export class WaitlistService {
       return await this.db.createUser(data);
     } catch (error) {
       logger.error("Error creating user", { error, email: data.email });
-      Sentry.captureException(error);
 
       // Check for unique constraint violation
       if ((error as any).code === "23505" || (error as any).code === "ER_DUP_ENTRY") {

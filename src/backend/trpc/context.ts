@@ -123,7 +123,7 @@ export async function createContext({
   // Extract session token from httpOnly cookie
   const sessionToken = extractSessionToken(req);
 
-  // Extract IP address for rate limiting and fraud detection
+  // Extract IP address for logging and fraud detection
   const ipAddress = extractIpAddress(req);
 
   // Generate/extract request ID for correlation

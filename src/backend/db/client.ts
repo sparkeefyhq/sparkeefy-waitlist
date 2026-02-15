@@ -17,8 +17,6 @@ import type {
   CreateUserInput,
 } from "../types";
 import { logger } from "../logging/logger";
-import * as Sentry from "@sentry/node";
-
 // ============================================================================
 // PRISMA CLIENT CONFIGURATION
 // ============================================================================
@@ -52,7 +50,6 @@ const prisma = new PrismaClient({
 // Log errors
 prisma.$on("error" as never, (e: any) => {
   logger.error("Prisma error", { error: e });
-  Sentry.captureException(e);
 });
 
 // Log warnings
@@ -87,7 +84,6 @@ export async function connectDatabase(): Promise<void> {
     logger.info("Database connected successfully");
   } catch (error) {
     logger.error("Failed to connect to database", { error });
-    Sentry.captureException(error);
     throw error;
   }
 }
@@ -104,7 +100,6 @@ export async function disconnectDatabase(): Promise<void> {
     logger.info("Database disconnected successfully");
   } catch (error) {
     logger.error("Failed to disconnect from database", { error });
-    Sentry.captureException(error);
   }
 }
 

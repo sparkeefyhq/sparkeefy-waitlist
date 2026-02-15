@@ -5,7 +5,7 @@
 **Framework:** tRPC + Express  
 **Database:** Supabase (postgresql hosted)  
 **Real-time Transport:** SSE (Server-Sent Events)  
-**Observability:** Winston + Sentry  
+**Observability:** Winston  
 **Last Updated:** January 2026
 
 ---
@@ -37,7 +37,7 @@
 
 This documentation specifies the complete backend implementation for a waitlist and referral system MVP. The system is designed as a **single-server monolithic Node.js application** using tRPC for type-safe API procedures, PostgreSQL/MySQL for persistent data storage, and SSE for real-time referral count updates. The architecture prioritizes simplicity, production-readiness, and minimal operational overhead while maintaining enterprise-grade security, observability, and error handling practices.
 
-The backend handles core workflows including waitlist entry collection, unique referral code generation, referral tracking with tier-based rewards, session-based user authentication without traditional login flows, and real-time notifications for referral milestones. All inputs are validated at the tRPC boundary using Zod, all outputs are strongly typed, and all operations are logged structurally with Winston and tracked through Sentry for production monitoring.
+The backend handles core workflows including waitlist entry collection, unique referral code generation, referral tracking with tier-based rewards, session-based user authentication without traditional login flows, and real-time notifications for referral milestones. All inputs are validated at the tRPC boundary using Zod, all outputs are strongly typed, and all operations are logged structurally with Winston for production monitoring.
 
 
 The backend will be a monolithic Node.js 20 application using tRPC for type-safe APIs, with a single PostgreSQL/MySQL database for persistence. The system centers on three core entities: Waitlist Entries (users who joined), Referral Links (unique shareable URLs), and Referral Relationships (tracking who referred whom). Security relies on httpOnly cookies containing session tokens to identify returning users without traditional authentication. Real-time referral count updates leverage SSE for one-directional server-to-client streaming since the counter only needs server pushes, not bidirectional communication
@@ -81,8 +81,8 @@ This documentation and implementation covers:
 - **Real-time Counter Updates**: Server-to-client updates via SSE for live referral count changes
 - **Statistics & Analytics**: Per-user referral count retrieval with capped display (10) and true count tracking
 - **Code Validation**: Public endpoint for validating referral code existence (frontend UX enhancement)
-- **Production-Grade Observability**: Structured logging with Winston, error tracking with Sentry, health checks
-- **Security Hardening**: httpOnly session cookies, rate limiting, CORS configuration, SQL injection prevention, XSS mitigation
+- **Production-Grade Observability**: Structured logging with Winston, health checks
+- **Security Hardening**: httpOnly session cookies, CORS configuration, SQL injection prevention, XSS mitigation
 
 ### Out of Scope
 
@@ -104,7 +104,7 @@ The following are explicitly NOT included in backend implementation:
 4. **Monolithic Architecture**: All logic contained in single codebase; no microservices complexity
 5. **No Overengineering**: Avoid premature optimization; implement only what's required for MVP functionality
 6. **Type Safety Mandatory**: All APIs must use Zod validation with TypeScript strict mode throughout
-7. **Security Non-Negotiable**: httpOnly cookies, CSRF protection, rate limiting, SQL injection prevention required from start
+7. **Security Non-Negotiable**: httpOnly cookies, CSRF protection, SQL injection prevention required from start
 8. **Observability Essential**: All APIs, errors, and business events must be logged and tracked for production visibility
 
 ---
@@ -122,7 +122,6 @@ The following are explicitly NOT included in backend implementation:
 | **Database** | PostgreSQL 12+ or MySQL 8+ | - | ACID compliance, excellent indexing, JSON support, proven reliability for production |
 | **Real-time Transport** | SSE (native) | - | Unidirectional server-to-client streaming; no WebSocket overhead for counter updates; automatic browser reconnection |
 | **Structured Logging** | Winston | 3.x+ | Industry-standard structured logging; JSON output for ELK/Datadog integration |
-| **Error Tracking** | Sentry SDK | Latest | Production error monitoring with context, source maps, releases; critical for debugging production issues |
 | **Session Management** | httpOnly Cookies (native) | - | Prevents XSS attacks; automatic browser storage; no client-side JavaScript access |
 | **ID Generation** | UUID (native) | - | Globally unique identifiers; prevents ID enumeration attacks |
 | **Referral Code Generation** | nanoid | 4.x+ | Collision-resistant; customizable alphabet; cryptographically secure; 8 chars sufficient for MVP |
@@ -138,8 +137,7 @@ The following are explicitly NOT included in backend implementation:
 │  ├─ CORS Configuration                                   │
 │  ├─ Cookie Parser                                        │
 │  ├─ Request Logging                                      │
-│  ├─ Rate Limiting (waitlist.join only)                  │
-│  └─ Error Boundary (Sentry)                             │
+│  └─ Global Error Handler                                │
 ├──────────────────────────────────────────────────────────┤
 │  tRPC Router Layer                                       │
 │  ├─ waitlist.join (mutation)                            │
@@ -176,7 +174,6 @@ The following are explicitly NOT included in backend implementation:
 ├──────────────────────────────────────────────────────────┤
 │  Observability & Monitoring                             │
 │  ├─ Winston Logger (structured JSON)                    │
-│  ├─ Sentry Integration (error tracking)                │
 │  ├─ Health Check Endpoint                              │
 │  └─ Request Correlation IDs                            │
 └──────────────────────────────────────────────────────────┘
@@ -210,7 +207,7 @@ sparkeefy-waitlist/
 │   ├── trpc/
 │   │   ├── context.ts                 # tRPC context factory
 │   │   ├── router.ts                  # Main tRPC router definition
-│   │   ├── middleware.ts              # tRPC middleware (auth, rate limit)
+│   │   ├── middleware.ts              # tRPC middleware (auth)
 │   │   └── procedures/
 │   │       └── waitlist.ts            # All waitlist.* procedures
 │   ├── services/
@@ -228,8 +225,7 @@ sparkeefy-waitlist/
 │   │   ├── referrals.ts               # Referral counting helpers
 │   │   └── links.ts                   # Referral link construction
 │   ├── logging/
-│   │   ├── logger.ts                  # Winston logger setup
-│   │   └── sentry.ts                  # Sentry initialization
+│   │   └── logger.ts                  # Winston logger setup
 │   └── types/
 │       └── index.ts                   # Global TypeScript interfaces
 ├── tests/
@@ -469,16 +465,12 @@ FRONTEND_URL="http://localhost:5173"  # Development
 COOKIE_SECRET="secure-random-32-char-string"  # Used for session token signing
 SESSION_TTL_DAYS=30                            # Session expiration time
 
-# Rate Limiting
-RATE_LIMIT_WINDOW_MS=3600000    # 1 hour in milliseconds
-RATE_LIMIT_MAX_REQUESTS=5       # Max requests per IP in window
 
 # CORS Configuration
 CORS_ORIGIN="http://localhost:5173"  # Frontend domain
 # Multiple origins separated by comma: "http://localhost:3000,https://app.com"
 
 # Observability
-SENTRY_DSN="https://key@sentry.io/12345"  # Sentry error tracking DSN
 LOG_LEVEL="info"                          # debug, info, warn, error
 
 # Feature Flags (Optional)
@@ -515,7 +507,6 @@ All environment variables must be validated on application startup using Zod. Th
 | `FRONTEND_URL` | http://localhost:5173 | https://app.com | Used for CORS and referral link generation |
 | `COOKIE_SECRET` | any random string | MUST be strong random string | Change regularly in production |
 | `SESSION_TTL_DAYS` | 30 (or 1 for testing) | 30 | Can be reduced for security, increased for convenience |
-| `SENTRY_DSN` | Optional (skip locally) | REQUIRED | Essential for production error tracking |
 | `LOG_LEVEL` | debug | info | More verbose in development, less spam in production |
 | `ENABLE_IP_TRACKING` | true | true | Can be disabled if infrastructure doesn't track IPs |
 
@@ -535,7 +526,6 @@ export const COMPUTED_CONFIG = {
   
   // Durations
   sessionTTLMs: SESSION_TTL_DAYS * 24 * 60 * 60 * 1000,  // Convert days to ms
-  rateLimitWindowMs: RATE_LIMIT_WINDOW_MS,   // Already in ms
   
   // Database
   isDatabaseSSL: DATABASE_URL.includes("sslmode=require"),  // Auto-detect SSL
@@ -575,7 +565,7 @@ interface TRPCContext {
 2. **Extract IP Address**: Get client IP from request
    - Prefer `x-forwarded-for` header if behind proxy
    - Fall back to `req.socket.remoteAddress`
-   - Used for rate limiting and fraud detection
+   - Used for fraud detection
 
 3. **Generate Request ID**: Create unique identifier for tracing
    - Use `x-request-id` header if provided
@@ -611,16 +601,9 @@ Middleware intercepts all procedures (or specific ones) before execution.
    - Throws `TRPCError` with code `UNAUTHORIZED` if missing
    - Runs AFTER context creation
 
-3. **Rate Limiting Middleware**
-   - Applies only to `waitlist.join` (mutation causing state changes)
-   - Uses sliding window counter (Redis-free approach for MVP)
-   - Limit: 5 requests per IP per hour
-   - On limit exceeded: throw `TRPCError` with code `TOO_MANY_REQUESTS`
-   - Development mode: rate limit disabled (set via config)
-
-4. **Error Boundary Middleware**
+3. **Error Boundary Middleware**
    - Wraps all procedure execution
-   - Catches exceptions, logs to Winston, reports to Sentry
+   - Catches exceptions, logs to Winston
    - Re-throws as `TRPCError` with sanitized message (no internal details)
    - Ensures all errors surface to client with consistent format
 
@@ -649,7 +632,6 @@ t.router({
 
 **Type**: Mutation (causes state change: creates user, creates referral)  
 **Authentication**: None (public procedure)  
-**Rate Limiting**: 5 requests per IP per hour  
 **Real-time Effects**: Triggers SSE event if referral credited  
 
 **Purpose**: Primary endpoint for joining waitlist with optional referral tracking. Handles both new signups and duplicate email scenarios.
@@ -750,8 +732,7 @@ Set httpOnly cookie `sessionToken` with these properties:
 | Invalid referral code | 400 | BAD_REQUEST | "Invalid referral code" | Code format incorrect (not 8 chars) |
 | Referral code not found | 404 | NOT_FOUND | "Referrer not found" | Code doesn't exist in DB |
 | Duplicate referral | 409 | CONFLICT | "Already referred by this user" | Composite unique key violation |
-| Rate limit exceeded | 429 | TOO_MANY_REQUESTS | "Too many requests, try again later" | IP has exceeded 5/hour limit |
-| Database error | 500 | INTERNAL_SERVER_ERROR | "Failed to join waitlist" | Log actual error to Winston/Sentry |
+| Database error | 500 | INTERNAL_SERVER_ERROR | "Failed to join waitlist" | Log actual error to Winston |
 
 **Implementation Notes**:
 
@@ -767,7 +748,6 @@ Set httpOnly cookie `sessionToken` with these properties:
 
 **Type**: Query (read-only, no state change)  
 **Authentication**: Required (protected procedure)  
-**Rate Limiting**: None (read operation)  
 **Real-time Effects**: None (just returns current state)  
 
 **Purpose**: Retrieve authenticated user's referral statistics including count, tier, and next milestone information.
@@ -961,7 +941,7 @@ Invalid code:
 - Used for frontend validation before user enters email
 - Return referrerEmail for potential UX feature (show referrer's name/email)
 - Email may optionally be hidden behind feature flag for privacy
-- No rate limiting required (read-only, low resource usage)
+- Read-only, low resource usage
 - Case-sensitive comparison: "abc12xyz" ≠ "ABC12XYZ" (codes are uppercase)
 
 ---
@@ -1266,56 +1246,6 @@ res.clearCookie("sessionToken", {
 
 ---
 
-### Rate Limiting Implementation
-
-**File**: `src/trpc/middleware.ts`
-
-**Policy**:
-- **Rate Limit**: 5 requests per IP per hour
-- **Applies To**: `waitlist.join` only (write operation)
-- **Why**: Prevent spam/brute force; read operations unaffected
-- **Development**: Disabled when `NODE_ENV !== "production"`
-
-**Algorithm**: Sliding window counter
-
-```
-Approach 1 (In-Memory, for MVP):
-  Maintain Map<IP, { count, windowStart }>
-  On each request:
-    1. Get current time
-    2. If (now - windowStart) > 1 hour: reset counter and window
-    3. Increment counter
-    4. If counter > 5: throw TOO_MANY_REQUESTS error
-    5. Clean up old IPs periodically
-  
-  Pros: Simple, no external dependency
-  Cons: Lost on server restart, not shared across instances
-  Decision: Acceptable for single-server MVP
-
-Approach 2 (Redis, recommended for production):
-  Store key: "ratelimit:ip:{IP}" with value {count}
-  Set expiration: 1 hour
-  On each request:
-    1. INCR ratelimit:ip:{IP}
-    2. EXPIRE ratelimit:ip:{IP} 3600 (if count == 1)
-    3. If count > 5: throw TOO_MANY_REQUESTS
-  
-  Pros: Survives restarts, works across instances
-  Cons: Extra Redis dependency; deferrable to post-MVP
-```
-
-**Error Response**:
-
-```json
-{
-  "code": "TOO_MANY_REQUESTS",
-  "message": "Too many requests, try again later",
-  "retryAfter": 3600
-}
-```
-
----
-
 ### Security Principles Summary
 
 1. **Never Store Passwords**: No password hashing, storage, or comparison
@@ -1326,8 +1256,7 @@ Approach 2 (Redis, recommended for production):
 6. **Duplicate Prevention**: Composite unique key prevents same referee credited twice
 7. **Input Validation**: All inputs validated at tRPC boundary before database interaction
 8. **SQL Injection Prevention**: Parameterized queries via Prisma/ORM (no string concatenation)
-9. **Rate Limiting**: Prevent spam and brute force on write operations
-10. **Error Messages**: No internal details leaked (generic "failed" messages to client)
+9. **Error Messages**: No internal details leaked (generic "failed" messages to client)
 
 ---
 
@@ -1481,7 +1410,7 @@ Event Object:
 7. ERROR HANDLING:
    ├─ Connection write error: remove client from manager
    ├─ Database query error: 500 Internal Server Error response
-   └─ All errors logged to Winston/Sentry
+   └─ All errors logged to Winston
 ```
 
 **CORS Configuration**: 
@@ -1848,7 +1777,6 @@ tRPC provides built-in error codes matching HTTP semantics:
 | `METHOD_NOT_SUPPORTED` | 405 | HTTP method wrong | (Not used in MVP) |
 | `TIMEOUT` | 408 | Request timeout | Database slow query |
 | `CONFLICT` | 409 | Resource conflict | Duplicate records |
-| `TOO_MANY_REQUESTS` | 429 | Rate limit exceeded | IP exceeded 5/hour limit |
 | `CLIENT_CLOSED_REQUEST` | 499 | Client closed connection | (Rare) |
 | `INTERNAL_SERVER_ERROR` | 500 | Server-side error | Database error, unexpected exception |
 
@@ -1879,17 +1807,11 @@ throw new TRPCError({
   message: "Session expired"
 });
 
-// Rate limited
-throw new TRPCError({
-  code: "TOO_MANY_REQUESTS",
-  message: "Too many requests, try again later"
-});
-
 // Internal error (with cause)
 throw new TRPCError({
   code: "INTERNAL_SERVER_ERROR",
   message: "Failed to join waitlist",
-  cause: err  // Logs to Sentry internally
+  cause: err
 });
 ```
 
@@ -1962,8 +1884,6 @@ logger.error("Failed to join waitlist", {
   timestamp: new Date().toISOString()
 });
 ```
-
-Then reported to Sentry (captured by error boundary middleware).
 
 ---
 
@@ -2099,52 +2019,6 @@ Then reported to Sentry (captured by error boundary middleware).
      "stack": "[error stack trace]"
    }
    ```
-
----
-
-### Sentry Integration
-
-**File**: `src/logging/sentry.ts`
-
-**Initialization**: Single call on app startup
-
-```typescript
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  environment: NODE_ENV,
-  tracesSampleRate: NODE_ENV === "production" ? 0.1 : 1.0,
-  integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Express({ app: true })
-  ]
-});
-```
-
-**Usage**: Errors automatically captured by middleware; can also manually report:
-
-```typescript
-Sentry.captureException(err, {
-  contexts: {
-    custom: {
-      email: user.email,
-      userId: user.id,
-      procedure: "waitlist.join"
-    }
-  },
-  tags: {
-    feature: "waitlist",
-    environment: NODE_ENV
-  }
-});
-```
-
-**Critical Alerts** (configure in Sentry):
-
-1. **Database Connection Failures**: Error rate spike
-2. **Referral Code Generation Failures**: Collision after 5 retries
-3. **Session Validation Errors**: Bulk token invalidations
-4. **SSE Connection Drops**: High disconnect rate
-5. **Rate Limit Breaches**: Spam detection
 
 ---
 
@@ -2357,7 +2231,7 @@ interface TRPCContext {
 - All validation and business logic
 - Database persistence
 - Error handling and logging
-- Security (cookies, rate limiting)
+- Security (cookies)
 
 **Frontend (NOT in this documentation) implements**:
 
@@ -2406,7 +2280,6 @@ interface TRPCContext {
 - `DATABASE_URL`: Production database endpoint (RDS/Cloud SQL)
 - `NODE_ENV`: "production"
 - `FRONTEND_URL`: Production domain (https://app.com)
-- `SENTRY_DSN`: Sentry project DSN
 - `COOKIE_SECRET`: Strong random string (256 bits+ recommended)
 - All other env vars with production values
 
@@ -2483,11 +2356,9 @@ app.use(cors({
 2. **Database Connection Failures**: Connection pool exhausted or down
 3. **Response Time Degradation**: P99 latency exceeds threshold
 4. **Missing Environment Variables**: Deployment fails validation
-5. **Rate Limit Breaches**: Sudden spike in 429 responses
-6. **Session Validation Failures**: Bulk authentication errors (potential security issue)
+5. **Session Validation Failures**: Bulk authentication errors (potential security issue)
 
 **Monitoring Tools**:
-- Sentry (error tracking)
 - Datadog/New Relic/CloudWatch (metrics, logs, traces)
 - PagerDuty (alert routing, on-call)
 
@@ -2505,7 +2376,6 @@ app.use(cors({
 - [ ] Database migrations tested in staging
 - [ ] Health endpoint verified working
 - [ ] CORS origins whitelisted correctly
-- [ ] Sentry DSN configured
 - [ ] Winston logging to files enabled
 
 **Deployment**:
@@ -2516,7 +2386,7 @@ app.use(cors({
 - [ ] Health check returns 200
 - [ ] SSE endpoint accessible
 - [ ] tRPC endpoint accepting requests
-- [ ] Logs appearing in files/Sentry
+- [ ] Logs appearing in files
 - [ ] No critical errors in first 10 minutes
 
 **Post-Deployment**:
@@ -2534,7 +2404,7 @@ app.use(cors({
 This documentation provides comprehensive specifications for implementing a production-ready waitlist and referral backend system. Key principles:
 
 1. **Type Safety**: All APIs use Zod validation with TypeScript strict mode
-2. **Security First**: httpOnly cookies, CSRF protection, rate limiting, SQL injection prevention
+2. **Security First**: httpOnly cookies, CSRF protection, SQL injection prevention
 3. **Simplicity**: Single-server MVP architecture without premature optimization
 4. **Observability**: Structured logging and error tracking from day one
 5. **Reliability**: Graceful error handling with user-friendly messages
