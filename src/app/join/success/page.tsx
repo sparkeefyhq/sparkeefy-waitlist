@@ -10,7 +10,7 @@ import ReferralDisplay from "@/components/waitlist/ReferralDisplay";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 import type { UserStatsResponse } from "@/lib/types";
 
-const WAIT_SECONDS = 0.35;
+const WAIT_SECONDS = 2.5;
 const FADE_DURATION = 0.2;
 
 function SuccessContent() {
