@@ -5,7 +5,10 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { waitlistContent, successContent } from "@/lib/config/waitlist.config";
+import { getStatsByToken } from "@/app/actions";
+import ReferralDisplay from "@/components/waitlist/ReferralDisplay";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
+import type { UserStatsResponse } from "@/lib/types";
 
 const WAIT_SECONDS = 0.35;
 const FADE_DURATION = 0.2;
@@ -14,28 +17,62 @@ function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const [stats, setStats] = useState<UserStatsResponse | null>(null);
+  const [readyToTransition, setReadyToTransition] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const referralPath = token ? `/join/referral?token=${encodeURIComponent(token)}` : "/join/referral";
+  const [showReferral, setShowReferral] = useState(false);
 
   useEffect(() => {
-    router.prefetch(referralPath);
-  }, [referralPath, router]);
+    if (!token || token.length !== 64) {
+      router.replace("/join");
+      return;
+    }
+
+    let active = true;
+    const loadStats = async () => {
+      const nextStats = await getStatsByToken(token);
+      if (!active) return;
+
+      if (!nextStats) {
+        router.replace("/join");
+        return;
+      }
+
+      setStats(nextStats);
+    };
+
+    void loadStats();
+    return () => {
+      active = false;
+    };
+  }, [router, token]);
 
   useEffect(() => {
     const waitTimer = setTimeout(() => {
-      setIsExiting(true);
+      setReadyToTransition(true);
     }, WAIT_SECONDS * 1000);
 
     return () => clearTimeout(waitTimer);
   }, []);
 
   useEffect(() => {
-    if (!isExiting) return;
-    const redirectTimer = setTimeout(() => {
-      router.replace(referralPath);
+    if (!readyToTransition || !stats || showReferral) return;
+
+    setIsExiting(true);
+    const transitionTimer = setTimeout(() => {
+      setShowReferral(true);
+      if (typeof window !== "undefined" && token) {
+        window.history.replaceState({}, "", `/join/referral?token=${encodeURIComponent(token)}`);
+      }
     }, FADE_DURATION * 1000);
-    return () => clearTimeout(redirectTimer);
-  }, [isExiting, referralPath, router]);
+
+    return () => clearTimeout(transitionTimer);
+  }, [readyToTransition, showReferral, stats, token]);
+
+  if (showReferral && stats && token) {
+    return <ReferralDisplay stats={stats} token={token} />;
+  }
+
   const animatedUnderline = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
