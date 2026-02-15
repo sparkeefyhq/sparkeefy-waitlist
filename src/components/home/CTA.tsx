@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const CTA = () => {
@@ -63,37 +64,38 @@ const CTA = () => {
 
           {/* Button - below text on mobile, right on desktop */}
           <div className="relative z-10 flex-shrink-0 order-2 w-full md:w-auto">
-            <motion.button
-              initial="initial"
-              whileHover="hover"
-              whileTap="tap"
-              variants={{
-                initial: { scale: 1 },
-                hover: { scale: 1.05 },
-                tap: { scale: 0.95 }
-              }}
-              onClick={() => window.open("/join")}
-              className="w-full md:w-auto bg-white text-black text-lg font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
-            >
-              Get Early Access
-              <motion.svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <Link href="/join" className="block w-full md:w-auto">
+              <motion.span
+                initial="initial"
+                whileHover="hover"
+                whileTap="tap"
                 variants={{
-                  initial: { x: 0 },
-                  hover: { x: 5 }
+                  initial: { scale: 1 },
+                  hover: { scale: 1.05 },
+                  tap: { scale: 0.95 }
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="w-full md:w-auto bg-white text-black text-lg font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 inline-block"
               >
-                <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
-              </motion.svg>
-            </motion.button>
+                Get Early Access
+                <motion.svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  variants={{
+                    initial: { x: 0 },
+                    hover: { x: 5 }
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
+                </motion.svg>
+              </motion.span>
+            </Link>
           </div>
         </div>
       </div>
