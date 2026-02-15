@@ -2252,7 +2252,7 @@ Reusable forever (generates new session cookie each time)
 
 Unique per user (1:1 mapping with email)
 
-Format: https://sparkeefy.com/auth/magic?token={magicLinkToken}
+Format: https://sparkeefy.com/join/referral?token={magicLinkToken}
 
 Email Delivery
 SMTP using net and tls modules

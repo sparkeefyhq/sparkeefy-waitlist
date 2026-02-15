@@ -109,7 +109,7 @@ export class EmailService {
    * @example
    * await emailService.sendMagicLinkEmail({
    *   email: "user@example.com",
-   *   magicLinkUrl: "https://app.com/auth/magic?token=...",
+   *   magicLinkUrl: "https://app.com/join/referral?token=...",
    *   referralCode: "ABC12XYZ",
    *   referralLink: "https://app.com?ref=ABC12XYZ"
    * });
