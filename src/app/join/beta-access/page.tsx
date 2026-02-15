@@ -48,7 +48,8 @@ function BetaAccessContent({ token }: { token: string | null }) {
   const [textAnswer, setTextAnswer] = useState("");
 
   const [state, formAction] = useFormState<FormActionState>(
-    submitSlackAccessAction,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- useFormState passes (prevState, formData) at runtime
+    submitSlackAccessAction as any,
     null
   );
 

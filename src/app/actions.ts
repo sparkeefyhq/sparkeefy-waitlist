@@ -10,6 +10,7 @@
  */
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db/client";
 import { WaitlistService } from "@/lib/services/WaitlistService";
@@ -84,17 +85,9 @@ export type FormActionState<T = any> = {
 // ============================================================================
 
 /**
- * Join Waitlist Action
- * 
- * Handles waitlist signup with optional referral code.
- * Supports progressive enhancement (works without JavaScript).
- * 
- * @param prevState - Previous form state (for useFormState)
- * @param formData - Form data from submission
- * @returns Form state with success/error/data
+ * Internal: run join logic and return state (for testing or alternate flows).
  */
-export async function joinWaitlistAction(
-  prevState: FormActionState<WaitlistJoinResponse>,
+async function joinWaitlistInternal(
   formData: FormData
 ): Promise<FormActionState<WaitlistJoinResponse>> {
   const startTime = Date.now();
@@ -405,6 +398,25 @@ export async function joinWaitlistAction(
       error: "An unexpected error occurred",
     };
   }
+}
+
+/**
+ * Join Waitlist Action (form action)
+ *
+ * Handles waitlist signup. Redirects on success or error.
+ * Use as <form action={joinWaitlistAction}> — no useFormState needed.
+ *
+ * @param formData - Form data from submission
+ */
+export async function joinWaitlistAction(formData: FormData): Promise<never> {
+  const result = await joinWaitlistInternal(formData);
+  if (result?.success && result.data?.user?.magicLinkToken) {
+    redirect(
+      `/join/success?token=${encodeURIComponent(result.data.user.magicLinkToken)}`
+    );
+  }
+  const error = result?.error ?? "Something went wrong";
+  redirect(`/join?error=${encodeURIComponent(error)}`);
 }
 
 // ============================================================================

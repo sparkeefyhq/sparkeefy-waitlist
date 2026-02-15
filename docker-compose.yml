@@ -28,4 +28,4 @@ volumes:
 # docker-compose logs -f postgres
 
 # Run Next.js dev server:
-# pnpm dev
+# bun dev

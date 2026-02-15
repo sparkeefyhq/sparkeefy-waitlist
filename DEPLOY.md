@@ -52,14 +52,14 @@ Without SMTP vars, the app runs but cannot send magic link emails.
 2. **App (Vercel)**  
    - [vercel.com](https://vercel.com) → Add New → Project → import this repo.  
    - **Framework:** Next.js (auto-detected).  
-   - **Build command:** `pnpm run build` (or `pnpm build`).  
+   - **Build command:** `bun run build` (or `bun build`).  
    - **Environment variables:** Add `DATABASE_URL` and any SMTP vars above.  
    - Deploy.
 
 3. **Migrations**  
    - Run once locally (or from CI) before/after first deploy:  
-     `DATABASE_URL="your-supabase-uri" pnpm db:migrate`  
-   - Or use Vercel’s “Build” or “Pre-deploy” step to run `pnpm db:migrate` if you add it to your pipeline.
+     `DATABASE_URL="your-supabase-uri" bun run db:migrate`  
+   - Or use Vercel’s “Build” or “Pre-deploy” step to run `bun run db:migrate` if you add it to your pipeline.
 
 ---
 
@@ -69,11 +69,11 @@ Without SMTP vars, the app runs but cannot send magic link emails.
 
 2. **App (Netlify):**  
    - Add site from Git → choose repo.  
-   - **Build command:** `pnpm run build`.  
+   - **Build command:** `bun run build`.  
    - **Publish directory:** `.next` (or use Netlify’s Next.js plugin defaults).  
    - Add env vars: `DATABASE_URL` and SMTP vars as needed.
 
-3. **Migrations:** Run `pnpm db:migrate` locally with `DATABASE_URL` or from your CI.
+3. **Migrations:** Run `bun run db:migrate` locally with `DATABASE_URL` or from your CI.
 
 ---
 
@@ -86,9 +86,9 @@ The repo includes `render.yaml` for a single Next.js web service.
 2. **Web Service:**  
    - [render.com](https://render.com) → New → Web Service → connect repo.  
    - Or use **Blueprint** and attach `render.yaml`.  
-   - **Build:** `pnpm install && pnpm run build`  
-   - **Start:** `pnpm run start`  
-   - **Pre-deploy (optional):** `pnpm db:migrate`
+   - **Build:** `bun install && bun run build`  
+   - **Start:** `bun run start`  
+   - **Pre-deploy (optional):** `bun run db:migrate`
 
 3. **Environment:** In Render Dashboard → Service → Environment, set `DATABASE_URL` and any SMTP vars.
 
@@ -99,7 +99,7 @@ The repo includes `render.yaml` for a single Next.js web service.
 Migrations are Drizzle files in `src/backend/db/migrations/`. Run them against your production DB once (and after adding new migrations):
 
 ```bash
-DATABASE_URL="postgresql://..." pnpm db:migrate
+DATABASE_URL="postgresql://..." bun run db:migrate
 ```
 
 Use your production `DATABASE_URL` (e.g. Supabase URI). You can run this from your machine or from a deploy step.
@@ -110,7 +110,7 @@ Use your production `DATABASE_URL` (e.g. Supabase URI). You can run this from yo
 
 - [ ] `DATABASE_URL` set on the host and migrations run.
 - [ ] SMTP vars set if you want magic link emails.
-- [ ] Build succeeds (`pnpm run build`).
+- [ ] Build succeeds (`bun run build`).
 - [ ] Open `/join` and submit an email; check DB for the new row.
 - [ ] If using emails, request a magic link and confirm it arrives and the link works.
 
@@ -137,5 +137,5 @@ Use your production `DATABASE_URL` (e.g. Supabase URI). You can run this from yo
 |------|--------|
 | **App** | One Next.js app (Vercel, Netlify, or Render). |
 | **Database** | PostgreSQL (`DATABASE_URL`) — e.g. Supabase. |
-| **Migrations** | Run `pnpm db:migrate` with production `DATABASE_URL`. |
+| **Migrations** | Run `bun run db:migrate` with production `DATABASE_URL`. |
 | **Env vars** | `DATABASE_URL` required; SMTP vars for email. |
