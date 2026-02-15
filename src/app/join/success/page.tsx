@@ -1,11 +1,37 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { waitlistContent, successContent } from "@/lib/config/waitlist.config";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 
+const WAIT_SECONDS = 5;
+const FADE_DURATION = 0.5;
+
 export default function SuccessPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  const [isExiting, setIsExiting] = useState(false);
+
+  useEffect(() => {
+    const waitTimer = setTimeout(() => {
+      setIsExiting(true);
+    }, WAIT_SECONDS * 1000);
+
+    return () => clearTimeout(waitTimer);
+  }, []);
+
+  useEffect(() => {
+    if (!isExiting) return;
+    const redirectTimer = setTimeout(() => {
+      const query = token ? `?token=${encodeURIComponent(token)}` : "";
+      router.replace(`/join/referral${query}`);
+    }, FADE_DURATION * 1000);
+    return () => clearTimeout(redirectTimer);
+  }, [isExiting, router, token]);
   const animatedUnderline = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -157,8 +183,14 @@ export default function SuccessPage() {
   );
 
   return (
-    <WaitlistLayout variant="success" mobileChildren={mobileContent}>
-      {desktopContent}
-    </WaitlistLayout>
+    <motion.div
+      initial={false}
+      animate={{ opacity: isExiting ? 0 : 1 }}
+      transition={{ duration: FADE_DURATION, ease: "easeInOut" }}
+    >
+      <WaitlistLayout variant="success" mobileChildren={mobileContent}>
+        {desktopContent}
+      </WaitlistLayout>
+    </motion.div>
   );
 }

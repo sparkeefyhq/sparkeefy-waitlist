@@ -1,9 +1,9 @@
 /**
  * Sparkeefy Waitlist Backend
- * 
+ *
  * Main application entry point.
- * Configures Express server, tRPC, SSE, and all middleware.
- * 
+ * Configures Express server, tRPC, and all middleware.
+ *
  * @module index
  */
 loadDotenv({ path: resolve(process.cwd(), ".env") });
@@ -21,7 +21,6 @@ import { createContext } from "./trpc/context";
 import { connectDatabase, disconnectDatabase } from "./db/client";
 import { logger } from "./logging/logger";
 import { initializeSentry, sentryErrorHandler } from "./logging/sentry";
-import { sseReferralUpdatesHandler } from "./sse/handler";
 
 import { config as loadDotenv } from "dotenv";
 import { resolve } from "path";
@@ -51,12 +50,7 @@ app.set("trust proxy", 1);
  * - X-Content-Type-Options
  * - X-XSS-Protection
  */
-app.use(
-  helmet({
-    contentSecurityPolicy: false, // Disable CSP for SSE
-    crossOriginEmbedderPolicy: false, // Allow SSE connections
-  })
-);
+app.use(helmet());
 
 /**
  * CORS Configuration
@@ -261,20 +255,6 @@ app.use(
 );
 
 // ============================================================================
-// SSE ENDPOINT
-// ============================================================================
-
-/**
- * Server-Sent Events Endpoint
- * 
- * GET /sse/referral-updates
- * 
- * Establishes SSE connection for real-time referral count updates.
- * Requires authentication via session cookie.
- */
-app.get("/sse/referral-updates", sseReferralUpdatesHandler);
-
-// ============================================================================
 // 404 HANDLER
 // ============================================================================
 
@@ -356,7 +336,6 @@ async function startServer() {
       logger.info("Available endpoints:", {
         health: `http://localhost:${config.port}/health`,
         trpc: `http://localhost:${config.port}/trpc`,
-        sse: `http://localhost:${config.port}/sse/referral-updates`,
       });
     });
 

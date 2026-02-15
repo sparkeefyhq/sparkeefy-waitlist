@@ -11,6 +11,7 @@ import { Request, Response } from "express";
 import { randomUUID } from "crypto";
 import { db } from "../db/client";
 import { logger } from "../logging/logger";
+import { SESSION_COOKIE_NAME } from "../utils/cookies";
 
 /**
  * tRPC Context Interface
@@ -43,10 +44,11 @@ function extractIpAddress(req: Request): string | undefined {
 
 /**
  * Extract session token from httpOnly cookie
+ * Uses SESSION_COOKIE_NAME so it matches the cookie set by setSessionCookie.
  */
 function extractSessionToken(req: Request): string | undefined {
   // Cookie parser middleware provides req.cookies
-  return req.cookies?.sessionToken;
+  return req.cookies?.[SESSION_COOKIE_NAME];
 }
 
 /**

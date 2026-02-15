@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
@@ -21,30 +22,40 @@ const question2 = {
   placeholder: "For example: forgetting a birthday, replying late, missing a moment.",
 };
 
-export default function BetaAccessPage() {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [textAnswer, setTextAnswer] = useState("");
-
-  // Load from localStorage on mount
-  useEffect(() => {
+function loadSavedForm(): { selectedOptions: string[]; textAnswer: string } {
+  if (typeof window === "undefined") return { selectedOptions: [], textAnswer: "" };
+  try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        if (data.selectedOptions) setSelectedOptions(data.selectedOptions);
-        if (data.textAnswer) setTextAnswer(data.textAnswer);
-      } catch {
-        // Invalid data, ignore
-      }
-    }
-  }, []);
+    if (!saved) return { selectedOptions: [], textAnswer: "" };
+    const data = JSON.parse(saved);
+    return {
+      selectedOptions: Array.isArray(data.selectedOptions) ? data.selectedOptions : [],
+      textAnswer: typeof data.textAnswer === "string" ? data.textAnswer : "",
+    };
+  } catch {
+    return { selectedOptions: [], textAnswer: "" };
+  }
+}
+
+export default function BetaAccessPage() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  const [formState, setFormState] = useState(loadSavedForm);
+  const { selectedOptions, textAnswer } = formState;
+
+  const setSelectedOptions = (updater: React.SetStateAction<string[]>) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedOptions: typeof updater === "function" ? updater(prev.selectedOptions) : updater,
+    }));
+  };
+  const setTextAnswer = (value: string) => {
+    setFormState((prev) => ({ ...prev, textAnswer: value }));
+  };
 
   // Save to localStorage when data changes
   useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ selectedOptions, textAnswer })
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ selectedOptions, textAnswer }));
   }, [selectedOptions, textAnswer]);
 
   const toggleOption = (id: string) => {
@@ -54,9 +65,9 @@ export default function BetaAccessPage() {
   };
 
   const handleSubmit = () => {
-    // For now just go back to referral
-    // Later this will submit to the backend
-    window.location.href = "/join/referral";
+    // For now just go back to referral (preserve token so user stays authenticated)
+    const query = token ? `?token=${encodeURIComponent(token)}` : "";
+    window.location.href = `/join/referral${query}`;
   };
 
   const canSubmit = selectedOptions.length > 0;
@@ -240,8 +251,10 @@ export default function BetaAccessPage() {
     </div>
   );
 
+  const backHref = token ? `/join/referral?token=${encodeURIComponent(token)}` : "/join/referral";
+
   return (
-    <WaitlistLayout variant="beta-access" mobileChildren={mobileContent}>
+    <WaitlistLayout variant="beta-access" mobileChildren={mobileContent} backHref={backHref}>
       {desktopContent}
     </WaitlistLayout>
   );

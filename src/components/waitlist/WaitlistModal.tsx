@@ -3,6 +3,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { waitlistContent } from "@/lib/config/waitlist.config";
 import EmailForm from "./EmailForm";
 import SocialIcons from "./SocialIcons";
@@ -13,8 +14,11 @@ interface WaitlistModalProps {
 }
 
 export default function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
-  const handleEmailSubmit = (email: string) => {
-    console.log("Email submitted:", email);
+  const router = useRouter();
+
+  const handleEmailSubmit = (data: { user: { magicLinkToken: string } }) => {
+    onOpenChange(false);
+    router.push(`/join/success?token=${encodeURIComponent(data.user.magicLinkToken)}`);
   };
 
   return (
