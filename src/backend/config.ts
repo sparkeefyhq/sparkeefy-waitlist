@@ -37,17 +37,6 @@ const envSchema = z.object({
   // CORS Configuration
   CORS_ORIGIN: z.string().default("*"),
 
-  // SMTP Email Configuration
-  SMTP_HOST: z.string().default("smtp.gmail.com"),
-  SMTP_PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("587"),
-  SMTP_USER: z.string().email("Invalid SMTP user email").optional(),
-  SMTP_PASS: z.string().min(1, "SMTP password required").optional(),
-  SMTP_FROM: z.string().email("Invalid FROM email").optional(),
-
-  // Session Configuration
-  SESSION_COOKIE_NAME: z.string().default("sparkeefy_session"),
-  SESSION_DURATION_DAYS: z.string().transform(Number).pipe(z.number().min(1).max(365)).default("30"),
-
 });
 
 // ============================================================================
@@ -114,22 +103,6 @@ export const config = {
       : env.CORS_ORIGIN.split(",").map((o) => o.trim()),
   },
 
-  // Session
-  session: {
-    cookieName: env.SESSION_COOKIE_NAME,
-    durationDays: env.SESSION_DURATION_DAYS,
-  },
-
-  // SMTP Email
-  smtp: {
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    user: env.SMTP_USER || "",
-    pass: env.SMTP_PASS || "",
-    from: env.SMTP_FROM || env.SMTP_USER || "sparkeefy@gmail.com", // TODO: change this to your actual email
-    enabled: !!(env.SMTP_USER && env.SMTP_PASS), // Only enabled if credentials provided, real gmail/email access required here
-  },
-
 } as const;
 
 // Log configuration on startup (development only)
@@ -140,7 +113,6 @@ if (config.isDevelopment) {
     port: config.port,
     // frontendUrl: config.frontendUrl,
     // databaseUrl: config.databaseUrl.replace(/:\/\/.*@/, "://***:***@"), // Hide credentials
-    smtpEnabled: config.smtp.enabled,
   });
   
 }

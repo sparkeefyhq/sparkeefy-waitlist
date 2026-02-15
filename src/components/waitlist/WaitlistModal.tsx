@@ -1,7 +1,6 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import Image from "next/image";
 import { waitlistContent } from "@/lib/config/waitlist.config";
 import EmailForm from "./EmailForm";
@@ -43,12 +42,6 @@ export default function WaitlistModal({ open, onOpenChange }: WaitlistModalProps
 
           {/* Glassmorphic card */}
           <div className="relative max-w-[1380px] w-[94vw] md:w-[72vw] bg-[rgba(0,0,0,0.45)] backdrop-blur-xl rounded-3xl md:rounded-[48px] shadow-[0px_12px_63.8px_0px_rgba(0,0,0,0.56)] overflow-clip py-10 md:py-[70px] px-5 md:px-20">
-            {/* Close button */}
-            <DialogPrimitive.Close className="absolute right-5 top-5 md:right-8 md:top-8 text-white/70 hover:text-white transition-opacity z-10">
-              <X className="size-5" />
-              <span className="sr-only">Close</span>
-            </DialogPrimitive.Close>
-
             {/* Content */}
             <div className="relative flex flex-col items-center text-center">
               {/* Badge */}

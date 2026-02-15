@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { waitlistContent, successContent } from "@/lib/config/waitlist.config";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 
-const WAIT_SECONDS = 5;
+const WAIT_SECONDS = 2;
 const FADE_DURATION = 0.5;
 
 function SuccessContent() {

@@ -16,7 +16,7 @@ import { db } from "@/lib/db/client";
 import { WaitlistService } from "@/lib/services/WaitlistService";
 import { ReferralService } from "@/lib/services/ReferralService";
 import { emailService } from "@/lib/services/EmailService";
-import { getUserFromToken, requireAuth } from "@/lib/auth";
+import { getUserFromToken } from "@/lib/auth";
 import { logger } from "@/lib/logging/logger";
 import {
   generateReferralCode,
@@ -488,8 +488,15 @@ export async function submitSlackAccessAction(
   formData: FormData
 ): Promise<FormActionState> {
   try {
-    // Require authentication
-    const user = await requireAuth();
+    // Authenticate via magic link token from form
+    const token = formData.get("token");
+    const user = await getUserFromToken(typeof token === "string" ? token : null);
+    if (!user) {
+      return {
+        success: false,
+        error: "Please use your magic link to access this page",
+      };
+    }
 
     // Parse form data
     const rawData = {
