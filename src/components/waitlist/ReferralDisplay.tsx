@@ -349,8 +349,8 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
 
             {/* URL + Copy button */}
             <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch md:items-center mt-3 md:mt-5">
-              <div className="hidden md:block relative flex-1 max-w-[304px] h-[35px] border-2 border-white/50 rounded-md overflow-hidden">
-                <p className="absolute left-3 top-2 text-base text-[#ffcbe5] tracking-[-0.32px] truncate">
+              <div className="relative flex-1 w-full md:max-w-[304px] min-h-[35px] md:h-[35px] border-2 border-white/50 rounded-md overflow-hidden flex items-center px-3 py-2">
+                <p className="text-xs md:text-base text-[#ffcbe5] tracking-[-0.32px] truncate">
                   {referralUrl}
                 </p>
               </div>
@@ -376,7 +376,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
             <p className="text-xs md:text-base text-white/80 md:text-white/80">Share your invite link via</p>
 
             {/* Social icons */}
-            <div className="flex gap-2 md:gap-[13px] items-center mt-2 md:mt-4">
+            <div className="flex flex-wrap justify-center gap-2 md:gap-[13px] items-center mt-2 md:mt-4">
               <SocialButton onClick={() => void handleShare("instagram")} ariaLabel="Share via Instagram">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="md:w-6 md:h-6">
                   <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2"/>
@@ -438,7 +438,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
               <div className="flex justify-between md:relative mt-1.5 md:mt-2 px-2 md:px-0 md:h-[60px]">
                 {/* 3 invites */}
                 <div className="flex flex-col items-center md:absolute md:left-[85px]">
-                  <div className={`hidden md:block w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
                   <p className={`text-[9px] md:text-[17px] md:mt-1 transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>
                     3 invites
                   </p>
@@ -446,7 +446,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
 
                 {/* 6 invites */}
                 <div className="flex flex-col items-center md:absolute md:left-[207px]">
-                  <div className={`hidden md:block w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
                   <p className={`text-[9px] md:text-[17px] md:mt-1 transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>
                     6 invites
                   </p>
@@ -454,7 +454,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
 
                 {/* 10 invites */}
                 <div className="flex flex-col items-center md:absolute md:left-[352px]">
-                  <div className={`hidden md:block w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
                   <p
                     className="font-bold text-[9px] md:text-[17px] md:mt-1 bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
                     style={{ WebkitTextFillColor: "transparent" }}
