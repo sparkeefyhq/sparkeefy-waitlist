@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Link from "next/link";
@@ -26,7 +26,7 @@ function CopyIcon() {
   );
 }
 
-export default function ReferralPage() {
+function ReferralContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -576,5 +576,21 @@ export default function ReferralPage() {
     >
       {desktopContent}
     </WaitlistLayout>
+  );
+}
+
+export default function ReferralPage() {
+  return (
+    <Suspense
+      fallback={
+        <WaitlistLayout variant="referral">
+          <div className="flex items-center justify-center min-h-[200px] text-white/60">
+            Loading...
+          </div>
+        </WaitlistLayout>
+      }
+    >
+      <ReferralContent />
+    </Suspense>
   );
 }

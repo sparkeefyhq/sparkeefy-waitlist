@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -10,7 +10,7 @@ import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 const WAIT_SECONDS = 5;
 const FADE_DURATION = 0.5;
 
-export default function SuccessPage() {
+function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -192,5 +192,21 @@ export default function SuccessPage() {
         {desktopContent}
       </WaitlistLayout>
     </motion.div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <WaitlistLayout variant="success">
+          <div className="flex items-center justify-center min-h-[200px] text-white/60">
+            Loading...
+          </div>
+        </WaitlistLayout>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
   );
 }

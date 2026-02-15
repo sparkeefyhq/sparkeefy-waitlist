@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -37,7 +37,7 @@ function loadSavedForm(): { selectedOptions: string[]; textAnswer: string } {
   }
 }
 
-export default function BetaAccessPage() {
+function BetaAccessContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [formState, setFormState] = useState(loadSavedForm);
@@ -257,5 +257,21 @@ export default function BetaAccessPage() {
     <WaitlistLayout variant="beta-access" mobileChildren={mobileContent} backHref={backHref}>
       {desktopContent}
     </WaitlistLayout>
+  );
+}
+
+export default function BetaAccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <WaitlistLayout variant="beta-access" backHref="/join/referral">
+          <div className="flex items-center justify-center min-h-[200px] text-white/60">
+            Loading...
+          </div>
+        </WaitlistLayout>
+      }
+    >
+      <BetaAccessContent />
+    </Suspense>
   );
 }
