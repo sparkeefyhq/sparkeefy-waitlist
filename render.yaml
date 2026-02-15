@@ -8,9 +8,9 @@ services:
     runtime: node
     plan: free
 
-    buildCommand: pnpm install && pnpm run build
-    startCommand: pnpm run start
-    preDeployCommand: pnpm db:migrate
+    buildCommand: bun install --frozen-lockfile && bun run build
+    startCommand: bun run start
+    preDeployCommand: bun run db:migrate
 
     # Env vars (add in Dashboard): DATABASE_URL, SMTP_*, etc.
     # No CORS or FRONTEND_URL needed - single Next.js service handles everything.

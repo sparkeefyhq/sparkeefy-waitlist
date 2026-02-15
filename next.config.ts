@@ -4,8 +4,9 @@ const nextConfig: NextConfig = {
   // Uncomment the following line to enable static HTML export
   // output: "export",
   images: {
-    // unoptimized: true,
-    domains: ["res.cloudinary.com"],
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
+    ],
   },
 };
 

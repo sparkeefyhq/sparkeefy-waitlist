@@ -2,18 +2,12 @@
 
 import { Suspense } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { waitlistContent } from "@/lib/config/waitlist.config";
 import EmailForm from "@/components/waitlist/EmailForm";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 
 export default function JoinPage() {
-  const router = useRouter();
-
-  const handleEmailSubmit = (data: { user: { magicLinkToken: string } }) => {
-    router.push(`/join/success?token=${encodeURIComponent(data.user.magicLinkToken)}`);
-  };
 
   const animatedUnderline = (
     <svg
@@ -106,7 +100,7 @@ export default function JoinPage() {
           </div>
           <div className="w-full">
             <Suspense fallback={<div className="h-[52px] rounded-full bg-white/10 animate-pulse" />}>
-              <EmailForm onSubmit={handleEmailSubmit} />
+              <EmailForm />
             </Suspense>
           </div>
         </div>
@@ -160,7 +154,7 @@ export default function JoinPage() {
         </div>
         <div className="w-full">
           <Suspense fallback={<div className="h-[52px] rounded-full bg-white/10 animate-pulse" />}>
-            <EmailForm onSubmit={handleEmailSubmit} />
+            <EmailForm />
           </Suspense>
         </div>
       </div>

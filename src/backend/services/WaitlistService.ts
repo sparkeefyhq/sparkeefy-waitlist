@@ -191,10 +191,6 @@ export class WaitlistService {
       // STEP 5: PREPARE USER DATA
       // ======================================================================
 
-      // Calculate session expiration (30 days from now)
-      const sessionExpiresAt = new Date();
-      sessionExpiresAt.setDate(sessionExpiresAt.getDate() + 30);
-
       // Generate magic link token for email verification
       const magicLinkToken = generateUniqueCode(generateReferralCode, async () => false, 1);
 
@@ -210,8 +206,6 @@ export class WaitlistService {
           : null,
         referralCode: userReferralCode,
         magicLinkToken: await magicLinkToken,
-        sessionToken,
-        sessionExpiresAt,
       };
 
       // ======================================================================
