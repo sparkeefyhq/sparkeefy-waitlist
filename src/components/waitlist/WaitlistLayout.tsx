@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -92,15 +92,7 @@ export default function WaitlistLayout({
             >
               <Home className="w-5 h-5 text-black" />
             </Link>
-          ) : (
-            <button
-              onClick={() => router.back()}
-              className="absolute right-4 top-4 text-white/70 hover:text-white transition-opacity z-10"
-            >
-              <X className="size-5" />
-              <span className="sr-only">Close</span>
-            </button>
-          )}
+          ) : null}
 
           <div className={`flex flex-col items-center text-center px-6 ${showBanner ? "pt-6 pb-6" : "pt-8 pb-12"}`}>
             {mobileChildren}
@@ -233,15 +225,7 @@ export default function WaitlistLayout({
             >
               <Home className="w-6 h-6 text-black" />
             </Link>
-          ) : (
-            <button
-              onClick={() => router.back()}
-              className="absolute rounded-full p-0.5 md:p-1.5 hover:bg-white/20 right-8 top-8 text-white/70 hover:text-white transition-all z-10 cursor-pointer"
-            >
-              <X className="size-5 md:size-6" />
-              <span className="sr-only">Close</span>
-            </button>
-          )}
+          ) : null}
 
           {children}
         </div>
