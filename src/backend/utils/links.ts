@@ -30,36 +30,37 @@ const DEFAULT_FRONTEND_URL = "http://localhost:5173";
 // ============================================================================
 
 /**
+ * Path for the join/waitlist page where ref is read by the form
+ */
+const JOIN_PATH = "/join";
+
+/**
  * Build Referral Link
- * 
- * Constructs a complete referral URL with the referral code.
- * Uses FRONTEND_URL environment variable as base.
- * 
+ *
+ * Returns a relative URL so it works on any origin (localhost, production, etc.).
+ *
  * @param {string} referralCode - 8-character referral code
- * @returns {string} Complete referral URL
- * 
- * @example
- * const link = buildReferralLink("ABC12XYZ");
- * console.log(link); // "https://app.com?ref=ABC12XYZ"
- * 
+ * @returns {string} Relative referral URL (e.g. /join?ref=ABC12XYZ)
+ *
  * @throws {Error} If referral code format is invalid
  */
 export function buildReferralLink(referralCode: string): string {
-  // Validate referral code format
   if (!isValidReferralCodeFormat(referralCode)) {
     throw new Error(
       `Invalid referral code format: ${referralCode}. Must be 8 alphanumeric characters.`
     );
   }
 
-  // Get base URL from environment
+  return `${JOIN_PATH}?${REFERRAL_QUERY_PARAM}=${referralCode}`;
+}
+
+/**
+ * Build absolute referral URL for emails (uses FRONTEND_URL so links work in email clients).
+ */
+export function buildAbsoluteReferralLink(referralCode: string): string {
   const baseUrl = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
-
-  // Remove trailing slash if present
   const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
-
-  // Construct URL with query parameter
-  return `${cleanBaseUrl}?${REFERRAL_QUERY_PARAM}=${referralCode}`;
+  return `${cleanBaseUrl}${buildReferralLink(referralCode)}`;
 }
 
 /**

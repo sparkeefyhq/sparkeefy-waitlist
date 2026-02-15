@@ -3,7 +3,7 @@
  * 
  * Core business logic for referral management.
  * Handles referral relationship creation, duplicate prevention,
- * referral counting, and real-time SSE event broadcasting.
+ * referral counting.
  * 
  * @module services/ReferralService
  */
@@ -13,7 +13,6 @@ import type { Referral } from "../types";
 import { db } from "../db/client";
 import { logger } from "../logging/logger";
 import * as Sentry from "@sentry/node";
-import { sseManager } from "../sse/SSEManager";
 import { 
   validateReferralRelationship, 
   referralExists 
@@ -63,7 +62,7 @@ export class ReferralService {
    * Create Referral
    * 
    * Creates a referral relationship between referrer and referee.
-   * Validates relationship, checks for duplicates, and broadcasts SSE update.
+   * Validates relationship and checks for duplicates.
    * 
    * @param {string} referrerId - User who referred (referral code owner)
    * @param {string} refereeId - User who was referred (new user)
@@ -174,30 +173,7 @@ export class ReferralService {
       });
 
       // ======================================================================
-      // STEP 6: BROADCAST SSE UPDATE TO REFERRER
-      // ======================================================================
-
-      try {
-        sseManager.sendReferralUpdated(referrerId, previousCount, newCount);
-
-        logger.info("SSE event broadcasted", {
-          referrerId,
-          previousCount,
-          newCount,
-          correlationId,
-        });
-      } catch (sseError) {
-        // Don't fail the referral creation if SSE fails
-        // SSE is non-critical - user can refresh to see updated count
-        logger.warn("Failed to broadcast SSE event", {
-          error: sseError,
-          referrerId,
-          correlationId,
-        });
-      }
-
-      // ======================================================================
-      // STEP 7: TRACK SUCCESS IN SENTRY
+      // STEP 6: TRACK SUCCESS IN SENTRY
       // ======================================================================
 
       Sentry.addBreadcrumb({

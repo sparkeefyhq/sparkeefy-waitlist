@@ -114,7 +114,7 @@ export const referralContent = {
       bold: "Unlock exclusive access",
     },
     copyButton: "Copy",
-    placeholderUrl: "https://sparkeefy.com/ref/abc123...",
+    placeholderUrl: "/join?ref=XXXXXXXX",
   },
 } as const;
 

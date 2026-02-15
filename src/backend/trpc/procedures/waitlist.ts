@@ -12,14 +12,13 @@ import {
   generateMagicLinkToken,
   generateSessionToken
 } from "../../utils/generators";
-import { buildReferralLink, buildMagicLinkUrl } from "../../utils/links.js";  // UPDATE this line
+import { buildReferralLink, buildAbsoluteReferralLink, buildMagicLinkUrl } from "../../utils/links.js";  // UPDATE this line
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { requireAuth, rateLimit } from "../middleware";
 import { WaitlistService } from "../../services/WaitlistService";
 import { ReferralService } from "../../services/ReferralService";
 import { SessionService } from "../../services/SessionService";
-import { SSEManager } from "../../sse/SSEManager";
 import { logger } from "../../logging/logger";
 import { calculateTier, getTierInfo, getNextTierThreshold } from "../../utils/tiers";
 import { db } from "../../db/client";
@@ -158,7 +157,6 @@ type ValidateReferralCodeInput = z.infer<typeof validateReferralCodeInput>;
  * @mutation
  * @public
  * @rateLimit 20 requests per IP per hour
- * @realtime Triggers SSE event if referral credited
  */
 const join = rateLimitedProcedure
   .use(rateLimit)
@@ -179,7 +177,6 @@ const join = rateLimitedProcedure
       const waitlistService = new WaitlistService(db);
       const referralService = new ReferralService(db);
       const sessionService = new SessionService();
-      const sseManager = new SSEManager();
 
       // Step 1: Check if email already exists
       const existingUser = await waitlistService.findUserByEmail(input.email);
@@ -268,19 +265,6 @@ const join = rateLimitedProcedure
               newReferralCount: referralCount,
               newTier: tier,
               requestId,
-            });
-
-            // Broadcast SSE event to referrer's active connections
-            sseManager.broadcastToUser(referrer.id, {
-              type: "referral_credited",
-              timestamp: new Date().toISOString(),
-              data: {
-                actualReferralCount: referralCount,
-                displayReferralCount: displayCount,
-                tier,
-                refereeEmail: input.email,
-                message: "New referral completed!",
-              },
             });
 
             message = "Referral credited to existing user";
@@ -377,7 +361,7 @@ const join = rateLimitedProcedure
               email: user.email,
               magicLinkUrl: buildMagicLinkUrl(user.magicLinkToken),
               referralCode: user.referralCode,
-              referralLink: buildReferralLink(user.referralCode),
+              referralLink: buildAbsoluteReferralLink(user.referralCode),
             });
 
             logger.info("Magic link email sent successfully", {
@@ -433,19 +417,6 @@ const join = rateLimitedProcedure
                   newReferralCount: referralCount,
                   newTier: tier,
                   requestId,
-                });
-
-                // Broadcast SSE event to referrer
-                sseManager.broadcastToUser(referrer.id, {
-                  type: "referral_credited",
-                  timestamp: new Date().toISOString(),
-                  data: {
-                    actualReferralCount: referralCount,
-                    displayReferralCount: displayCount,
-                    tier,
-                    refereeEmail: input.email,
-                    message: "New referral completed!",
-                  },
                 });
 
                 message = "Successfully joined waitlist with referral";
@@ -513,7 +484,7 @@ const join = rateLimitedProcedure
         requestId,
       });
 
-      // Return complete response
+      // Return complete response (magicLinkToken allows redirect with token-in-URL for referral page)
       return {
         success: true,
         user: {
@@ -528,6 +499,7 @@ const join = rateLimitedProcedure
           referralCode: user.referralCode,
           referralLink,
           magicLinkUrl,
+          magicLinkToken: user.magicLinkToken,
           actualReferralCount,
           displayReferralCount,
           tier,
@@ -647,6 +619,81 @@ const getMyStats = protectedProcedure
         requestId,
       });
 
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to retrieve statistics",
+        cause: error,
+      });
+    }
+  });
+
+// ============================================================================
+// PROCEDURE 2b: waitlist.getMyStatsByToken
+// ============================================================================
+
+/**
+ * Get My Stats By Token Procedure
+ *
+ * Public endpoint that returns referral stats when given a magic link token in the URL.
+ * No cookie required - token is passed as input (e.g. from ?token= in the URL).
+ */
+const getMyStatsByToken = publicProcedure
+  .input(authenticateWithMagicLinkInput)
+  .query(async ({ input, ctx }): Promise<UserStatsResponse> => {
+    const { token } = input;
+    const requestId = ctx.requestId || "unknown";
+
+    try {
+      const waitlistService = new WaitlistService(db);
+      const referralService = new ReferralService(db);
+
+      const user = await waitlistService.findUserByMagicLinkToken(token);
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid or expired magic link token.",
+        });
+      }
+
+      const actualReferralCount = await referralService.countUserReferrals(user.id);
+      const displayReferralCount = Math.min(actualReferralCount, 10);
+      const tier = calculateTier(actualReferralCount);
+      const tierInfo = getTierInfo(tier);
+      const nextTierAt = getNextTierThreshold(actualReferralCount);
+      const nextTierLabel = nextTierAt ? getTierInfo(calculateTier(nextTierAt)).label : null;
+      const referralLink = buildReferralLink(user.referralCode);
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: user.phoneNumber,
+          marketingOptIn: user.marketingOptIn,
+          additionalRemarks: user.additionalRemarks,
+          referralCode: user.referralCode,
+          referralLink,
+          createdAt: user.createdAt.toISOString(),
+          updatedAt: user.updatedAt.toISOString(),
+        },
+        referralStats: {
+          actualReferralCount,
+          displayReferralCount,
+          tier,
+          tierLabel: tierInfo.label,
+          nextTierAt: nextTierAt ?? undefined,
+          nextTierLabel: nextTierLabel ?? undefined,
+        },
+        sessionExpiresAt: user.sessionExpiresAt.toISOString(),
+      };
+    } catch (error) {
+      if (error instanceof TRPCError) throw error;
+      logger.error("Failed to get stats by token", {
+        error: error instanceof Error ? error.message : String(error),
+        requestId,
+      });
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to retrieve statistics",
@@ -932,6 +979,7 @@ const getSlackAccessStatus = protectedProcedure
 export const waitlistRouter = router({
   join,
   getMyStats,
+  getMyStatsByToken,
   validateReferralCode,
   authenticateWithMagicLink,
   slackAccess,

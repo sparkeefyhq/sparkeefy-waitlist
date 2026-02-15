@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
 
 interface EmailFormProps {
-  onSubmit?: (email: string) => void;
+  /** Called on successful join with the join response (includes magicLinkToken for token-in-URL flow). */
+  onSubmit?: (data: { user: { magicLinkToken: string } }) => void;
 }
 
 export default function EmailForm({ onSubmit }: EmailFormProps) {
@@ -15,11 +16,9 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
   const searchParams = useSearchParams();
   const referralCode = searchParams.get("ref") || undefined; // Extract from URL ?ref=ABC12XYZ
   
-  // tRPC mutation for waitlist.join
   const joinMutation = trpc.waitlist.join.useMutation({
     onSuccess: (data) => {
-      if (onSubmit) onSubmit(email);
-      // Backend sets sessionToken cookie automatically via httpOnly
+      if (onSubmit) onSubmit(data);
     },
     onError: (error) => {
       console.error("Join failed:", error.message);

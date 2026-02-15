@@ -4,28 +4,55 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { referralContent } from "@/lib/config/waitlist.config";
+import { trpc } from "@/lib/trpc";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 
+const PLACEHOLDER_URL = referralContent.rightSection.placeholderUrl;
+
+function SparkleIcon() {
+  return (
+    <img src="/img/sparkle-star.svg" alt="" width={16} height={14} className="-scale-y-100" />
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="2" />
+      <path d="M4 14V5C4 3.89543 4.89543 3 6 3H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function ReferralPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const [copied, setCopied] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [currentInvites, setCurrentInvites] = useState(0);
   const popupRef = useRef<HTMLDivElement>(null);
   const mobilePopupRef = useRef<HTMLDivElement>(null);
 
-  // Load invites from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("sparkeefy-invites");
-    if (saved) {
-      setCurrentInvites(parseInt(saved, 10));
-    }
-  }, []);
+  const { data, isLoading: isStatsLoading, isError, error } = trpc.waitlist.getMyStatsByToken.useQuery(
+    { token: token! },
+    { retry: false, enabled: !!token && token.length === 64 }
+  );
 
-  // Save invites to localStorage when changed
+  const isUnauthorized = isError && (error as { data?: { code?: string } })?.data?.code === "UNAUTHORIZED";
+
+  // Redirect to /join when no token, invalid format, or invalid/expired token
   useEffect(() => {
-    localStorage.setItem("sparkeefy-invites", currentInvites.toString());
-  }, [currentInvites]);
+    if (token === null) return; // still reading searchParams
+    if (!token || token.length !== 64) {
+      router.replace("/join");
+      return;
+    }
+    if (isUnauthorized) {
+      router.replace("/join");
+    }
+  }, [token, isUnauthorized, router]);
 
   // Close popup on click outside
   useEffect(() => {
@@ -34,7 +61,6 @@ export default function ReferralPage() {
       const isOutsideDesktop = popupRef.current && !popupRef.current.contains(target);
       const isOutsideMobile = mobilePopupRef.current && !mobilePopupRef.current.contains(target);
 
-      // Only close if click is outside both refs (whichever is rendered)
       if ((popupRef.current && isOutsideDesktop && !mobilePopupRef.current) ||
           (mobilePopupRef.current && isOutsideMobile && !popupRef.current) ||
           (popupRef.current && mobilePopupRef.current && isOutsideDesktop && isOutsideMobile)) {
@@ -50,21 +76,32 @@ export default function ReferralPage() {
     };
   }, [showPopup]);
 
-  // Placeholder - will be replaced with backend data
-  const referralUrl = referralContent.rightSection.placeholderUrl;
+  const referralPath = data?.user?.referralLink ?? PLACEHOLDER_URL;
+  const referralUrl =
+    typeof window !== "undefined" ? `${window.location.origin}${referralPath}` : referralPath;
+  const currentInvites = data?.referralStats?.actualReferralCount ?? 0;
+  const displayInvites = Math.min(currentInvites, 10);
 
-  // Handle share action (copy or social click)
+  // Don't flash content before redirecting when no token or unauthorized
+  if (!token || isUnauthorized) {
+    return null;
+  }
+
+  // Loading state: show minimal UI so user knows something is happening
+  if (isStatsLoading) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-[rgb(13,13,13)]">
+        <p className="text-white/80">Loading your referral link...</p>
+      </div>
+    );
+  }
+
   const handleShare = async (isCopy = false) => {
     if (isCopy) {
       await navigator.clipboard.writeText(referralUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-
-    // Increment invites (max 10)
-    setCurrentInvites((prev) => Math.min(prev + 1, 10));
-
-    // Show popup
     setShowPopup(true);
   };
 
@@ -73,19 +110,6 @@ export default function ReferralPage() {
     e.preventDefault();
     handleShare(false);
   };
-
-  // Custom sparkle star icon (from Figma)
-  const SparkleIcon = () => (
-    <img src="/img/sparkle-star.svg" alt="" width={16} height={14} className="-scale-y-100" />
-  );
-
-  // Custom copy icon (matches Figma)
-  const CopyIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="2" />
-      <path d="M4 14V5C4 3.89543 4.89543 3 6 3H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
 
   const animatedUnderline = (
     <svg
@@ -244,7 +268,7 @@ export default function ReferralPage() {
           <motion.div
             className="absolute left-[3px] top-1/2 -translate-y-1/2 h-[12px] rounded-full bg-gradient-to-r from-white to-[#ff0080]"
             initial={{ width: 0 }}
-            animate={{ width: `${Math.min((currentInvites / 10) * 100, 100)}%` }}
+            animate={{ width: `${Math.min((displayInvites / 10) * 100, 100)}%` }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             style={{ maxWidth: "calc(100% - 6px)" }}
           />
@@ -252,8 +276,8 @@ export default function ReferralPage() {
 
         {/* Milestones - inline */}
         <div className="flex justify-between mt-1.5 px-2">
-          <p className={`text-[9px] transition-colors duration-300 ${currentInvites >= 3 ? "text-white" : "text-white/50"}`}>3 invites</p>
-          <p className={`text-[9px] transition-colors duration-300 ${currentInvites >= 6 ? "text-white" : "text-white/50"}`}>6 invites</p>
+          <p className={`text-[9px] transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>3 invites</p>
+          <p className={`text-[9px] transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>6 invites</p>
           <p
             className="font-bold text-[9px] bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
             style={{ WebkitTextFillColor: "transparent" }}
@@ -278,7 +302,7 @@ export default function ReferralPage() {
         </p>
       </div>
       <Link
-        href="/join/beta-access"
+        href={token ? `/join/beta-access?token=${encodeURIComponent(token)}` : "/join/beta-access"}
         className="px-8 py-4 bg-white text-black font-medium text-[16px] rounded-full hover:bg-white/90 transition-colors whitespace-nowrap border border-black/10"
       >
         Request Access
@@ -297,7 +321,7 @@ export default function ReferralPage() {
         We&apos;re onboarding a small group of beta testers to refine Sparkeefy. Feedback from this group will directly influence how the product evolves.
       </p>
       <Link
-        href="/join/beta-access"
+        href={token ? `/join/beta-access?token=${encodeURIComponent(token)}` : "/join/beta-access"}
         className="mt-3 px-5 py-2.5 bg-white text-black font-medium text-[13px] rounded-full hover:bg-white/90 transition-colors"
       >
         Request Access
@@ -505,7 +529,7 @@ export default function ReferralPage() {
                 <motion.div
                   className="absolute left-[5px] top-1/2 -translate-y-1/2 h-[23px] rounded-full bg-gradient-to-r from-white to-[#ff0080]"
                   initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((currentInvites / 10) * 100, 100)}%` }}
+                  animate={{ width: `${Math.min((displayInvites / 10) * 100, 100)}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                   style={{ maxWidth: "calc(100% - 10px)" }}
                 />
@@ -515,19 +539,19 @@ export default function ReferralPage() {
               <div className="relative mt-[8px] h-[60px]">
                 {/* 3 invites milestone */}
                 <div className="absolute left-[85px] flex flex-col items-center">
-                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${currentInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`mt-[4px] text-[17px] transition-colors duration-300 ${currentInvites >= 3 ? "text-white" : "text-white/50"}`}>3 invites</p>
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
+                  <p className={`mt-[4px] text-[17px] transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>3 invites</p>
                 </div>
 
                 {/* 6 invites milestone */}
                 <div className="absolute left-[207px] flex flex-col items-center">
-                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${currentInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`mt-[4px] text-[17px] transition-colors duration-300 ${currentInvites >= 6 ? "text-white" : "text-white/50"}`}>6 invites</p>
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
+                  <p className={`mt-[4px] text-[17px] transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>6 invites</p>
                 </div>
 
                 {/* 10 invites milestone */}
                 <div className="absolute left-[352px] flex flex-col items-center">
-                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${currentInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
                   <p
                     className="mt-[4px] font-bold text-[17px] bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
                     style={{ WebkitTextFillColor: "transparent" }}

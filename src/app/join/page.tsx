@@ -11,9 +11,8 @@ import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 export default function JoinPage() {
   const router = useRouter();
 
-  const handleEmailSubmit = (email: string) => {
-    console.log("Email submitted:", email);
-    router.push("/join/success");
+  const handleEmailSubmit = (data: { user: { magicLinkToken: string } }) => {
+    router.push(`/join/success?token=${encodeURIComponent(data.user.magicLinkToken)}`);
   };
 
   const animatedUnderline = (

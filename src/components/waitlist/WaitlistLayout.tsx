@@ -15,6 +15,8 @@ interface WaitlistLayoutProps {
   banner?: React.ReactNode;
   mobileBanner?: React.ReactNode;
   showBanner?: boolean;
+  /** For beta-access: back link (e.g. /join/referral?token=...) so user returns with auth. */
+  backHref?: string;
 }
 
 export default function WaitlistLayout({
@@ -24,6 +26,7 @@ export default function WaitlistLayout({
   banner,
   mobileBanner,
   showBanner = false,
+  backHref,
 }: WaitlistLayoutProps) {
   const router = useRouter();
   const [scale, setScale] = useState<number | null>(null);
@@ -77,7 +80,7 @@ export default function WaitlistLayout({
         <div className={`relative w-full backdrop-blur-xl rounded-[22px] shadow-[0px_5.54px_29.453px_0px_rgba(0,0,0,0.56)] overflow-clip ${isBetaAccess ? "bg-[rgba(0,0,0,0.6)]" : "bg-[rgba(0,0,0,0.45)]"}`}>
           {isBetaAccess ? (
             <Link
-              href="/auth/magic"
+              href={backHref ?? "/join/referral"}
               className="absolute left-4 top-4 z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[36px] h-[36px] bg-white rounded-full"
             >
               <ArrowLeft className="w-5 h-5 text-black" />
@@ -218,7 +221,7 @@ export default function WaitlistLayout({
           {/* Back button for beta-access, Home button for referral, Close button for others */}
           {isBetaAccess ? (
             <Link
-              href="/auth/magic"
+              href={backHref ?? "/join/referral"}
               className="absolute left-[29px] top-[26px] z-10 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center w-[48px] h-[48px] bg-white rounded-full"
             >
               <ArrowLeft className="w-6 h-6 text-black" />

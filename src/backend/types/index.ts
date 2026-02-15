@@ -83,18 +83,6 @@ export interface TierInfo {
 }
 
 /**
- * SSE Connection
- * Active Server-Sent Events connection
- */
-export interface SSEConnection {
-  id: string;
-  userId: string;
-  response: Response;
-  connectedAt: Date;
-  lastActivity: Date;
-}
-
-/**
  * Join Waitlist Input
  * Input for joining the waitlist
  */
@@ -159,6 +147,7 @@ export interface WaitlistJoinResponse {
     referralCode: string;
     referralLink: string;
     magicLinkUrl: string;
+    magicLinkToken: string;
     actualReferralCount: number;
     displayReferralCount: number;
     tier: TierType;
@@ -210,85 +199,6 @@ export interface ReferralCodeValidationResponse {
   valid: boolean;
   referrerEmail?: string;
   message?: string;
-}
-
-// ============================================================================
-// SSE (SERVER-SENT EVENTS) TYPES
-// ============================================================================
-
-/**
- * SSE Event Types
- * Different types of real-time events
- */
-export type SSEEventType = "referral_credited" | "tier_upgraded" | "milestone_reached" | "connection_established" | "heartbeat" | "connected" | "referral_updated";
-
-/**
- * SSE Event Payload
- * Base structure for all SSE events
- */
-export interface SSEEvent<T = any> {
-  type: SSEEventType;
-  timestamp: string; // ISO8601
-  data: T;
-}
-
-/**
- * Referral Credited Event Data
- * Sent when someone joins using user's referral link
- */
-export interface ReferralCreditedEventData {
-  actualReferralCount: number;
-  displayReferralCount: number;
-  tier: TierType;
-  refereeEmail?: string;
-  message?: string;
-  previousCount?: number;
-  newCount?: number;
-  displayCount?: number;
-}
-
-/**
- * Tier Upgraded Event Data
- * Sent when user reaches new tier threshold
- */
-export interface TierUpgradedEventData {
-  previousTier: TierType;
-  newTier: TierType;
-  newTierLabel: string;
-  referralCount: number;
-  message: string;
-}
-
-/**
- * Milestone Reached Event Data
- * Sent when user reaches specific referral milestones
- */
-export interface MilestoneReachedEventData {
-  milestone: number;
-  referralCount: number;
-  totalReferrals?: number;
-  tier?: TierType;
-  message: string;
-}
-
-/**
- * Connection Established Event Data
- * Sent when SSE connection is first established
- */
-export interface ConnectionEstablishedEventData {
-  userId: string;
-  currentReferralCount: number;
-  tier: TierType;
-  message: string;
-}
-
-/**
- * Heartbeat Event Data
- * Periodic keep-alive signal
- */
-export interface HeartbeatEventData {
-  timestamp: string; // ISO8601
-  uptime: number; // seconds
 }
 
 // ============================================================================
@@ -500,19 +410,6 @@ export function isTierType(value: any): value is TierType {
   return ["normal", "1month", "3months", "founder"].includes(value);
 }
 
-/**
- * Type guard for SSEEventType
- */
-export function isSSEEventType(value: any): value is SSEEventType {
-  return [
-    "referral_credited",
-    "tier_upgraded",
-    "milestone_reached",
-    "connection_established",
-    "heartbeat",
-  ].includes(value);
-}
-
 // ============================================================================
 // UTILITY TYPE HELPERS
 // ============================================================================
@@ -550,9 +447,6 @@ export type DeepReadonly<T> = {
  */
 export type {
   WaitlistUser as User,
-  // Referral,
-  // TierType,
-  // SSEEvent,
   AppConfig as Config,
 };
 
