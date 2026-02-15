@@ -8,7 +8,7 @@
  */
 
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, sql, and, asc, count } from "drizzle-orm";
+import { eq, sql, and, asc, desc, count } from "drizzle-orm";
 import { Pool } from "pg";
 import type { WaitlistUser, Referral, CreateUserInput } from "../types";
 import {
@@ -124,6 +124,21 @@ export class DatabaseClient {
     }
   }
 
+  async listWaitlistUsers(options?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<WaitlistUser[]> {
+    const limit = options?.limit ?? 10000;
+    const offset = options?.offset ?? 0;
+    const rows = await this._db
+      .select()
+      .from(waitlistUsers)
+      .orderBy(desc(waitlistUsers.createdAt))
+      .limit(limit)
+      .offset(offset);
+    return rows as WaitlistUser[];
+  }
+
   async createUser(data: CreateUserInput): Promise<WaitlistUser> {
     const [row] = await this._db
       .insert(waitlistUsers)
@@ -208,6 +223,14 @@ export class DatabaseClient {
       .where(eq(referrals.referrerId, userId))
       .orderBy(asc(referrals.createdAt));
     return rows as Referral[];
+  }
+
+  async countAllReferrals(): Promise<number> {
+    const result = await this._db
+      .select({ value: count() })
+      .from(referrals);
+    const n = result[0]?.value;
+    return typeof n === "number" ? n : Number(n ?? 0);
   }
 
   // ==========================================================================
