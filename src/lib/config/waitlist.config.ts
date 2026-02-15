@@ -1,3 +1,5 @@
+export const siteUrl = "https://sparkeefy.com";
+
 export const waitlistContent = {
   badge: {
     emoji: "\u{1F497}",

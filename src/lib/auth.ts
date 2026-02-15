@@ -9,7 +9,6 @@
 
 import type { WaitlistUser } from "./types";
 import { db } from "./db/client";
-import { logger } from "./logging/logger";
 
 /**
  * Get User from Token
@@ -29,11 +28,7 @@ export async function getUserFromToken(
   try {
     const user = await db.findUserByMagicLinkToken(token);
     return user;
-  } catch (error) {
-    logger.error("Error validating magic link token", {
-      error: error instanceof Error ? error.message : String(error),
-      tokenPrefix: token.substring(0, 8) + "***",
-    });
+  } catch {
     return null;
   }
 }

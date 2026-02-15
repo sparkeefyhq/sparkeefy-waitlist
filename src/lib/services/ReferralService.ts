@@ -8,7 +8,6 @@
  */
 
 import type { Referral } from "../types";
-import { logger } from "../logging/logger";
 import { validateReferralRelationship } from "../utils/referrals";
 
 export interface ReferralDatabaseClient {

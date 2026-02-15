@@ -17,7 +17,6 @@ import { WaitlistService } from "@/lib/services/WaitlistService";
 import { ReferralService } from "@/lib/services/ReferralService";
 import { emailService } from "@/lib/services/EmailService";
 import { getUserFromToken } from "@/lib/auth";
-import { logger } from "@/lib/logging/logger";
 import {
   generateReferralCode,
   generateUniqueCode,
@@ -90,9 +89,6 @@ export type FormActionState<T = any> = {
 async function joinWaitlistInternal(
   formData: FormData
 ): Promise<FormActionState<WaitlistJoinResponse>> {
-  const startTime = Date.now();
-  const requestId = `join-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-
   try {
     // Parse form data
     const rawData = {
@@ -110,7 +106,6 @@ async function joinWaitlistInternal(
     const validated = joinWaitlistSchema.safeParse(rawData);
     if (!validated.success) {
       const firstError = validated.error.errors[0];
-      logger.warn("Validation failed", { error: firstError, requestId });
       return {
         success: false,
         error: firstError?.message || "Invalid input",
@@ -118,12 +113,6 @@ async function joinWaitlistInternal(
     }
 
     const input = validated.data;
-
-    logger.info("Waitlist join attempt", {
-      email: input.email.substring(0, 5) + "***",
-      hasReferral: !!input.referralCode,
-      requestId,
-    });
 
     // Initialize services
     const waitlistService = new WaitlistService(db);
@@ -134,12 +123,6 @@ async function joinWaitlistInternal(
 
     // Validate email domain
     if (!isAllowedEmailDomain(input.email, BLOCKED_EMAIL_DOMAINS)) {
-      logger.warn("Disposable email blocked", {
-        email: input.email.substring(0, 5) + "***",
-        domain: input.email.split("@")[1],
-        requestId,
-      });
-
       return {
         success: false,
         error: "Please use a real email address (no temporary/disposable emails)",
@@ -154,12 +137,6 @@ async function joinWaitlistInternal(
       // EMAIL EXISTS - Handle duplicate scenario
       user = existingUser;
       message = "User already exists";
-
-      logger.info("Existing user detected", {
-        userId: user.id,
-        email: input.email.substring(0, 5) + "***",
-        requestId,
-      });
 
       // If referral code provided, attempt to create referral
       if (input.referralCode) {
@@ -199,22 +176,8 @@ async function joinWaitlistInternal(
           // Create referral relationship
           await referralService.createReferral(referrer.id, user.id);
           newReferralCreated = true;
-
-          logger.info("Referral credited", {
-            referrerId: referrer.id,
-            refereeId: user.id,
-            requestId,
-          });
-
           message = "Referral credited to existing user";
         } catch (error) {
-          logger.error("Failed to create referral for existing user", {
-            error: error instanceof Error ? error.message : String(error),
-            userId: user.id,
-            referralCode: input.referralCode,
-            requestId,
-          });
-
           return {
             success: false,
             error: "Failed to process referral",
@@ -252,13 +215,6 @@ async function joinWaitlistInternal(
 
         message = "Successfully joined waitlist";
 
-        logger.info("New user joined waitlist", {
-          userId: user.id,
-          email: input.email.substring(0, 5) + "***",
-          referralCode: user.referralCode,
-          requestId,
-        });
-
         // Send magic link email
         try {
           await emailService.sendMagicLinkEmail({
@@ -267,18 +223,8 @@ async function joinWaitlistInternal(
             referralCode: user.referralCode,
             referralLink: buildAbsoluteReferralLink(user.referralCode),
           });
-
-          logger.info("Magic link email sent successfully", {
-            userId: user.id,
-            email: input.email.substring(0, 5) + "***",
-            requestId,
-          });
-        } catch (emailError) {
-          logger.error("Failed to send magic link email", {
-            error: emailError instanceof Error ? emailError.message : String(emailError),
-            userId: user.id,
-            requestId,
-          });
+        } catch {
+          // Email not sent (no-op when disabled)
         }
 
         // If referral code provided, create referral relationship
@@ -289,44 +235,19 @@ async function joinWaitlistInternal(
             );
 
             if (!referrer) {
-              logger.warn("Referral code not found for new user", {
-                referralCode: input.referralCode,
-                userId: user.id,
-                requestId,
-              });
+              // Referral code not found - continue without referral
             } else if (referrer.id === user.id) {
-              logger.warn("Self-referral attempt detected", {
-                userId: user.id,
-                requestId,
-              });
+              // Self-referral - skip
             } else {
               await referralService.createReferral(referrer.id, user.id);
               newReferralCreated = true;
-
-              logger.info("Referral credited for new user", {
-                referrerId: referrer.id,
-                refereeId: user.id,
-                requestId,
-              });
-
               message = "Successfully joined waitlist with referral";
             }
-          } catch (error) {
-            logger.error("Failed to process referral for new user", {
-              error: error instanceof Error ? error.message : String(error),
-              userId: user.id,
-              referralCode: input.referralCode,
-              requestId,
-            });
+          } catch {
+            // Referral creation failed - continue
           }
         }
       } catch (error) {
-        logger.error("Failed to create new user", {
-          error: error instanceof Error ? error.message : String(error),
-          email: input.email.substring(0, 5) + "***",
-          requestId,
-        });
-
         return {
           success: false,
           error: error instanceof Error && error.message.includes("already exists")
@@ -345,17 +266,6 @@ async function joinWaitlistInternal(
     // Build referral link
     const referralLink = buildReferralLink(user.referralCode);
     const magicLinkUrl = buildMagicLinkUrl(user.magicLinkToken);
-
-    const duration = Date.now() - startTime;
-
-    logger.info("Waitlist join completed", {
-      userId: user.id,
-      newReferralCreated,
-      tier,
-      referralCount: actualReferralCount,
-      duration: `${duration}ms`,
-      requestId,
-    });
 
     const response: WaitlistJoinResponse = {
       success: true,
@@ -387,12 +297,7 @@ async function joinWaitlistInternal(
       success: true,
       data: response,
     };
-  } catch (error) {
-    logger.error("Unexpected error in joinWaitlistAction", {
-      error: error instanceof Error ? error.message : String(error),
-      requestId,
-    });
-
+  } catch {
     return {
       success: false,
       error: "An unexpected error occurred",
@@ -460,8 +365,7 @@ export async function validateReferralCodeAction(code: string): Promise<{
         message: "Referral code not found",
       };
     }
-  } catch (error) {
-    logger.error("Error validating referral code", { error, code });
+  } catch {
     return {
       valid: false,
       message: "Failed to validate referral code",
@@ -522,8 +426,6 @@ export async function submitSlackAccessAction(
       data: result,
     };
   } catch (error) {
-    logger.error("Error submitting Slack survey", { error });
-    
     if (error instanceof Error && error.message.includes("Unauthorized")) {
       return {
         success: false,
@@ -589,8 +491,7 @@ export async function getStatsByToken(token: string): Promise<UserStatsResponse 
         nextTierLabel: nextTierLabel ?? undefined,
       },
     };
-  } catch (error) {
-    logger.error("Error getting stats by token", { error });
+  } catch {
     return null;
   }
 }

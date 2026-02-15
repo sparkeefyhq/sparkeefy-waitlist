@@ -7,8 +7,6 @@
  * @module services/EmailService
  */
 
-import { logger } from "../logging/logger";
-
 export interface MagicLinkEmailData {
   email: string;
   magicLinkUrl: string;
@@ -17,11 +15,8 @@ export interface MagicLinkEmailData {
 }
 
 class EmailService {
-  async sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void> {
-    logger.debug("Email sending disabled - magic link not sent", {
-      to: data.email,
-      referralCode: data.referralCode,
-    });
+  async sendMagicLinkEmail(_data: MagicLinkEmailData): Promise<void> {
+    // No-op
   }
 }
 

@@ -17,7 +17,6 @@ import type {
   SlackAccessInput
 } from "../types";
 import { db } from "../db/client";
-import { logger } from "../logging/logger";
 import { 
   generateReferralCode, 
   generateUniqueCode 
@@ -63,7 +62,6 @@ export class WaitlistService {
 
   constructor(db: DatabaseClient) {
     this.db = db;
-    logger.info("WaitlistService initialized");
   }
 
   // ==========================================================================
@@ -79,8 +77,7 @@ export class WaitlistService {
   async findUserByEmail(email: string): Promise<WaitlistUser | null> {
     try {
       return await this.db.findUserByEmail(email.toLowerCase());
-    } catch (error) {
-      logger.error("Error finding user by email", { error, email });
+    } catch {
       throw new Error("Database error while checking email");
     }
   }
@@ -94,8 +91,7 @@ export class WaitlistService {
   async findUserByReferralCode(code: string): Promise<WaitlistUser | null> {
     try {
       return await this.db.findUserByReferralCode(code.toUpperCase());
-    } catch (error) {
-      logger.error("Error finding user by referral code", { error, code });
+    } catch {
       throw new Error("Database error while validating referral code");
     }
   }
@@ -117,21 +113,9 @@ export class WaitlistService {
    */
   async findUserByMagicLinkToken(magicLinkToken: string): Promise<WaitlistUser | null> {
     try {
-      // Validate token format before database lookup
-      if (!magicLinkToken || magicLinkToken.length !== 64) {
-        logger.warn("Invalid magic link token format", {
-          tokenPrefix: magicLinkToken?.substring(0, 8) + "***" || "undefined",
-          length: magicLinkToken?.length || 0,
-        });
-        return null;
-      }
-
+      if (!magicLinkToken || magicLinkToken.length !== 64) return null;
       return await this.db.findUserByMagicLinkToken(magicLinkToken);
-    } catch (error) {
-      logger.error("Error finding user by magic link token", { 
-        error: error instanceof Error ? error.message : String(error),
-        tokenPrefix: magicLinkToken.substring(0, 8) + "***" 
-      });
+    } catch {
       throw new Error("Database error during magic link authentication");
     }
   }
@@ -146,8 +130,6 @@ export class WaitlistService {
     try {
       return await this.db.createUser(data);
     } catch (error) {
-      logger.error("Error creating user", { error, email: data.email });
-
       // Check for unique constraint violation
       if ((error as any).code === "23505" || (error as any).code === "ER_DUP_ENTRY") {
         throw new Error("Email already exists");
@@ -186,15 +168,11 @@ export class WaitlistService {
    */
   async submitSlackAccess(userId: string, input: SlackAccessInput): Promise<SlackAccessResponse> {
     try {
-      logger.info("Submitting Slack access survey", { userId });
-      
       const survey = await this.db.submitSlackAccessSurvey(userId, {
         q1Answer: input.q1Answer,
         q2Answer: input.q2Answer,
       });
 
-      logger.info("Slack survey submitted", { userId, q1Answer: input.q1Answer });
-      
       return {
         success: true,
         submitted: true,
@@ -203,8 +181,7 @@ export class WaitlistService {
         submittedAt: survey.submittedAt.toISOString(),
         message: "Slack access survey submitted successfully!",
       };
-    } catch (error) {
-      logger.error("Error submitting Slack survey", { error, userId });
+    } catch {
       throw new Error("Failed to submit survey");
     }
   }
@@ -229,8 +206,7 @@ export class WaitlistService {
         }),
         message: survey ? "Survey already submitted" : "No survey submitted yet",
       };
-    } catch (error) {
-      logger.error("Error getting Slack survey status", { error, userId });
+    } catch {
       throw new Error("Failed to retrieve survey status");
     }
   }
