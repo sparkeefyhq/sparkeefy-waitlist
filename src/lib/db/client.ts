@@ -11,7 +11,6 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, sql, and, asc, count } from "drizzle-orm";
 import { Pool } from "pg";
 import type { WaitlistUser, Referral, CreateUserInput } from "../types";
-import { logger } from "../logging/logger";
 import {
   waitlistUsers,
   referrals,
@@ -41,9 +40,7 @@ const drizzleDb = drizzle(pool);
 export async function connectDatabase(): Promise<void> {
   try {
     await drizzleDb.execute(sql`SELECT 1`);
-    logger.info("Database connected successfully");
   } catch (error) {
-    logger.error("Failed to connect to database", { error });
     throw error;
   }
 }
@@ -56,9 +53,8 @@ export async function connectDatabase(): Promise<void> {
 export async function disconnectDatabase(): Promise<void> {
   try {
     await pool.end();
-    logger.info("Database disconnected successfully");
-  } catch (error) {
-    logger.error("Failed to disconnect from database", { error });
+  } catch {
+    // Ignore
   }
 }
 
@@ -97,7 +93,6 @@ export class DatabaseClient {
         .limit(1);
       return (rows[0] as WaitlistUser | undefined) ?? null;
     } catch (error) {
-      logger.error("Database error: findUserByReferralCode", { error, code });
       throw error;
     }
   }
@@ -111,10 +106,6 @@ export class DatabaseClient {
         .limit(1);
       return (rows[0] as WaitlistUser | undefined) ?? null;
     } catch (error) {
-      logger.error("Database error: findUserByMagicLinkToken", {
-        error,
-        tokenPrefix: token.substring(0, 8) + "***",
-      });
       throw error;
     }
   }
@@ -129,7 +120,6 @@ export class DatabaseClient {
         .limit(1);
       return (rows[0] as WaitlistUser | undefined) ?? null;
     } catch (error) {
-      logger.error("Database error: findUserById", { error, userId });
       throw error;
     }
   }
@@ -267,8 +257,7 @@ export class DatabaseClient {
     try {
       await this._db.execute(sql`SELECT 1`);
       return true;
-    } catch (error) {
-      logger.error("Database health check failed", { error });
+    } catch {
       return false;
     }
   }

@@ -8,6 +8,7 @@
  */
 
 import { isValidReferralCodeFormat } from "./generators";
+import { siteUrl } from "../config/waitlist.config";
 
 // ============================================================================
 // CONFIGURATION
@@ -18,12 +19,6 @@ import { isValidReferralCodeFormat } from "./generators";
  * The query parameter used in referral links
  */
 export const REFERRAL_QUERY_PARAM = "ref";
-
-/**
- * Default Frontend URL
- * Fallback if FRONTEND_URL environment variable not set
- */
-const DEFAULT_FRONTEND_URL = "http://localhost:5173";
 
 // ============================================================================
 // LINK CONSTRUCTION
@@ -55,11 +50,10 @@ export function buildReferralLink(referralCode: string): string {
 }
 
 /**
- * Build absolute referral URL for emails (uses FRONTEND_URL so links work in email clients).
+ * Build absolute referral URL for emails (uses siteUrl from config).
  */
 export function buildAbsoluteReferralLink(referralCode: string): string {
-  const baseUrl = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
-  const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanBaseUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
   return `${cleanBaseUrl}${buildReferralLink(referralCode)}`;
 }
 
@@ -85,8 +79,7 @@ export function buildMagicLinkUrl(magicLinkToken: string): string {
     );
   }
 
-  const baseUrl = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
-  const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanBaseUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
 
   // Point directly at referral page so email links land there (no separate auth/magic page)
   return `${cleanBaseUrl}/join/referral?token=${magicLinkToken}`;
@@ -390,66 +383,5 @@ export function buildSharingLinks(
  * console.log(baseUrl); // "https://app.sparkeefy.com"
  */
 export function getBaseUrl(): string {
-  return process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
-}
-
-/**
- * Validate Base URL Configuration
- * 
- * Checks if FRONTEND_URL environment variable is properly configured.
- * 
- * @returns {{ valid: boolean; url: string; error?: string }}
- * 
- * @example
- * const validation = validateBaseUrlConfig();
- * if (!validation.valid) {
- *   console.warn("FRONTEND_URL not configured:", validation.error);
- * }
- */
-export function validateBaseUrlConfig(): {
-  valid: boolean;
-  url: string;
-  error?: string;
-} {
-  const url = process.env.FRONTEND_URL;
-
-  if (!url) {
-    return {
-      valid: false,
-      url: DEFAULT_FRONTEND_URL,
-      error: "FRONTEND_URL environment variable not set. Using default.",
-    };
-  }
-
-  try {
-    new URL(url);
-    return { valid: true, url };
-  } catch (error) {
-    return {
-      valid: false,
-      url: DEFAULT_FRONTEND_URL,
-      error: `Invalid FRONTEND_URL: ${url}. Using default.`,
-    };
-  }
-}
-
-/**
- * Log Link Configuration
- * 
- * Logs link configuration for debugging.
- * Only runs in development mode.
- * 
- * @example
- * logLinkConfig(); // Logs in development only
- */
-export function logLinkConfig(): void {
-  if (process.env.NODE_ENV !== "production") {
-    const validation = validateBaseUrlConfig();
-    console.log("🔗 Referral Link Configuration:", {
-      baseUrl: validation.url,
-      queryParam: REFERRAL_QUERY_PARAM,
-      configured: validation.valid,
-      warning: validation.error,
-    });
-  }
+  return siteUrl;
 }

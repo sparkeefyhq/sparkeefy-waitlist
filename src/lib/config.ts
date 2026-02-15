@@ -102,15 +102,3 @@ export const config = {
   },
 
 } as const;
-
-// Log configuration on startup (development only)
-if (config.isDevelopment) {
-  console.log("✅ Configuration loaded:");
-  console.log({
-    nodeEnv: config.nodeEnv,
-    port: config.port,
-    // frontendUrl: config.frontendUrl,
-    // databaseUrl: config.databaseUrl.replace(/:\/\/.*@/, "://***:***@"), // Hide credentials
-  });
-  
-}
