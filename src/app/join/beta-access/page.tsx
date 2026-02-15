@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useFormState, useFormStatus } from "react-dom";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
-
-const STORAGE_KEY = "sparkeefy-beta-access";
+import { submitSlackAccessAction, type FormActionState } from "@/app/actions";
 
 // Question 1 options
 const primaryUseOptions = [
-  { id: "partner", label: "My partner" },
-  { id: "friend", label: "A close friend" },
-  { id: "family", label: "A family member" },
-  { id: "unsure", label: "I'm not sure yet" },
+  { id: "A", label: "My partner" },
+  { id: "B", label: "A close friend" },
+  { id: "C", label: "A family member" },
+  { id: "D", label: "I'm not sure yet" },
 ];
 
 // Question 2
@@ -22,57 +22,51 @@ const question2 = {
   placeholder: "For example: forgetting a birthday, replying late, missing a moment.",
 };
 
-function loadSavedForm(): { selectedOptions: string[]; textAnswer: string } {
-  if (typeof window === "undefined") return { selectedOptions: [], textAnswer: "" };
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return { selectedOptions: [], textAnswer: "" };
-    const data = JSON.parse(saved);
-    return {
-      selectedOptions: Array.isArray(data.selectedOptions) ? data.selectedOptions : [],
-      textAnswer: typeof data.textAnswer === "string" ? data.textAnswer : "",
-    };
-  } catch {
-    return { selectedOptions: [], textAnswer: "" };
-  }
+function SubmitButton({ canSubmit }: { canSubmit: boolean }) {
+  const { pending } = useFormStatus();
+  const disabled = !canSubmit || pending;
+  
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      className={`flex items-center justify-center gap-2 md:gap-[10px] h-[40px] w-full md:w-[150px] rounded-full font-bold text-base md:text-[20px] tracking-[-0.4px] md:tracking-[-0.8px] transition-all ${
+        disabled
+          ? "bg-white/30 text-white/50 cursor-not-allowed"
+          : "bg-white text-black hover:bg-white/90"
+      }`}
+    >
+      <span>{pending ? "Submitting..." : "Submit"}</span>
+      <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
+    </button>
+  );
 }
 
-function BetaAccessContent() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const [formState, setFormState] = useState(loadSavedForm);
-  const { selectedOptions, textAnswer } = formState;
+function BetaAccessContent({ token }: { token: string | null }) {
+  const router = useRouter();
+  const [selected, setSelected] = useState<string | null>(null);
+  const [textAnswer, setTextAnswer] = useState("");
 
-  const setSelectedOptions = (updater: React.SetStateAction<string[]>) => {
-    setFormState((prev) => ({
-      ...prev,
-      selectedOptions: typeof updater === "function" ? updater(prev.selectedOptions) : updater,
-    }));
-  };
-  const setTextAnswer = (value: string) => {
-    setFormState((prev) => ({ ...prev, textAnswer: value }));
-  };
+  const [state, formAction] = useFormState<FormActionState>(
+    submitSlackAccessAction,
+    null
+  );
 
-  // Save to localStorage when data changes
+  // Redirect back to referral page on success
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ selectedOptions, textAnswer }));
-  }, [selectedOptions, textAnswer]);
+    if (state?.success) {
+      const query = token ? `?token=${encodeURIComponent(token)}` : "";
+      router.push(`/join/referral${query}`);
+    }
+  }, [state, token, router]);
 
   const toggleOption = (id: string) => {
-    setSelectedOptions((prev) =>
-      prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id]
-    );
+    setSelected(id);
   };
 
-  const handleSubmit = () => {
-    // For now just go back to referral (preserve token so user stays authenticated)
-    const query = token ? `?token=${encodeURIComponent(token)}` : "";
-    window.location.href = `/join/referral${query}`;
-  };
+  const canSubmit = selected !== null;
 
-  const canSubmit = selectedOptions.length > 0;
-
-  // Animated underline for "Questions"
+  // Animated underline
   const animatedUnderline = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -101,166 +95,100 @@ function BetaAccessContent() {
     </svg>
   );
 
-  /* ===== Mobile content ===== */
-  const mobileContent = (
-    <div className="flex flex-col items-center w-full pt-2">
-      {/* Header - two lines */}
-      <div className="relative text-center">
-        <p className="font-retro text-[28px] text-white tracking-[-1px] leading-tight">
-          A couple of
-        </p>
-        <p className="font-retro text-[28px] text-[#ffcbe5] tracking-[-1px] leading-tight">
-          Questions
-        </p>
-        <div className="absolute right-[10%] -bottom-1 w-[80px] h-[4px]">
-          {animatedUnderline}
-        </div>
-      </div>
-
-      <div className="w-full mt-5">
-        {/* Question 1 */}
-        <p className="font-medium text-[14px] text-white tracking-[-0.56px]">
-          Who would you primarily use Sparkeefy for?
-        </p>
-        <p className="text-[11px] text-white/40 mt-1">
-          <span className="text-red-400/40">*</span>Select one or more options
-        </p>
-
-        {/* Options - 2x2 grid */}
-        <div className="grid grid-cols-2 gap-2 mt-3">
-          {primaryUseOptions.map((option) => (
-            <button
-              key={option.id}
-              onClick={() => toggleOption(option.id)}
-              className={`h-[40px] rounded-full border transition-all text-[13px] font-semibold tracking-[-0.39px] ${
-                selectedOptions.includes(option.id)
-                  ? "bg-white/10 border-[#ff68b4] text-white"
-                  : "bg-white/10 border-transparent text-white hover:border-white/30"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Question 2 */}
-        <p className="font-medium text-[14px] text-white tracking-[-0.56px] mt-4">
-          {question2.question}
-        </p>
-
-        {/* Text area */}
-        <textarea
-          value={textAnswer}
-          onChange={(e) => setTextAnswer(e.target.value)}
-          placeholder={question2.placeholder}
-          className="w-full mt-2 h-[80px] bg-white/10 rounded-[12px] p-3 text-[12px] text-white placeholder:text-white/40 resize-none focus:outline-none focus:ring-1 focus:ring-white/30"
-        />
-      </div>
-
-      {/* Submit button */}
-      <button
-        onClick={handleSubmit}
-        disabled={!canSubmit}
-        className={`mt-5 flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[14px] transition-all ${
-          canSubmit
-            ? "bg-white text-black hover:bg-white/90"
-            : "bg-white/30 text-white/50 cursor-not-allowed"
-        }`}
-      >
-        <span>Submit</span>
-        <ArrowRight className="w-4 h-4" />
-      </button>
-    </div>
-  );
-
-  /* ===== Desktop content ===== */
-  const desktopContent = (
-    <div className="absolute inset-0 flex flex-col">
-      {/* Header */}
-      <div className="flex flex-col items-center pt-[80px]">
-        <div className="relative">
-          <p className="font-retro text-[50px] text-white tracking-[-2px] text-center">
-            <span>A couple of </span>
-            <span className="text-[#ffcbe5]">Questions</span>
-          </p>
-          <div
-            className="absolute pointer-events-none"
-            style={{ right: 0, bottom: -4, width: 166, height: 8 }}
-          >
-            {animatedUnderline}
-          </div>
-        </div>
-      </div>
-
-      {/* Content area */}
-      <div className="flex-1 px-[163px] pt-[50px]">
-        {/* Question 1 */}
-        <p className="font-medium text-[24px] text-white tracking-[-0.96px]">
-          Who would you primarily use Sparkeefy for?
-        </p>
-        <p className="text-[18px] text-white/40 mt-2 tracking-[-0.36px]">
-          <span className="text-red-400/40">*</span>Select one or more options
-        </p>
-
-        {/* Options row */}
-        <div className="flex gap-4 mt-6 px-[15px]">
-          {primaryUseOptions.map((option) => (
-            <button
-              key={option.id}
-              onClick={() => toggleOption(option.id)}
-              className={`h-[60px] w-[250px] rounded-full border transition-all text-[20px] font-semibold tracking-[-0.6px] ${
-                selectedOptions.includes(option.id)
-                  ? "bg-white/10 border-[#ff68b4] text-white"
-                  : "bg-white/10 border-transparent text-white hover:border-white/30"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Question 2 */}
-        <p className="font-medium text-[24px] text-white tracking-[-0.96px] mt-[35px]">
-          {question2.question}
-        </p>
-
-        {/* Text area */}
-        <textarea
-          value={textAnswer}
-          onChange={(e) => setTextAnswer(e.target.value)}
-          placeholder={question2.placeholder}
-          className="w-[1054px] mt-6 h-[126px] bg-white/10 rounded-[24px] px-[38px] py-[20px] text-[16px] text-white placeholder:text-white/40 resize-none focus:outline-none focus:ring-1 focus:ring-white/30"
-        />
-      </div>
-
-      {/* Submit button - positioned at left: 1065px, top: 617px from Figma */}
-      <div className="absolute left-[1065px] top-[617px]">
-        <button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className={`flex items-center justify-center gap-[10px] h-[40px] w-[150px] rounded-full font-bold text-[20px] tracking-[-0.8px] transition-all ${
-            canSubmit
-              ? "bg-white text-black hover:bg-white/90"
-              : "bg-white/30 text-white/50 cursor-not-allowed"
-          }`}
-        >
-          <span>Submit</span>
-          <ArrowRight className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
-
   const backHref = token ? `/join/referral?token=${encodeURIComponent(token)}` : "/join/referral";
 
   return (
-    <WaitlistLayout variant="beta-access" mobileChildren={mobileContent} backHref={backHref}>
-      {desktopContent}
+    <WaitlistLayout variant="beta-access" backHref={backHref}>
+      <form action={formAction} className="w-full max-w-4xl mx-auto px-4 md:px-0">
+        {/* Hidden field for token */}
+        {token && <input type="hidden" name="token" value={token} />}
+        
+        {/* Error display */}
+        {state?.error && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+            {state.error}
+          </div>
+        )}
+
+        {/* Header */}
+        <div className="flex flex-col items-center pt-8 md:pt-20 mb-8 md:mb-12">
+          <div className="relative">
+            <p className="font-retro text-[28px] md:text-[50px] text-white md:tracking-[-2px] text-center">
+              <span>A couple of </span>
+              <span className="text-[#ffcbe5]">Questions</span>
+            </p>
+            <div
+              className="absolute pointer-events-none right-0 md:right-0 -bottom-1 md:-bottom-1 w-20 md:w-[166px] h-1 md:h-2"
+            >
+              {animatedUnderline}
+            </div>
+          </div>
+        </div>
+
+        {/* Question 1 */}
+        <div className="mb-6 md:mb-8">
+          <p className="font-medium text-sm md:text-2xl text-white tracking-[-0.56px] md:tracking-[-0.96px]">
+            Who would you primarily use Sparkeefy for?
+          </p>
+          <p className="text-xs md:text-lg text-white/40 mt-1 md:mt-2 tracking-[-0.22px] md:tracking-[-0.36px]">
+            <span className="text-red-400/40">*</span>Select one option
+          </p>
+
+          {/* Options - responsive grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-3 md:mt-6">
+            {primaryUseOptions.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => toggleOption(option.id)}
+                className={`h-[40px] md:h-[60px] rounded-full border transition-all text-[13px] md:text-[20px] font-semibold tracking-[-0.39px] md:tracking-[-0.6px] ${
+                  selected === option.id
+                    ? "bg-white/10 border-[#ff68b4] text-white"
+                    : "bg-white/10 border-transparent text-white hover:border-white/30"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {/* Hidden input for form submission */}
+          <input type="hidden" name="q1Answer" value={selected || ""} />
+        </div>
+
+        {/* Question 2 */}
+        <div className="mb-6 md:mb-8">
+          <p className="font-medium text-sm md:text-2xl text-white tracking-[-0.56px] md:tracking-[-0.96px]">
+            {question2.question}
+          </p>
+
+          {/* Text area */}
+          <textarea
+            name="q2Answer"
+            value={textAnswer}
+            onChange={(e) => setTextAnswer(e.target.value)}
+            placeholder={question2.placeholder}
+            className="w-full mt-2 md:mt-6 h-[80px] md:h-[126px] bg-white/10 rounded-[12px] md:rounded-[24px] p-3 md:px-[38px] md:py-[20px] text-[12px] md:text-[16px] text-white placeholder:text-white/40 resize-none focus:outline-none focus:ring-1 focus:ring-white/30"
+          />
+        </div>
+
+        {/* Submit button */}
+        <div className="flex justify-center md:justify-end">
+          <SubmitButton canSubmit={canSubmit} />
+        </div>
+      </form>
     </WaitlistLayout>
   );
 }
 
-export default function BetaAccessPage() {
+export default async function BetaAccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string }>;
+}) {
+  // Await searchParams (required in Next.js 15+)
+  const params = await searchParams;
+  const token = params.token || null;
+
   return (
     <Suspense
       fallback={
@@ -271,7 +199,7 @@ export default function BetaAccessPage() {
         </WaitlistLayout>
       }
     >
-      <BetaAccessContent />
+      <BetaAccessContent token={token} />
     </Suspense>
   );
 }

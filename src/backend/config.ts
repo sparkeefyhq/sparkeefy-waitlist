@@ -9,7 +9,7 @@
 
 import { z } from "zod";
 import dotenv from "dotenv";
-dotenv.config(); // MUST be before PrismaClient
+dotenv.config();
 
 // ============================================================================
 // ENVIRONMENT SCHEMA

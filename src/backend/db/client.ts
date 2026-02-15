@@ -1,72 +1,36 @@
 /**
  * Database Client
- * 
- * Prisma-based database client singleton with connection pooling.
+ *
+ * Drizzle-based database client with connection pooling.
  * Implements interfaces required by WaitlistService and ReferralService.
- * 
+ *
  * @module db/client
  */
 
 import dotenv from "dotenv";
-dotenv.config(); // MUST be before PrismaClient
+dotenv.config();
 
-import { PrismaClient } from "@prisma/client";
-import type {
-  WaitlistUser,
-  Referral,
-  CreateUserInput,
-} from "../types";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { eq, sql, and, asc, count } from "drizzle-orm";
+import { Pool } from "pg";
+import type { WaitlistUser, Referral, CreateUserInput } from "../types";
 import { logger } from "../logging/logger";
+import {
+  waitlistUsers,
+  referrals,
+  slackAccessSurveys,
+} from "./schema";
+
 // ============================================================================
-// PRISMA CLIENT CONFIGURATION
+// POOL AND DRIZZLE INSTANCE
 // ============================================================================
 
-/**
- * Prisma Client Singleton
- * 
- * Configured with:
- * - Connection pooling (default: 10 connections)
- * - Query timeout: 10 seconds
- * - Query logging in development
- * - Error logging in all environments
- */
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === "development"
-  ? ["query", "info", "warn", "error"]
-  : ["warn", "error"],
-
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 10,
 });
 
-
-// ============================================================================
-// PRISMA EVENT LOGGING
-// ============================================================================
-
-// Log errors
-prisma.$on("error" as never, (e: any) => {
-  logger.error("Prisma error", { error: e });
-});
-
-// Log warnings
-prisma.$on("warn" as never, (e: any) => {
-  logger.warn("Prisma warning", { warning: e });
-});
-
-// Log queries (development only)
-if (process.env.NODE_ENV === "development") {
-  prisma.$on("query" as never, (e: any) => {
-    logger.debug("Prisma query", {
-      query: e.query,
-      params: e.params,
-      duration: e.duration,
-    });
-  });
-}
+const drizzleDb = drizzle(pool);
 
 // ============================================================================
 // CONNECTION LIFECYCLE
@@ -74,13 +38,12 @@ if (process.env.NODE_ENV === "development") {
 
 /**
  * Connect to Database
- * 
- * Establishes connection pool to database.
- * Called on application startup.
+ *
+ * Verifies connectivity by running a simple query.
  */
 export async function connectDatabase(): Promise<void> {
   try {
-    await prisma.$connect();
+    await drizzleDb.execute(sql`SELECT 1`);
     logger.info("Database connected successfully");
   } catch (error) {
     logger.error("Failed to connect to database", { error });
@@ -90,13 +53,12 @@ export async function connectDatabase(): Promise<void> {
 
 /**
  * Disconnect from Database
- * 
- * Closes all database connections.
- * Called on application shutdown.
+ *
+ * Closes all database connections in the pool.
  */
 export async function disconnectDatabase(): Promise<void> {
   try {
-    await prisma.$disconnect();
+    await pool.end();
     logger.info("Database disconnected successfully");
   } catch (error) {
     logger.error("Failed to disconnect from database", { error });
@@ -109,275 +71,204 @@ export async function disconnectDatabase(): Promise<void> {
 
 /**
  * Database Client
- * 
- * Wrapper around Prisma Client implementing service interfaces.
+ *
+ * Wrapper around Drizzle implementing service interfaces.
  * Provides type-safe database operations for all services.
  */
 export class DatabaseClient {
-  private prisma: PrismaClient;
-
-  constructor(prismaClient: PrismaClient = prisma) {
-    this.prisma = prismaClient;
-  }
+  constructor(private _db: typeof drizzleDb = drizzleDb) {}
 
   // ==========================================================================
   // WAITLIST USER OPERATIONS
   // ==========================================================================
 
-  /**
-   * Find User by Email
-   * 
-   * @param {string} email - User email (normalized to lowercase)
-   * @returns {Promise<WaitlistUser | null>} User or null if not found
-   */
   async findUserByEmail(email: string): Promise<WaitlistUser | null> {
-    return await this.prisma.waitlistUser.findUnique({
-      where: { email: email.toLowerCase() },
-    }) as WaitlistUser | null;
+    const rows = await this._db
+      .select()
+      .from(waitlistUsers)
+      .where(eq(waitlistUsers.email, email.toLowerCase()))
+      .limit(1);
+    return (rows[0] as WaitlistUser | undefined) ?? null;
   }
 
-  /**
-   * Find User by Referral Code
-   * 
-   * @param {string} code - Referral code (8 characters)
-   * @returns {Promise<WaitlistUser | null>} User or null if not found
-   */
   async findUserByReferralCode(code: string): Promise<WaitlistUser | null> {
     try {
-      return await this.prisma.waitlistUser.findFirst({
-        where: {
-          referralCode: {
-            equals: code,
-            mode: 'insensitive', // Case-insensitive
-          },
-        },
-      }) as WaitlistUser | null;
+      const rows = await this._db
+        .select()
+        .from(waitlistUsers)
+        .where(sql`lower(${waitlistUsers.referralCode}) = lower(${code})`)
+        .limit(1);
+      return (rows[0] as WaitlistUser | undefined) ?? null;
     } catch (error) {
       logger.error("Database error: findUserByReferralCode", { error, code });
       throw error;
     }
   }
 
-    /**
-   * Find User by Magic Link Token
-   * 
-   * @param {string} token - Magic link token
-   * @returns {Promise<WaitlistUser | null>} User or null if not found
-   */
-    async findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null> {
-      try {
-        return await this.prisma.waitlistUser.findUnique({
-          where: { magicLinkToken: token },
-        }) as WaitlistUser | null;
-
-      } catch (error) {
-        logger.error("Database error: findUserByMagicLinkToken", { 
-          error, 
-          tokenPrefix: token.substring(0, 8) + "***" 
-        });
-        throw error;
-      }
+  async findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null> {
+    try {
+      const rows = await this._db
+        .select()
+        .from(waitlistUsers)
+        .where(eq(waitlistUsers.magicLinkToken, token))
+        .limit(1);
+      return (rows[0] as WaitlistUser | undefined) ?? null;
+    } catch (error) {
+      logger.error("Database error: findUserByMagicLinkToken", {
+        error,
+        tokenPrefix: token.substring(0, 8) + "***",
+      });
+      throw error;
     }
-
-  /**
-   * Find User by Session Token
-   * 
-   * @param {string} token - Session token (64 hex characters)
-   * @returns {Promise<WaitlistUser | null>} User or null if not found
-   */
-  async findUserBySessionToken(token: string): Promise<WaitlistUser | null> {
-    return await this.prisma.waitlistUser.findUnique({
-      where: { sessionToken: token },
-    }) as WaitlistUser | null;
   }
 
-  /**
-   * Find User by ID
-   * 
-   * @param {string} id - User ID (UUID)
-   * @returns {Promise<WaitlistUser | null>} User or null if not found
-   */
+
   async findUserById(userId: string): Promise<WaitlistUser | null> {
     try {
-      return await this.prisma.waitlistUser.findUnique({
-        where: { id: userId },
-      }) as WaitlistUser | null;
+      const rows = await this._db
+        .select()
+        .from(waitlistUsers)
+        .where(eq(waitlistUsers.id, userId))
+        .limit(1);
+      return (rows[0] as WaitlistUser | undefined) ?? null;
     } catch (error) {
       logger.error("Database error: findUserById", { error, userId });
       throw error;
     }
   }
 
-  /**
-   * Create User
-   * 
-   * @param {CreateUserInput} data - User data
-   * @returns {Promise<WaitlistUser>} Created user
-   */
   async createUser(data: CreateUserInput): Promise<WaitlistUser> {
-    return await this.prisma.waitlistUser.create({
-      data: {
+    const [row] = await this._db
+      .insert(waitlistUsers)
+      .values({
         email: data.email,
-        username: data.username,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phoneNumber: data.phoneNumber,
-        marketingOptIn: data.marketingOptIn,
-        additionalRemarks: data.additionalRemarks,
+        username: data.username ?? null,
+        firstName: data.firstName ?? null,
+        lastName: data.lastName ?? null,
+        phoneNumber: data.phoneNumber ?? null,
+        marketingOptIn: data.marketingOptIn ?? false,
+        additionalRemarks: data.additionalRemarks ?? null,
         referralCode: data.referralCode,
         magicLinkToken: data.magicLinkToken,
-        sessionToken: data.sessionToken,
-        sessionExpiresAt: data.sessionExpiresAt,
-      },
-    }) as WaitlistUser;
+      })
+      .returning();
+    return row as WaitlistUser;
   }
 
-  /**
-   * Update User
-   * 
-   * @param {string} id - User ID
-   * @param {Partial<WaitlistUser>} data - Fields to update
-   * @returns {Promise<WaitlistUser>} Updated user
-   */
   async updateUser(
     id: string,
     data: Partial<WaitlistUser>
   ): Promise<WaitlistUser> {
-    return await this.prisma.waitlistUser.update({
-      where: { id },
-      data,
-    }) as WaitlistUser;
+    const [row] = await this._db
+      .update(waitlistUsers)
+      .set(data as Record<string, unknown>)
+      .where(eq(waitlistUsers.id, id))
+      .returning();
+    if (!row) throw new Error("updateUser: no row returned");
+    return row as WaitlistUser;
   }
 
-  async updateUserSession(
-    userId: string,
-    sessionToken: string,
-    sessionExpiresAt: Date
-  ): Promise<WaitlistUser> {
-    return await this.prisma.waitlistUser.update({
-      where: { id: userId },
-      data: {
-        sessionToken,
-        sessionExpiresAt,
-      },
-    }) as WaitlistUser;
-  }
 
   // ==========================================================================
   // REFERRAL OPERATIONS
   // ==========================================================================
 
-  /**
-   * Create Referral
-   * 
-   * @param {object} data - Referral data
-   * @param {string} data.referrerId - Referrer user ID
-   * @param {string} data.refereeId - Referee user ID
-   * @returns {Promise<Referral>} Created referral
-   */
   async createReferral(data: {
     referrerId: string;
     refereeId: string;
   }): Promise<Referral> {
-    return await this.prisma.referral.create({
-      data: {
+    const [row] = await this._db
+      .insert(referrals)
+      .values({
         referrerId: data.referrerId,
         refereeId: data.refereeId,
-      },
-    }) as Referral;
+      })
+      .returning();
+    if (!row) throw new Error("createReferral: no row returned");
+    return row as Referral;
   }
 
-  /**
-   * Find Referral by Users
-   * 
-   * Checks if referral relationship exists between two users.
-   * 
-   * @param {string} referrerId - Referrer user ID
-   * @param {string} refereeId - Referee user ID
-   * @returns {Promise<Referral | null>} Referral or null if not found
-   */
   async findReferralByUsers(
     referrerId: string,
     refereeId: string
   ): Promise<Referral | null> {
-    return await this.prisma.referral.findFirst({
-      where: {
-        referrerId,
-        refereeId,
-      },
-    }) as Referral | null;
+    const rows = await this._db
+      .select()
+      .from(referrals)
+      .where(
+        and(
+          eq(referrals.referrerId, referrerId),
+          eq(referrals.refereeId, refereeId)
+        )
+      )
+      .limit(1);
+    return (rows[0] as Referral | undefined) ?? null;
   }
 
-  /**
-   * Count User Referrals
-   * 
-   * Returns total number of successful referrals for a user.
-   * 
-   * @param {string} userId - User ID
-   * @returns {Promise<number>} Referral count
-   */
   async countUserReferrals(userId: string): Promise<number> {
-    return await this.prisma.referral.count({
-      where: { referrerId: userId },
-    });
+    const result = await this._db
+      .select({ value: count() })
+      .from(referrals)
+      .where(eq(referrals.referrerId, userId));
+    const n = result[0]?.value;
+    return typeof n === "number" ? n : Number(n ?? 0);
   }
 
-  /**
-   * Get User Referrals
-   * 
-   * Returns all referral records for a user.
-   * 
-   * @param {string} userId - User ID
-   * @returns {Promise<Referral[]>} Array of referrals
-   */
   async getUserReferrals(userId: string): Promise<Referral[]> {
-    return await this.prisma.referral.findMany({
-      where: { referrerId: userId },
-      orderBy: { createdAt: "asc" },
-    }) as Referral[];
+    const rows = await this._db
+      .select()
+      .from(referrals)
+      .where(eq(referrals.referrerId, userId))
+      .orderBy(asc(referrals.createdAt));
+    return rows as Referral[];
   }
 
-  /**
- * Submit Slack Access Survey
- */
-async submitSlackAccessSurvey(
-  userId: string,
-  data: { q1Answer: string; q2Answer?: string }
-): Promise<any> {
-  return await this.prisma.slackAccessSurvey.upsert({
-    where: { userId },
-    update: data,
-    create: {
-      userId,
-      q1Answer: data.q1Answer,
-      q2Answer: data.q2Answer || null,
-    },
-  });
-}
+  // ==========================================================================
+  // SLACK ACCESS SURVEY
+  // ==========================================================================
 
-/**
- * Get Slack Access Survey
- */
-async getSlackAccessSurvey(userId: string): Promise<any | null> {
-  return await this.prisma.slackAccessSurvey.findUnique({
-    where: { userId },
-  });
-}
+  async submitSlackAccessSurvey(
+    userId: string,
+    data: { q1Answer: string; q2Answer?: string }
+  ): Promise<{ userId: string; q1Answer: string; q2Answer: string | null; submittedAt: Date; updatedAt: Date }> {
+    const [row] = await this._db
+      .insert(slackAccessSurveys)
+      .values({
+        userId,
+        q1Answer: data.q1Answer,
+        q2Answer: data.q2Answer ?? null,
+      })
+      .onConflictDoUpdate({
+        target: slackAccessSurveys.userId,
+        set: {
+          q1Answer: data.q1Answer,
+          q2Answer: data.q2Answer ?? null,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    if (!row) throw new Error("submitSlackAccessSurvey: no row returned");
+    return row;
+  }
+
+  async getSlackAccessSurvey(
+    userId: string
+  ): Promise<{ userId: string; q1Answer: string; q2Answer: string | null; submittedAt: Date; updatedAt: Date } | null> {
+    const rows = await this._db
+      .select()
+      .from(slackAccessSurveys)
+      .where(eq(slackAccessSurveys.userId, userId))
+      .limit(1);
+    return (rows[0] as typeof rows[0] | undefined) ?? null;
+  }
 
   // ==========================================================================
   // HEALTH CHECK
   // ==========================================================================
 
-  /**
-   * Health Check
-   * 
-   * Tests database connectivity.
-   * 
-   * @returns {Promise<boolean>} True if database is healthy
-   */
   async healthCheck(): Promise<boolean> {
     try {
-      await this.prisma.$queryRaw`SELECT 1`;
+      await this._db.execute(sql`SELECT 1`);
       return true;
     } catch (error) {
       logger.error("Database health check failed", { error });
@@ -390,16 +281,4 @@ async getSlackAccessSurvey(userId: string): Promise<any | null> {
 // SINGLETON EXPORT
 // ============================================================================
 
-/**
- * Singleton Database Client Instance
- * 
- * Import this in services and procedures.
- * 
- * @example
- * import { db } from './db/client';
- * const user = await db.findUserByEmail('user@example.com');
- */
-export const db = new DatabaseClient(prisma);
-
-// Export Prisma client for advanced usage
-export { prisma };
+export const db = new DatabaseClient(drizzleDb);

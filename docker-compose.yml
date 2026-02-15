@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: sparkeefy_postgres
     restart: always
     environment:
@@ -17,11 +15,17 @@ services:
 volumes:
   postgres_data:
 
-# # Start Supabase (postgresql hosted)
+# Development PostgreSQL for local development
+# Next.js server runs on port 3000 with server actions
+
+# Start database:
 # docker-compose up -d
 
-# # Check status
+# Check status:
 # docker-compose ps
 
-# # View logs
+# View logs:
 # docker-compose logs -f postgres
+
+# Run Next.js dev server:
+# pnpm dev
