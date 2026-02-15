@@ -62,8 +62,31 @@ const retroVintage = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.sparkeefy.com"),
   title: "Sparkeefy",
   description: "Caring for your loved ones",
+  openGraph: {
+    title: "Sparkeefy",
+    description: "Caring for your loved ones",
+    url: "https://www.sparkeefy.com",
+    siteName: "Sparkeefy",
+    images: [
+      {
+        url: "/logo-heart.png",
+        width: 1080,
+        height: 1080,
+        alt: "Sparkeefy - Caring for your loved ones",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Sparkeefy",
+    description: "Caring for your loved ones",
+    images: ["/logo-heart.png"],
+  },
   icons: {
     icon: [
       { url: '/favicon.ico' },
