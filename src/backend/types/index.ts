@@ -277,26 +277,6 @@ export interface ErrorContext {
   metadata?: Record<string, any>;
 }
 
-/**
- * Rate Limit Entry
- * Tracks rate limiting per IP address
- */
-export interface RateLimitEntry {
-  count: number;
-  windowStart: number; // timestamp
-  windowExpires: number; // timestamp
-}
-
-/**
- * Rate Limit Info
- * Information about current rate limit status
- */
-export interface RateLimitInfo {
-  remaining: number;
-  limit: number;
-  resetAt: Date;
-}
-
 // ============================================================================
 // CONFIGURATION TYPES
 // ============================================================================
@@ -313,9 +293,6 @@ export interface AppConfig {
   frontendUrl: string;
   corsOrigin: string | string[];
   sessionTtlDays: number;
-  rateLimitWindowMs: number;
-  rateLimitMaxRequests: number;
-  sentryDsn?: string;
   logLevel: "debug" | "info" | "warn" | "error";
   enableIpTracking: boolean;
 }
@@ -346,7 +323,6 @@ export type AuditEventType =
   | "tier_changed"
   | "session_created"
   | "session_expired"
-  | "rate_limit_exceeded"
   | "authentication_failed";
 
 /**

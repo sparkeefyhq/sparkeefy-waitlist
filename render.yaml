@@ -13,4 +13,4 @@ services:
     preDeployCommand: pnpm prisma migrate deploy
 
     # Env vars (add in Dashboard): DATABASE_URL, CORS_ORIGIN, FRONTEND_URL,
-    # SESSION_*, SMTP_*, SENTRY_*, RATE_LIMIT_*, etc. Copy from .env.example.
+    # SESSION_*, SMTP_*, etc. Copy from .env.example.

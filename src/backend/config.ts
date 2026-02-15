@@ -37,10 +37,6 @@ const envSchema = z.object({
   // CORS Configuration
   CORS_ORIGIN: z.string().default("*"),
 
-  // Sentry Configuration (Optional in development)
-  SENTRY_DSN: z.string().url().optional(),
-  SENTRY_ENVIRONMENT: z.string().optional(),
-
   // SMTP Email Configuration
   SMTP_HOST: z.string().default("smtp.gmail.com"),
   SMTP_PORT: z.string().transform(Number).pipe(z.number().min(1).max(65535)).default("587"),
@@ -52,11 +48,6 @@ const envSchema = z.object({
   SESSION_COOKIE_NAME: z.string().default("sparkeefy_session"),
   SESSION_DURATION_DAYS: z.string().transform(Number).pipe(z.number().min(1).max(365)).default("30"),
 
-  // Rate Limiting (Optional)
-  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).pipe(z.number().min(1000)).default("900000"), // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).pipe(z.number().min(1)).default("100"),
-  JOIN_RATE_LIMIT_WINDOW_MS: z.string().transform(Number).pipe(z.number().min(1000)).default("3600000"), // 1 hour
-  JOIN_RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).pipe(z.number().min(1)).default("20"),
 });
 
 // ============================================================================
@@ -123,13 +114,6 @@ export const config = {
       : env.CORS_ORIGIN.split(",").map((o) => o.trim()),
   },
 
-  // Sentry
-  sentry: {
-    dsn: env.SENTRY_DSN,
-    environment: env.SENTRY_ENVIRONMENT || env.NODE_ENV,
-    enabled: !!env.SENTRY_DSN && env.NODE_ENV === "production",
-  },
-
   // Session
   session: {
     cookieName: env.SESSION_COOKIE_NAME,
@@ -146,15 +130,6 @@ export const config = {
     enabled: !!(env.SMTP_USER && env.SMTP_PASS), // Only enabled if credentials provided, real gmail/email access required here
   },
 
-  // Rate Limiting
-  rateLimit: {
-    windowMs: env.RATE_LIMIT_WINDOW_MS,
-    maxRequests: env.RATE_LIMIT_MAX_REQUESTS,
-  },
-  joinRateLimit: {
-    windowMs: env.JOIN_RATE_LIMIT_WINDOW_MS,
-    maxRequests: env.JOIN_RATE_LIMIT_MAX_REQUESTS,
-  },
 } as const;
 
 // Log configuration on startup (development only)
@@ -165,7 +140,6 @@ if (config.isDevelopment) {
     port: config.port,
     // frontendUrl: config.frontendUrl,
     // databaseUrl: config.databaseUrl.replace(/:\/\/.*@/, "://***:***@"), // Hide credentials
-    sentryEnabled: config.sentry.enabled,
     smtpEnabled: config.smtp.enabled,
   });
   

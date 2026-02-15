@@ -18,7 +18,6 @@ import * as tls from "tls";
 import * as net from "net";
 import { config } from "../config";
 import { logger } from "../logging/logger";
-import * as Sentry from "@sentry/node";
 
 // ============================================================================
 // CONSTANTS
@@ -262,7 +261,6 @@ export class EmailService {
       const handleError = (error: Error) => {
         clearTimeout(timeout);
         logger.error("SMTP connection error", { error });
-        Sentry.captureException(error);
         reject(error);
       };
 

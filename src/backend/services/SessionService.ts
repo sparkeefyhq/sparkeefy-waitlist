@@ -10,7 +10,6 @@
 import { Response } from "express";
 import { randomBytes } from "crypto";
 import { logger } from "../logging/logger";
-import * as Sentry from "@sentry/node";
 import { 
   SESSION_COOKIE_NAME, 
   getCookieConfig 
@@ -74,7 +73,6 @@ export class SessionService {
       return token;
     } catch (error) {
       logger.error("Failed to generate session token", { error });
-      Sentry.captureException(error);
       throw new Error("Failed to generate secure session token");
     }
   }
@@ -116,7 +114,6 @@ export class SessionService {
       });
     } catch (error) {
       logger.error("Failed to set session cookie", { error });
-      Sentry.captureException(error);
       throw new Error("Failed to set session cookie");
     }
   }
@@ -148,7 +145,6 @@ export class SessionService {
       });
     } catch (error) {
       logger.error("Failed to clear session cookie", { error });
-      Sentry.captureException(error);
       throw new Error("Failed to clear session cookie");
     }
   }

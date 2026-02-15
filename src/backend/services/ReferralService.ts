@@ -12,7 +12,6 @@ import { TRPCError } from "@trpc/server";
 import type { Referral } from "../types";
 import { db } from "../db/client";
 import { logger } from "../logging/logger";
-import * as Sentry from "@sentry/node";
 import { 
   validateReferralRelationship, 
   referralExists 
@@ -172,23 +171,6 @@ export class ReferralService {
         correlationId,
       });
 
-      // ======================================================================
-      // STEP 6: TRACK SUCCESS IN SENTRY
-      // ======================================================================
-
-      Sentry.addBreadcrumb({
-        category: "referral",
-        message: "Referral created",
-        level: "info",
-        data: {
-          referralId: referral.id,
-          referrerId,
-          refereeId,
-          newCount,
-          tierUpgraded: isTierUpgraded(previousCount, newCount),
-        },
-      });
-
       return referral;
     } catch (error) {
       // Log error with context
@@ -197,19 +179,6 @@ export class ReferralService {
         referrerId,
         refereeId,
         correlationId,
-      });
-
-      // Track error in Sentry
-      Sentry.captureException(error, {
-        tags: {
-          operation: "create_referral",
-        },
-        contexts: {
-          referral: {
-            referrerId,
-            refereeId,
-          },
-        },
       });
 
       // Re-throw if already TRPCError
@@ -247,7 +216,6 @@ export class ReferralService {
       return await this.db.countUserReferrals(userId);
     } catch (error) {
       logger.error("Error counting user referrals", { error, userId });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to count referrals",
@@ -295,7 +263,6 @@ async referralExists(referrerId: string, refereeId: string): Promise<boolean> {
       return await this.db.getUserReferrals(userId);
     } catch (error) {
       logger.error("Error fetching user referrals", { error, userId });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to fetch referrals",
@@ -331,7 +298,6 @@ async referralExists(referrerId: string, refereeId: string): Promise<boolean> {
         referrerId,
         refereeId,
       });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to check referral existence",
@@ -465,7 +431,6 @@ async referralExists(referrerId: string, refereeId: string): Promise<boolean> {
       };
     } catch (error) {
       logger.error("Error calculating referral stats", { error, userId });
-      Sentry.captureException(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to calculate referral statistics",

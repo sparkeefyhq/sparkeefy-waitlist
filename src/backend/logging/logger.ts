@@ -108,7 +108,7 @@ if (process.env.NODE_ENV === "production") {
  * 
  * logger.info('User joined', { userId, email });
  * logger.error('Database error', { error });
- * logger.warn('Rate limit exceeded', { ip });
+ * logger.warn('Validation failed', { field });
  * logger.debug('Processing request', { requestId });
  */
 export const logger = winston.createLogger({
