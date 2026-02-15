@@ -74,26 +74,22 @@ export function buildAbsoluteReferralLink(referralCode: string): string {
  * 
  * @example
  * const url = buildMagicLinkUrl("a3f5b2c1d4e6f7g8...");
- * // Returns: "https://sparkeefy.com/auth/magic?token=a3f5b2c1d4e6f7g8..."
- * 
+ * // Returns: "https://sparkeefy.com/join/referral?token=a3f5b2c1d4e6f7g8..."
+ *
  * @throws {Error} If magicLinkToken is not 64 characters
  */
 export function buildMagicLinkUrl(magicLinkToken: string): string {
-  // Validate token format
   if (!magicLinkToken || magicLinkToken.length !== 64) {
     throw new Error(
       `Invalid magic link token format: ${magicLinkToken}. Must be 64 hex characters.`
     );
   }
 
-  // Get base URL from environment
   const baseUrl = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
-
-  // Remove trailing slash if present
   const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
 
-  // Construct URL with magic link route and token parameter
-  return `${cleanBaseUrl}/auth/magic?token=${magicLinkToken}`;
+  // Point directly at referral page so email links land there (no separate auth/magic page)
+  return `${cleanBaseUrl}/join/referral?token=${magicLinkToken}`;
 }
 
 /**
@@ -105,7 +101,7 @@ export function buildMagicLinkUrl(magicLinkToken: string): string {
  * @returns {string | null} Extracted token or null if invalid
  * 
  * @example
- * extractMagicLinkToken("https://app.com/auth/magic?token=abc...");
+ * extractMagicLinkToken("https://app.com/join/referral?token=abc...");
  * // Returns: "abc..."
  */
 export function extractMagicLinkToken(url: string): string | null {
