@@ -17,8 +17,6 @@ import {
   referralExists 
 } from "../utils/referrals";
 import { isTierUpgraded } from "../utils/tiers";
-import { PrismaClient } from "@prisma/client";
-
 
 // ============================================================================
 // TYPE DEFINITIONS

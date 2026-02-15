@@ -1,89 +1,74 @@
 "use client";
 
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { useFormState, useFormStatus } from "react-dom";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { joinWaitlistAction, type FormActionState } from "@/app/actions";
 import { waitlistContent } from "@/lib/config/waitlist.config";
 import { Input } from "@/components/ui/input";
-import { useSearchParams } from "next/navigation";
+import type { WaitlistJoinResponse } from "@/lib/types";
 
 interface EmailFormProps {
   /** Called on successful join with the join response (includes magicLinkToken for token-in-URL flow). */
   onSubmit?: (data: { user: { magicLinkToken: string } }) => void;
 }
 
-export default function EmailForm({ onSubmit }: EmailFormProps) {
-  const [email, setEmail] = useState("");
-  const searchParams = useSearchParams();
-  const referralCode = searchParams.get("ref") || undefined; // Extract from URL ?ref=ABC12XYZ
+function SubmitButton() {
+  const { pending } = useFormStatus();
   
-  const joinMutation = trpc.waitlist.join.useMutation({
-    onSuccess: (data) => {
-      if (onSubmit) onSubmit(data);
-    },
-    onError: (error) => {
-      console.error("Join failed:", error.message);
-    }
-  });
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="shrink-0 bg-white text-black w-[86px] md:w-[86px] h-[41px] px-4 md:px-0 md:mr-[6px] rounded-full text-base md:text-lg font-bold tracking-[-0.36px] hover:bg-gray-200 active:scale-95 transition-all duration-150 disabled:opacity-50"
+    >
+      {pending ? "Joining..." : waitlistContent.form.submitButton}
+    </button>
+  );
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    
-    joinMutation.mutate({
-      email: email.toLowerCase().trim(),
-      referralCode, // Pass referral code from URL if present
-      // Optional fields
-      // username,
-      // firstName,
-      // lastName,
-      // marketingOptIn: true,
-      // phoneNumber,
-      // additionalRemarks,
-    });
-  };
+export default function EmailForm({ onSubmit }: EmailFormProps) {
+  const searchParams = useSearchParams();
+  const referralCode = searchParams.get("ref") || undefined;
+  
+  const [state, formAction] = useFormState<FormActionState<WaitlistJoinResponse>>(
+    joinWaitlistAction,
+    null
+  );
+
+  // Handle successful submission
+  useEffect(() => {
+    if (state?.success && state.data && onSubmit) {
+      onSubmit(state.data);
+    }
+  }, [state, onSubmit]);
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      {/* Desktop: inline layout */}
-      <div className="hidden md:flex relative items-center bg-white/10 rounded-full h-[53px] shadow-[0px_11px_15px_0px_rgba(0,0,0,0.22)]">
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={waitlistContent.form.emailPlaceholder}
-          required
-          disabled={joinMutation.isPending}
-          className="flex-1 bg-transparent text-white placeholder:text-white/50 outline-none text-xl tracking-[-0.4px] pl-6 pr-2 font-bold border-none shadow-none focus-visible:ring-0 focus-visible:border-none h-full rounded-full autofill:bg-transparent autofill:text-white [-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset] [&:-webkit-autofill:hover]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset] [&:-webkit-autofill:focus]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset]"
-        />
-        <button
-          type="submit"
-          disabled={joinMutation.isPending}
-          className="shrink-0 bg-white text-black w-[86px] h-[41px] rounded-full text-lg font-bold tracking-[-0.36px] mr-[6px] hover:bg-gray-200 active:scale-95 transition-all duration-150 disabled:opacity-50"
-        >
-          {joinMutation.isPending ? "Joining..." : waitlistContent.form.submitButton}
-        </button>
-      </div>
-
-      {/* Mobile: stacked layout */}
-      <div className="flex md:hidden flex-col items-center gap-4">
-        <div className="w-full bg-white/10 rounded-full h-[52px] shadow-[0px_11px_15px_0px_rgba(0,0,0,0.22)]">
+    <form action={formAction} className="w-full">
+      {/* Hidden field for referral code */}
+      {referralCode && (
+        <input type="hidden" name="referralCode" value={referralCode} />
+      )}
+      
+      {/* Error display */}
+      {state?.error && (
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+          {state.error}
+        </div>
+      )}
+      
+      {/* Responsive layout: inline on desktop, stacked on mobile */}
+      <div className="flex flex-col md:flex-row md:relative items-center gap-4 md:gap-0 md:bg-white/10 md:rounded-full md:h-[53px] md:shadow-[0px_11px_15px_0px_rgba(0,0,0,0.22)]">
+        <div className="w-full md:flex-1 bg-white/10 md:bg-transparent rounded-full h-[52px] md:h-full shadow-[0px_11px_15px_0px_rgba(0,0,0,0.22)] md:shadow-none">
           <Input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
             placeholder={waitlistContent.form.emailPlaceholder}
-            required
-            disabled={joinMutation.isPending}
-            className="w-full h-full bg-transparent text-white placeholder:text-white/50 outline-none text-base tracking-[-0.4px] px-6 font-bold border-none shadow-none focus-visible:ring-0 focus-visible:border-none rounded-full [-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset] [&:-webkit-autofill:hover]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset] [&:-webkit-autofill:focus]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset]"
+            aria-label="Email address"
+            className="w-full h-full bg-transparent text-white placeholder:text-white/50 outline-none text-base md:text-xl tracking-[-0.4px] px-6 md:pl-6 md:pr-2 font-bold border-none shadow-none focus-visible:ring-0 focus-visible:border-none rounded-full [-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset] [&:-webkit-autofill:hover]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset] [&:-webkit-autofill:focus]:[-webkit-box-shadow:0_0_0px_1000px_rgb(30,30,30)_inset]"
           />
         </div>
-        <button
-          type="submit"
-          disabled={joinMutation.isPending}
-          className="bg-white text-black px-10 h-[41px] rounded-full text-lg font-bold tracking-[-0.36px] hover:bg-gray-200 active:scale-95 transition-all duration-150 disabled:opacity-50"
-        >
-          {joinMutation.isPending ? "Joining..." : waitlistContent.form.submitButton}
-        </button>
+        <SubmitButton />
       </div>
     </form>
   );

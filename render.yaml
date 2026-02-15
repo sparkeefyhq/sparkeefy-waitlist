@@ -1,16 +1,16 @@
-# Render Blueprint: Express backend only (free tier).
+# Render Blueprint: Next.js app (free tier).
 # Set all env vars in Render Dashboard → Service → Environment.
 # See DEPLOY.md for the full list.
 
 services:
   - type: web
-    name: waitlist-api
+    name: sparkeefy-waitlist
     runtime: node
     plan: free
 
-    buildCommand: pnpm install && pnpm prisma generate
-    startCommand: pnpm run start:prod
-    preDeployCommand: pnpm prisma migrate deploy
+    buildCommand: pnpm install && pnpm run build
+    startCommand: pnpm run start
+    preDeployCommand: pnpm db:migrate
 
-    # Env vars (add in Dashboard): DATABASE_URL, CORS_ORIGIN, FRONTEND_URL,
-    # SESSION_*, SMTP_*, etc. Copy from .env.example.
+    # Env vars (add in Dashboard): DATABASE_URL, SMTP_*, etc.
+    # No CORS or FRONTEND_URL needed - single Next.js service handles everything.
