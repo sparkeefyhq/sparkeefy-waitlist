@@ -60,19 +60,34 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
   const [shareFeedback, setShareFeedback] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
+  const slowIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const referralPath = stats.user.referralLink ?? PLACEHOLDER_URL;
   const referralUrl = typeof window !== "undefined" ? `${window.location.origin}${referralPath}` : referralPath;
   const currentInvites = stats.referralStats.actualReferralCount;
   const displayInvites = Math.min(currentInvites, 10);
 
-  // Refetch stats every 60 seconds so referral count stays up to date
+  // Refetch stats: every 5s for the first 10 minutes, then every minute
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const refetch = async () => {
       const next = await getStatsByToken(token);
       if (next) setStats(next);
-    }, 60_000);
-    return () => clearInterval(interval);
+    };
+
+    const fastInterval = setInterval(refetch, 5 * 1000); // 5 seconds
+    const switchToSlow = setTimeout(() => {
+      clearInterval(fastInterval);
+      slowIntervalRef.current = setInterval(refetch, 60 * 1000); // 1 minute
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => {
+      clearInterval(fastInterval);
+      clearTimeout(switchToSlow);
+      if (slowIntervalRef.current) {
+        clearInterval(slowIntervalRef.current);
+        slowIntervalRef.current = null;
+      }
+    };
   }, [token]);
 
   // Close popup on click outside
