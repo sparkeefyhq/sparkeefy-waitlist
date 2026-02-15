@@ -2128,15 +2128,6 @@ Unique per user (1:1 mapping with email)
 
 Format: https://sparkeefy.com/join/referral?token={magicLinkToken}
 
-Email Delivery
-SMTP using net and tls modules
-
-No external dependencies (no nodemailer)
-
-Gmail SMTP
-
-HTML email template with professional styling
-
 ## Type Definitions & Interfaces
 
 ### Global Types

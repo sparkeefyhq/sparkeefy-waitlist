@@ -3,7 +3,7 @@
  * 
  * Core business logic for waitlist management.
  * Handles user registration, duplicate detection, referral code extraction,
- * and coordination with ReferralService and SessionService.
+ * and coordination with ReferralService.
  * 
  * @module services/WaitlistService
  */
@@ -46,7 +46,6 @@ import {
 export interface DatabaseClient {
   findUserByEmail(email: string): Promise<WaitlistUser | null>;
   findUserByReferralCode(code: string): Promise<WaitlistUser | null>;
-  findUserBySessionToken(token: string): Promise<WaitlistUser | null>;
   findUserByMagicLinkToken(token: string): Promise<WaitlistUser | null>;
   createUser(data: CreateUserInput): Promise<WaitlistUser>;
   updateUser(id: string, data: Partial<WaitlistUser>): Promise<WaitlistUser>;
@@ -378,25 +377,6 @@ export class WaitlistService {
   }
 
     /**
-   * Find User by Session Token
-   * 
-   * @param {string} token - Session token
-   * @returns {Promise<WaitlistUser | null>} User or null
-   */
-  async findUserBySessionToken(token: string): Promise<WaitlistUser | null> {
-    try {
-      return await this.db.findUserBySessionToken(token);
-    } catch (error) {
-      logger.error("Error finding user by session token", { error });
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Database error during authentication",
-        cause: error,
-      });
-    }
-  }
-
-  /**
    * Find User by Magic Link Token
    * 
    * Retrieves user by their permanent magic link token.
@@ -444,7 +424,7 @@ export class WaitlistService {
    * Find User by ID
    * 
    * Internal method for getUserStats.
-   * Assumes database client has this method or uses findUserBySessionToken alternative.
+   * Assumes database client has this method.
    * 
    * @param {string} userId - User ID
    * @returns {Promise<WaitlistUser | null>} User or null
