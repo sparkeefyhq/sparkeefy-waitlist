@@ -47,9 +47,13 @@ export default function WaitlistLayout({
   const isBetaAccess = variant === "beta-access";
 
   return (
-    <div className="relative h-svh w-full bg-[rgb(13,13,13)] overflow-hidden">
+    <div className="relative min-h-svh w-full bg-[rgb(13,13,13)] overflow-x-hidden md:h-svh md:overflow-hidden">
       {/* ===== MOBILE LAYOUT (< md) ===== */}
-      <div className={`md:hidden relative h-svh w-full flex flex-col items-center px-5 ${showBanner ? "justify-start pt-10 pb-4" : "justify-center py-8"}`}>
+      <div
+        className={`md:hidden relative min-h-svh w-full flex flex-col items-center px-5 overflow-y-auto ${
+          showBanner ? "justify-start pt-10 pb-4" : "justify-center py-8"
+        }`}
+      >
         {/* Mobile background gradients */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Top overlay — green for join, pink for success */}
@@ -95,7 +99,7 @@ export default function WaitlistLayout({
           ) : null}
 
           <div className={`flex flex-col items-center text-center px-6 ${showBanner ? "pt-6 pb-6" : "pt-8 pb-12"}`}>
-            {mobileChildren}
+            {mobileChildren ?? children}
           </div>
         </div>
 
