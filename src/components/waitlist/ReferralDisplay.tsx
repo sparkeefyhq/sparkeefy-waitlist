@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { getStatsByToken } from "@/app/actions";
 import { referralContent } from "@/lib/config/waitlist.config";
 import WaitlistLayout from "@/components/waitlist/WaitlistLayout";
 import type { UserStatsResponse } from "@/lib/types";
@@ -40,7 +41,8 @@ interface ReferralDisplayProps {
   token: string;
 }
 
-export default function ReferralDisplay({ stats, token }: ReferralDisplayProps) {
+export default function ReferralDisplay({ stats: initialStats, token }: ReferralDisplayProps) {
+  const [stats, setStats] = useState<UserStatsResponse>(initialStats);
   const [copied, setCopied] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -49,6 +51,15 @@ export default function ReferralDisplay({ stats, token }: ReferralDisplayProps) 
   const referralUrl = typeof window !== "undefined" ? `${window.location.origin}${referralPath}` : referralPath;
   const currentInvites = stats.referralStats.actualReferralCount;
   const displayInvites = Math.min(currentInvites, 10);
+
+  // Refetch stats every 60 seconds so referral count stays up to date
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const next = await getStatsByToken(token);
+      if (next) setStats(next);
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [token]);
 
   // Close popup on click outside
   useEffect(() => {
