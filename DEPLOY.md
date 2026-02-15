@@ -82,7 +82,7 @@ The repo includes `render.yaml` for a single Next.js web service.
 
 ## Running Migrations
 
-Migrations are Drizzle files in `src/backend/db/migrations/`. Run them against your production DB once (and after adding new migrations):
+Migrations are Drizzle files in `src/lib/db/migrations/`. Run them against your production DB once (and after adding new migrations):
 
 ```bash
 DATABASE_URL="postgresql://..." bun run db:migrate
