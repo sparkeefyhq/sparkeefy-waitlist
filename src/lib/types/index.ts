@@ -212,7 +212,7 @@ export interface SlackAccessSurvey {
 }
 
 export interface SlackAccessInput {
-  q1Answer: "A" | "B" | "C" | "D";
+  q1Answer: string;
   q2Answer: string;
 }
 
