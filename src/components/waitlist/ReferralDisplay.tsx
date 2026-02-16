@@ -289,7 +289,6 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
             <p className="font-bold text-base md:text-[32px] text-white leading-normal">
               <span>{referralContent.leftSection.heading.text}</span>
               <span className="font-retro font-normal">{referralContent.leftSection.heading.brandRetro}</span>
-              <span>{referralContent.leftSection.heading.brandBold}</span>
             </p>
 
             <p className="hidden md:block text-base text-white/80 leading-normal mt-8">

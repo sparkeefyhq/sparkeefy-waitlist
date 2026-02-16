@@ -153,6 +153,8 @@ export const AboutHeroMobile = () => {
     };
   }, [activeTab, isPaused]);
 
+  const tapStartPos = useRef(0);
+
   return (
     <div
       className="max-md:flex flex-col w-full bg-[#010302] text-white relative h-dvh justify-between overflow-hidden px-6 pt-16 select-none md:hidden"
@@ -207,20 +209,36 @@ export const AboutHeroMobile = () => {
         ))}
       </div>
 
-      {/* Click zones for prev/next - positioned below navbar */}
-      <div className="absolute top-22 left-0 right-0 bottom-0 z-30 flex">
-        <div className="w-1/3 h-full" onClick={prevTab} />
-        <div className="w-2/3 h-full" onClick={nextTab} />
-      </div>
-
       <div className="w-full mx-auto flex-grow flex flex-col justify-start z-10 pt-14 overflow-y-auto scrollbar-hide">
         <motion.div
           className="flex flex-col items-start gap-8 w-full h-full"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.1}
           onDragEnd={(_, info) => {
-            if (info.offset.x > 50) prevTab();
-            else if (info.offset.x < -50) nextTab();
+            const threshold = 50;
+            const velocityThreshold = 500;
+            if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
+              prevTab();
+            } else if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
+              nextTab();
+            }
+          }}
+          onTapStart={(_, info) => {
+            tapStartPos.current = info.point.x;
+          }}
+          onTap={(_, info) => {
+            // If the user moved more than 10px, it was likely a swipe, not a tap
+            const distance = Math.abs(info.point.x - tapStartPos.current);
+            if (distance > 10) return;
+
+            const screenWidth = window.innerWidth;
+            // Use the start position to determine the intent of the tap
+            if (tapStartPos.current < screenWidth / 3) {
+              prevTab();
+            } else {
+              nextTab();
+            }
           }}
         >
           <div className="w-full flex flex-col gap-4 items-start text-left relative min-h-[45dvh] z-20">

@@ -49,7 +49,6 @@ export default function WaitlistModal({ open, onOpenChange }: WaitlistModalProps
                 <Image src="/logo-heart.svg" alt="" width={21} height={21} className="shrink-0" />
                 <p className="text-base text-white/85 tracking-[0.16px] leading-normal">
                   <span className="font-retro">{waitlistContent.badge.brandRetro}</span>
-                  <span className="font-bold text-white">{waitlistContent.badge.brandBold}</span>
                   <span className="font-medium">{waitlistContent.badge.suffix}</span>
                 </p>
               </div>

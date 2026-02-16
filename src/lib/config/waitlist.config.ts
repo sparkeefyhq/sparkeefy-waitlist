@@ -3,8 +3,7 @@ export const siteUrl = "https://sparkeefy.com";
 export const waitlistContent = {
   badge: {
     emoji: "\u{1F497}",
-    brandRetro: "Sparkee",
-    brandBold: "fy",
+    brandRetro: "Sparkeefy",
     suffix: " is launching soon"
   },
 
@@ -78,8 +77,7 @@ export const successContent = {
   confirmed: "Early Access Confirmed.",
   description: {
     text: "We'll reach out when ",
-    brandRetro: "Sparkee",
-    brandBold: "fy",
+    brandRetro: "Sparkeefy",
     suffix: " is ready",
     boldText: "no spam, no unnecessary notifications.",
   },
@@ -94,8 +92,7 @@ export const referralContent = {
   leftSection: {
     heading: {
       text: "Unlock more by inviting people who'd love ",
-      brandRetro: "Sparkee",
-      brandBold: "fy",
+      brandRetro: "Sparkeefy",
     },
     description: "Invite friends who'd genuinely find this helpful - and unlock exclusive benefits along the way.",
     rewards: [
