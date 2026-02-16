@@ -47,7 +47,6 @@ export default function JoinPage() {
         <Image src="/logo-heart.svg" alt="" width={21} height={21} className="shrink-0" />
         <p className="text-[16px] text-[rgba(255,255,255,0.85)] tracking-[0.16px] leading-normal whitespace-nowrap font-medium">
           <span className="font-retro font-normal">{waitlistContent.badge.brandRetro}</span>
-          <span className="font-bold text-white">{waitlistContent.badge.brandBold}</span>
           <span>{waitlistContent.badge.suffix}</span>
         </p>
       </div>
@@ -116,7 +115,6 @@ export default function JoinPage() {
         <Image src="/logo-heart.svg" alt="" width={21} height={21} className="shrink-0" />
         <p className="text-sm text-white/85 tracking-[0.16px] leading-normal whitespace-nowrap">
           <span className="font-retro">{waitlistContent.badge.brandRetro}</span>
-          <span className="font-bold text-white">{waitlistContent.badge.brandBold}</span>
           <span className="font-medium">{waitlistContent.badge.suffix}</span>
         </p>
       </div>

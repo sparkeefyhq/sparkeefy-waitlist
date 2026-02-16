@@ -44,7 +44,7 @@ function SubmitButton({ canSubmit }: { canSubmit: boolean }) {
 
 function BetaAccessContent({ token }: { token: string | null }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
   const [textAnswer, setTextAnswer] = useState("");
 
   const [state, formAction] = useFormState<FormActionState>(
@@ -62,10 +62,14 @@ function BetaAccessContent({ token }: { token: string | null }) {
   }, [state, token, router]);
 
   const toggleOption = (id: string) => {
-    setSelected(id);
+    setSelected(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id) 
+        : [...prev, id]
+    );
   };
 
-  const canSubmit = selected !== null;
+  const canSubmit = selected.length > 0;
 
   // Animated underline
   const animatedUnderline = (
@@ -132,7 +136,7 @@ function BetaAccessContent({ token }: { token: string | null }) {
             Who would you primarily use Sparkeefy for?
           </p>
           <p className="text-xs md:text-lg text-white/40 mt-1 md:mt-2 tracking-[-0.22px] md:tracking-[-0.36px]">
-            <span className="text-red-400/40">*</span>Select one option
+            <span className="text-red-400/40">*</span>Select one or more options
           </p>
 
           {/* Options - responsive grid */}
@@ -143,7 +147,7 @@ function BetaAccessContent({ token }: { token: string | null }) {
                 type="button"
                 onClick={() => toggleOption(option.id)}
                 className={`h-[40px] md:h-[60px] rounded-full border transition-all text-[13px] md:text-[20px] font-semibold tracking-[-0.39px] md:tracking-[-0.6px] ${
-                  selected === option.id
+                  selected.includes(option.id)
                     ? "bg-white/10 border-[#ff68b4] text-white"
                     : "bg-white/10 border-transparent text-white hover:border-white/30"
                 }`}
@@ -153,7 +157,7 @@ function BetaAccessContent({ token }: { token: string | null }) {
             ))}
           </div>
           {/* Hidden input for form submission */}
-          <input type="hidden" name="q1Answer" value={selected || ""} />
+          <input type="hidden" name="q1Answer" value={selected.join(",") || ""} />
         </div>
 
         {/* Question 2 */}

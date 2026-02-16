@@ -74,7 +74,7 @@ export const slackAccessSurveys = pgTable("slack_access_surveys", {
   userId: uuid("user_id")
     .primaryKey()
     .references(() => waitlistUsers.id, { onDelete: "cascade" }),
-  q1Answer: varchar("q1_answer", { length: 1 }).notNull(),
+  q1Answer: varchar("q1_answer", { length: 255 }).notNull(),
   q2Answer: varchar("q2_answer"),
   submittedAt: timestamp("submitted_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" })

@@ -65,7 +65,7 @@ const joinWaitlistSchema = z.object({
 });
 
 const slackAccessSchema = z.object({
-  q1Answer: z.enum(["A", "B", "C", "D"]),
+  q1Answer: z.string().min(1),
   q2Answer: z.string().min(10).max(2000),
 });
 
