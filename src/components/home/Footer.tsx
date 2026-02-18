@@ -213,27 +213,30 @@ const Footer = () => {
           >
             <div className="flex flex-col max-md:items-center gap-3">
               <Link
-                href="#"
+                href="/"
                 className="font-semibold md:font-bold hover:text-pink-300 text-white max-md:mb-2"
               >
                 Home
               </Link>
-              <Link href="#" className="hover:text-pink-300 text-gray-200">
+              <Link href="/#features" className="hover:text-pink-300 text-gray-200">
                 Features
               </Link>
-              <Link href="#" className="hover:text-pink-300 text-gray-200">
+              <Link href="/#who-is-sparkeefy-for" className="hover:text-pink-300 text-gray-200">
                 Who is Sparkeefy for
               </Link>
-              <Link href="#" className="hover:text-pink-300 text-gray-200">
+              <Link href="/#faq" className="hover:text-pink-300 text-gray-200">
                 FAQs
               </Link>
             </div>
             <div className="flex flex-col gap-3">
-              {/* <Link href="#" className="font-semibold md:font-bold">
-                Privacy
-              </Link> */}
               <Link
-                href="#"
+                href="/privacy"
+                className="font-semibold md:font-bold hover:text-pink-300 text-white"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/about"
                 className="font-semibold md:font-bold hover:text-pink-300 text-white"
               >
                 About

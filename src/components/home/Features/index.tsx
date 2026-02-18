@@ -26,14 +26,14 @@ const Features = () => {
   // Show nothing during SSR/hydration to prevent mismatch
   if (!mounted) {
     return (
-      <section className="relative w-full bg-white pt-0 pb-0 md:pt-34 md:pb-32 overflow-x-clip md:overflow-visible -mt-1">
+      <section id="features" className="relative w-full bg-white pt-0 pb-0 md:pt-34 md:pb-32 overflow-x-clip md:overflow-visible -mt-1">
         <div className="h-[300vh] md:h-[250vh]" />
       </section>
     );
   }
 
   return (
-    <section className="relative w-full bg-white pt-0 pb-0 md:pt-34 md:pb-32 overflow-x-clip md:overflow-visible -mt-1">
+    <section id="features" className="relative w-full bg-white pt-0 pb-0 md:pt-34 md:pb-32 overflow-x-clip md:overflow-visible -mt-1">
       {isMobile ? <FeatureTabsMobile effect={MOBILE_EFFECT} /> : <FeatureTabs />}
     </section>
   );

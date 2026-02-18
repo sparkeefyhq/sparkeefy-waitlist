@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const WhoIsSparkeefyFor = () => {
   return (
-    <section className="relative w-full bg-[#010302] pt-10 md:pt-8 pb-10 md:pb-28 mt-20 md:mt-32 px-4 lg:px-0 -mb-1">
+    <section id="who-is-sparkeefy-for" className="relative w-full bg-[#010302] pt-10 md:pt-8 pb-10 md:pb-28 mt-20 md:mt-32 px-4 lg:px-0 -mb-1">
       {/* Top Curve - Sitting above the section to overlap previous white section */}
       <div className="absolute top-0 left-0 right-0 h-20 md:h-56 -translate-y-[90%] md:-translate-y-[95%] z-10 w-full overflow-hidden">
         {/* Mobile curve - gentler/flatter arc */}
