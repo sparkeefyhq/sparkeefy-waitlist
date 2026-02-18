@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { 
   EffectCards, 
@@ -205,9 +206,9 @@ export const FeatureCardMobile = ({
                   {card.description}{" "}
                   <span className="font-semibold">{card.highlight}</span>
                 </p>
-                <button
+                <Link
+                  href={`/about#${card.id}`}
                   className="group relative cursor-pointer inline-flex items-center justify-center overflow-hidden px-4 py-2 rounded-full text-black bg-white text-sm font-medium transition-all min-w-[120px]"
-                  onClick={() => window.open("/about")}
                 >
                   <span className="flex items-center gap-2 whitespace-nowrap">
                     Know More
@@ -227,7 +228,7 @@ export const FeatureCardMobile = ({
                       />
                     </svg>
                   </span>
-                </button>
+                </Link>
               </div>
 
               {/* Feature illustration image */}

@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { featureCards } from "./data";
 import { useMediaQuery } from "react-responsive";
@@ -124,9 +125,9 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
             {card.description}{" "}
             <span className="font-semibold">{card.highlight}</span>
           </p>
-          <button
+          <Link
+            href={`/about#${card.id}`}
             className="group relative cursor-pointer inline-flex items-center justify-center overflow-hidden px-4 md:px-6 py-2 md:py-3 rounded-full text-black bg-white text-sm md:text-base font-medium hover:bg-gray-50 transition-all min-w-[120px] md:min-w-[140px]"
-            onClick={() => window.open("/about")}
           >
             <span className="flex items-center gap-2 whitespace-nowrap">
               Know More
@@ -134,7 +135,7 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
                 <path d="M6.11279 16.7836L10.9128 11.9836L6.11279 7.18359M12.8328 16.7836L17.6328 11.9836L12.8328 7.18359" stroke="currentColor" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
-          </button>
+          </Link>
         </div>
 
         {/* Feature illustration image - mobile: bottom center, desktop: right side */}

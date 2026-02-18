@@ -107,6 +107,13 @@ const imageVariants = {
 
 const STORY_DURATION = 8000;
 
+const SECTION_HASH_TO_INDEX: Record<string, number> = {
+  "stay-thoughtful": 0,
+  "say-it-better": 1,
+  "plan-with-ease": 2,
+  "gift-thoughtfully": 3,
+};
+
 export const AboutHeroMobile = () => {
   const [[activeTab, direction], setActiveTab] = useState([0, 0]);
   const [progress, setProgress] = useState(0);
@@ -115,6 +122,22 @@ export const AboutHeroMobile = () => {
 
   useEffect(() => {
     startTimeRef.current = Date.now();
+  }, []);
+
+  useEffect(() => {
+    const syncFromHash = () => {
+      const hash = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+      const tabIndex = hash ? SECTION_HASH_TO_INDEX[hash] : undefined;
+      if (tabIndex !== undefined && tabIndex !== activeTab) {
+        setActiveTab([tabIndex, tabIndex > activeTab ? 1 : -1]);
+        setProgress(0);
+        startTimeRef.current = Date.now();
+      }
+      if (hash) window.scrollTo(0, 0);
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
   }, []);
   const [isPaused, setIsPaused] = useState(false);
 

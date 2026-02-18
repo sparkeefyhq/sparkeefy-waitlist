@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import StarsBackground from "@/components/home/StarsBackground";
 import { motion, AnimatePresence } from "framer-motion";
@@ -162,8 +162,29 @@ const imageVariants = {
   },
 };
 
+const SECTION_HASH_TO_INDEX: Record<string, number> = {
+  "stay-thoughtful": 0,
+  "say-it-better": 1,
+  "plan-with-ease": 2,
+  "gift-thoughtfully": 3,
+};
+
 const AboutHero = () => {
   const [[activeTab, direction], setActiveTab] = useState([0, 0]);
+
+  useEffect(() => {
+    const syncFromHash = () => {
+      const hash = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+      const tabIndex = hash ? SECTION_HASH_TO_INDEX[hash] : undefined;
+      if (tabIndex !== undefined && tabIndex !== activeTab) {
+        setActiveTab([tabIndex, tabIndex > activeTab ? 1 : -1]);
+      }
+      if (hash) window.scrollTo(0, 0);
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
 
   const changeTab = (newTab: number) => {
     if (newTab === activeTab) return;
