@@ -109,7 +109,7 @@ const Navbar = () => {
                 className="relative w-8 h-8"
               >
                 <Image
-                  src="/logo-heart.svg"
+                  src="/logo-heart.png"
                   alt="Sparkeefy Heart"
                   fill
                   className="object-contain"

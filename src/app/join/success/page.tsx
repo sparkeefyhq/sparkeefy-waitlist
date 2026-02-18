@@ -108,7 +108,7 @@ function SuccessContent() {
         className="absolute left-1/2 -translate-x-1/2 inline-flex items-center justify-center gap-[5px] bg-[rgba(255,255,255,0.1)] rounded-[66.875px] overflow-clip"
         style={{ top: 70, width: 254, height: 39 }}
       >
-        <Image src="/logo-heart.svg" alt="" width={21} height={21} className="shrink-0" />
+        <Image src="/logo-heart.png" alt="" width={21} height={21} className="shrink-0" />
         <p className="text-[16px] text-[rgba(255,255,255,0.85)] tracking-[0.16px] leading-normal whitespace-nowrap font-medium">
           <span className="font-retro font-normal">{waitlistContent.badge.brandRetro}</span>
           <span>{waitlistContent.badge.suffix}</span>
@@ -174,7 +174,7 @@ function SuccessContent() {
     <>
       {/* Badge */}
       <div className="inline-flex items-center justify-center gap-[5px] bg-white/10 rounded-full h-[39px] px-5">
-        <Image src="/logo-heart.svg" alt="" width={21} height={21} className="shrink-0" />
+        <Image src="/logo-heart.png" alt="" width={21} height={21} className="shrink-0" />
         <p className="text-sm text-white/85 tracking-[0.16px] leading-normal whitespace-nowrap">
           <span className="font-retro">{waitlistContent.badge.brandRetro}</span>
           <span className="font-medium">{waitlistContent.badge.suffix}</span>

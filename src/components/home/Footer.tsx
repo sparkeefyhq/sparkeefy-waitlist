@@ -139,7 +139,7 @@ const Footer = () => {
                     className="relative w-10 h-10 md:w-8 md:h-8"
                   >
                     <Image
-                      src="/logo-heart.svg"
+                      src="/logo-heart.png"
                       alt="Sparkeefy Heart"
                       fill
                       className="object-contain"

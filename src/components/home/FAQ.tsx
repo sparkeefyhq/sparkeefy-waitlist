@@ -8,9 +8,9 @@ const faqs = [
     question: "Is Sparkeefy only for romantic relationships?",
     answer: (
       <>
-        No. Sparkeefy works for anyone you care about-partners, friends, and
+        <strong>No.</strong> Sparkeefy works for anyone you care about-partners, friends, and
         family.
-        <br /> Anywhere remembering and showing up matters, Sparkeefy fits.
+        <br /> <strong>Anywhere remembering and showing up matters, Sparkeefy fits.</strong>
       </>
     ),
   },
@@ -18,7 +18,7 @@ const faqs = [
     question: "Is my data safe?",
     answer: (
       <>
-        Yes. Your data is private by default and never shared.
+        Yes. Your data is <strong>private by default</strong> and <strong>never shared</strong>.
         <br /> Sparkeefy is built to support your relationships-not monitor or
         monetize them.
       </>
@@ -28,9 +28,9 @@ const faqs = [
     question: "How does Sparkeefy actually work?",
     answer: (
       <>
-        Sparkeefy helps you keep track of important moments and preferences-so
+        Sparkeefy helps you <strong>keep track of important moments and preferences</strong>-so
         you don&apos;t have to rely on memory alone. When helpful, it offers
-        gentle suggestions for replies or plans. You&apos;re always in control.
+        gentle suggestions for replies or plans. <strong>You&apos;re always in control.</strong>
       </>
     ),
   },
@@ -38,9 +38,9 @@ const faqs = [
     question: "How does early access work?",
     answer: (
       <>
-        Join the waitlist to get early access as we roll out features in stages.
-        <br /> Early users get priority access, special perks, and a chance to
-        help shape Sparkeefy.
+        <strong>Join the waitlist</strong> to get early access as we roll out features in stages.
+        <br /> Early users get <strong>priority access, special perks, and a chance to
+        help shape Sparkeefy.</strong>
       </>
     ),
   },
