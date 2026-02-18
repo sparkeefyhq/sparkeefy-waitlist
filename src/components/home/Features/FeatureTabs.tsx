@@ -12,6 +12,7 @@ export const FeatureTabs = () => {
   const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const isScrollingProgrammatically = React.useRef(false);
+  const programmaticScrollResetRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Robust Media Query via react-responsive (Handles scaling/zoom better)
   const [mounted, setMounted] = React.useState(false);
@@ -50,8 +51,8 @@ export const FeatureTabs = () => {
       // Skip if we're programmatically scrolling (from tab click)
       if (isScrollingProgrammatically.current) return;
 
-      // Using 0.25 per card to match FeatureCard timing
-      const newIndex = Math.min(Math.floor((value + 0.01) / 0.25), 3);
+      const step = 1 / featureCards.length;
+      const newIndex = Math.min(Math.floor((value + 0.01) / step), featureCards.length - 1);
       setActiveIndex(newIndex);
     });
     return () => unsubscribe();
@@ -74,19 +75,33 @@ export const FeatureTabs = () => {
     const absoluteTop = rect.top + window.scrollY;
     const scrollDistance = container.offsetHeight - window.innerHeight;
 
-    // Calculate target scroll position based on index * 0.25 (start of card activation)
-    // We add a small buffer (+0.02) to ensure we land firmly inside the Hold Phase
-    const targetScroll = absoluteTop + (index * 0.25 + 0.02) * scrollDistance;
+    // Calculate target scroll position based on card index, landing firmly inside the Hold Phase
+    const step = 1 / featureCards.length;
+    const targetScroll = absoluteTop + (index * step + 0.02 * step) * scrollDistance;
 
     window.scrollTo({
-      top: targetScroll + 2, // Slight buffer
+      top: targetScroll + 2,
       behavior: "smooth",
     });
 
-    // Reset flag after scroll animation completes
-    setTimeout(() => {
-      isScrollingProgrammatically.current = false;
-    }, 800);
+    // Cancel any previously scheduled reset
+    if (programmaticScrollResetRef.current) {
+      clearTimeout(programmaticScrollResetRef.current);
+      window.removeEventListener("scrollend", resetProgrammaticScroll);
+    }
+
+    // Reset as soon as scroll finishes, with a max-wait fallback
+    window.addEventListener("scrollend", resetProgrammaticScroll, { once: true });
+    programmaticScrollResetRef.current = setTimeout(resetProgrammaticScroll, 1200);
+  };
+
+  const resetProgrammaticScroll = () => {
+    isScrollingProgrammatically.current = false;
+    window.removeEventListener("scrollend", resetProgrammaticScroll);
+    if (programmaticScrollResetRef.current) {
+      clearTimeout(programmaticScrollResetRef.current);
+      programmaticScrollResetRef.current = null;
+    }
   };
 
   return (
@@ -100,23 +115,23 @@ export const FeatureTabs = () => {
             style={{
               top:
                 mounted && isMobile
-                  ? `calc((300vh - 100vh) * ${index * 0.25})`
-                  : `calc((250vh - 100vh) * ${index * 0.25})`,
+                  ? `calc((300vh - 100vh) * ${index / featureCards.length})`
+                  : `calc((250vh - 100vh) * ${index / featureCards.length})`,
             }}
           />
         ))}
       </div>
 
-      {/* Section Header - outside sticky for non-tall desktop screens (height < 900) */}
-      <div className="hidden [@media(min-height:901px)]:md:hidden md:block">
+      {/* Section Header - outside sticky only on desktop with short screens (width >= 768px AND height < 900px) */}
+      <div className="hidden [@media(min-width:768px)_and_(max-height:899px)]:block">
         <FeatureHeader activeColor={featureCards[activeIndex].accentColor} />
       </div>
 
       {/* Sticky Container */}
       <div className="sticky top-6 md:top-8 px-4 bg-white">
-        {/* Header inside sticky for mobile and tall screens (height >= 900) */}
-        <div className="md:hidden lg:[@media(min-height:900px)]:block hidden">
-          <div className="lg:[@media(min-height:900px)]:pt-10">
+        {/* Header inside sticky for mobile (< 768px) and tall desktop (>= 900px height) */}
+        <div className="[@media(min-width:768px)_and_(max-height:899px)]:hidden">
+          <div className="[@media(min-width:768px)_and_(min-height:900px)]:pt-10">
             {isMobile ? (
               <FeatureHeaderMbile activeColor={featureCards[activeIndex].accentColor} />
             ) : (

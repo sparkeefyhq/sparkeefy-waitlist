@@ -24,7 +24,7 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
   }, []);
 
   // Config
-  const step = 0.25;
+  const step = 1 / totalCards;
   const holdDuration = 0.15;
   const isLast = index === totalCards - 1;
   const baseTilt = isMobile ? 4 : 5; // Uniform Clockwise Tilt
@@ -93,7 +93,7 @@ export const FeatureCard = ({ card, index, activeIndex = 0, scrollYProgress, tot
         scale: variant === "tilted" ? scale : 1,
         zIndex: totalCards - index,
         top: index * 1,
-        pointerEvents: index === 0 ? "auto" : pointerEvents,
+        pointerEvents: pointerEvents,
       }}
     >
       {/* Sun Ray Overlay */}
