@@ -40,12 +40,6 @@ export const socialLinks = [
     icon: "FaWhatsapp"
   },
   {
-    id: "reddit",
-    name: "Reddit",
-    url: "https://reddit.com/submit?url=sparkeefy.com&title=Sparkeefy",
-    icon: "FaReddit"
-  },
-  {
     id: "snapchat",
     name: "Snapchat",
     url: "https://snapchat.com/add/sparkeefy",

@@ -339,7 +339,6 @@ export function buildSharingLinks(
   whatsapp: string;
   linkedin: string;
   twitter: string;
-  reddit: string;
   email: string;
   copy: string;
 } {
@@ -356,9 +355,6 @@ export function buildSharingLinks(
     // Twitter/X
     twitter: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedLink}`,
 
-    // Reddit
-    reddit: `https://reddit.com/submit?url=${encodedLink}&title=${encodedMessage}`,
-
     // Email
     email: `mailto:?subject=${encodedMessage}&body=${encodedMessage}%20${encodedLink}`,
 
@@ -370,7 +366,6 @@ export function buildSharingLinks(
 export type ReferralShareService =
   | "instagram"
   | "whatsapp"
-  | "reddit"
   | "snapchat"
   | "discord"
   | "linkedin"
@@ -409,7 +404,6 @@ export function buildReferralSharePayload(
       // Instagram has no reliable web intent for pre-filled share content.
       instagram: null,
       whatsapp: `https://wa.me/?text=${encodedText}`,
-      reddit: `https://reddit.com/submit?url=${encodedLink}&title=${encodedMessage}`,
       // Snapchat web sharing is inconsistent; native sheet is preferred.
       snapchat: null,
       // Discord has no prefilled web compose endpoint.

@@ -1,10 +1,9 @@
-import { FaInstagram, FaWhatsapp, FaReddit, FaSnapchat, FaDiscord, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { FaInstagram, FaWhatsapp, FaSnapchat, FaDiscord, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { socialLinks } from "@/lib/config/waitlist.config";
 
 const iconMap = {
   FaInstagram,
   FaWhatsapp,
-  FaReddit,
   FaSnapchat,
   FaDiscord,
   FaLinkedin,
