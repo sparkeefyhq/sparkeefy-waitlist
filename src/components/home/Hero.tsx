@@ -42,7 +42,7 @@ const Hero = () => {
             src="https://res.cloudinary.com/djqi5un1w/image/upload/v1769585052/hero-bg-mobile_hbscxi.png"
             alt="Hero Background Mobile"
             fill
-            className="object-cover scale-[160%] -translate-y-1/4 md:hidden"
+            className="object-cover scale-y-[220%] scale-x-[160%] -translate-y-[32%] md:hidden"
             priority
           />
         </div>
