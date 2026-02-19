@@ -46,12 +46,6 @@ export const socialLinks = [
     icon: "FaSnapchat"
   },
   {
-    id: "discord",
-    name: "Discord",
-    url: "https://discord.gg/sparkeefy",
-    icon: "FaDiscord"
-  },
-  {
     id: "linkedin",
     name: "LinkedIn",
     url: "https://linkedin.com/company/sparkeefy",

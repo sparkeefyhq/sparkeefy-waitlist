@@ -367,7 +367,6 @@ export type ReferralShareService =
   | "instagram"
   | "whatsapp"
   | "snapchat"
-  | "discord"
   | "linkedin"
   | "x";
 
@@ -406,8 +405,6 @@ export function buildReferralSharePayload(
       whatsapp: `https://wa.me/?text=${encodedText}`,
       // Snapchat web sharing is inconsistent; native sheet is preferred.
       snapchat: null,
-      // Discord has no prefilled web compose endpoint.
-      discord: "https://discord.com/channels/@me",
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedLink}`,
       x: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedLink}`,
     },
