@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getAdminSignupData, deleteSignup } from "../actions";
 import type { AdminSignupRow } from "../actions";
+import { SendEmailButton } from "@/components/admin/SendEmailButton";
+import { SendAllEmailsButton } from "@/components/admin/SendAllEmailsButton";
 
 function formatDate(d: Date): string {
   const date = d instanceof Date ? d : new Date(d);
@@ -18,7 +20,7 @@ function truncate(s: string | null, max: number): string {
   return s.length <= max ? s : s.slice(0, max) + "…";
 }
 
-function name(row: AdminSignupRow): string {
+function displayName(row: AdminSignupRow): string {
   const parts = [row.firstName, row.lastName].filter(Boolean);
   return parts.length ? parts.join(" ") : "—";
 }
@@ -30,12 +32,14 @@ export default async function AdminDashboardPage() {
   }
 
   const { users, totalSignups, totalReferrals, signupsLast7Days } = data;
+  const unsentCount = users.filter((u) => !u.welcomeEmailSentAt).length;
+  const sentCount = users.length - unsentCount;
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Sign-ups</h1>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-4">
         <div className="rounded-lg border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground">Total signups</p>
           <p className="text-2xl font-semibold">{totalSignups}</p>
@@ -48,10 +52,32 @@ export default async function AdminDashboardPage() {
           <p className="text-sm text-muted-foreground">Last 7 days</p>
           <p className="text-2xl font-semibold">{signupsLast7Days}</p>
         </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Welcome emails</p>
+          <p className="text-2xl font-semibold">
+            {sentCount}
+            <span className="text-sm font-normal text-muted-foreground">
+              {" "}
+              / {users.length}
+            </span>
+          </p>
+        </div>
       </section>
 
+      {/* Bulk send bar */}
+      {users.length > 0 && (
+        <section className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
+          <p className="text-sm text-muted-foreground">
+            {unsentCount > 0
+              ? `${unsentCount} user${unsentCount === 1 ? "" : "s"} haven't received the welcome email yet`
+              : "All users have received the welcome email"}
+          </p>
+          <SendAllEmailsButton unsentCount={unsentCount} />
+        </section>
+      )}
+
       <section className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full min-w-[800px] text-left text-sm">
+        <table className="w-full min-w-[900px] text-left text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/50">
               <th className="px-4 py-3 font-medium">Email</th>
@@ -63,13 +89,14 @@ export default async function AdminDashboardPage() {
               <th className="px-4 py-3 font-medium">Marketing</th>
               <th className="px-4 py-3 font-medium">Created</th>
               <th className="px-4 py-3 font-medium">Remarks</th>
+              <th className="px-4 py-3 font-medium text-center">Welcome email</th>
               <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
                   No sign-ups yet
                 </td>
               </tr>
@@ -84,7 +111,7 @@ export default async function AdminDashboardPage() {
                   }
                 >
                   <td className="px-4 py-3">{row.email}</td>
-                  <td className="px-4 py-3">{name(row)}</td>
+                  <td className="px-4 py-3">{displayName(row)}</td>
                   <td className="px-4 py-3">{row.username ?? "—"}</td>
                   <td className="px-4 py-3">{row.phoneNumber ?? "—"}</td>
                   <td className="px-4 py-3 font-mono text-xs">{row.referralCode}</td>
@@ -95,6 +122,21 @@ export default async function AdminDashboardPage() {
                   </td>
                   <td className="max-w-[200px] px-4 py-3 text-muted-foreground">
                     {truncate(row.additionalRemarks, 50)}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {row.welcomeEmailSentAt ? (
+                      <span
+                        className="inline-flex items-center gap-1 text-xs text-green-600"
+                        title={`Sent ${formatDate(row.welcomeEmailSentAt)}`}
+                      >
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L7 8.94 5.28 7.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.06 0l4.25-4.25Z" />
+                        </svg>
+                        Sent
+                      </span>
+                    ) : (
+                      <SendEmailButton userId={row.id} email={row.email} />
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <form action={deleteSignup}>

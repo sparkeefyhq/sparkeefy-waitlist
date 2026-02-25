@@ -1,14 +1,17 @@
 "use server";
 
 /**
- * Admin server actions: login, logout, and get signup data.
+ * Admin server actions: login, logout, signup data, and welcome-email sending.
  * All admin-specific logic lives here; no middleware.
  */
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { createHash } from "crypto";
 import { db } from "@/lib/db/client";
+import { emailService } from "@/lib/services/EmailService";
+import { buildMagicLinkUrl, buildAbsoluteReferralLink } from "@/lib/utils/links";
 import type { WaitlistUser } from "@/lib/types";
 
 const ADMIN_COOKIE_NAME = "admin_session";
@@ -88,19 +91,104 @@ export async function getAdminSignupData(): Promise<AdminSignupData | null> {
   };
 }
 
-export async function deleteSignup(
-  formData: FormData
-): Promise<{ error?: string }> {
+export async function deleteSignup(formData: FormData): Promise<void> {
   const ok = await verifyAdminCookie();
-  if (!ok) {
-    redirect("/admin/login");
-  }
+  if (!ok) redirect("/admin/login");
 
   const id = formData.get("id");
-  if (typeof id !== "string" || !id) {
-    return { error: "Invalid signup id" };
-  }
+  if (typeof id !== "string" || !id) return;
 
   await db.deleteUser(id);
   redirect("/admin");
+}
+
+// ============================================================================
+// WELCOME EMAIL ACTIONS
+// ============================================================================
+
+export async function sendWelcomeEmailAction(
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
+  const ok = await verifyAdminCookie();
+  if (!ok) return { success: false, error: "Unauthorized" };
+
+  if (!emailService.isConfigured) {
+    return {
+      success: false,
+      error: "Email not configured. Set RESEND_API_KEY in your environment.",
+    };
+  }
+
+  const user = await db.findUserById(userId);
+  if (!user) return { success: false, error: "User not found" };
+
+  try {
+    await emailService.sendWelcomeEmail({
+      email: user.email,
+      magicLinkUrl: buildMagicLinkUrl(user.magicLinkToken),
+      referralCode: user.referralCode,
+      referralLink: buildAbsoluteReferralLink(user.referralCode),
+    });
+
+    await db.markWelcomeEmailSent(user.id);
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to send email";
+    return { success: false, error: message };
+  }
+}
+
+export type BulkEmailResult = {
+  total: number;
+  sent: number;
+  failed: number;
+  errors: Array<{ email: string; error: string }>;
+};
+
+export async function sendAllWelcomeEmailsAction(): Promise<
+  { success: boolean; data?: BulkEmailResult; error?: string }
+> {
+  const ok = await verifyAdminCookie();
+  if (!ok) return { success: false, error: "Unauthorized" };
+
+  if (!emailService.isConfigured) {
+    return {
+      success: false,
+      error: "Email not configured. Set RESEND_API_KEY in your environment.",
+    };
+  }
+
+  const users = await db.listWaitlistUsers();
+  const unsent = users.filter((u) => !u.welcomeEmailSentAt);
+
+  const result: BulkEmailResult = {
+    total: unsent.length,
+    sent: 0,
+    failed: 0,
+    errors: [],
+  };
+
+  for (const user of unsent) {
+    try {
+      await emailService.sendWelcomeEmail({
+        email: user.email,
+        magicLinkUrl: buildMagicLinkUrl(user.magicLinkToken),
+        referralCode: user.referralCode,
+        referralLink: buildAbsoluteReferralLink(user.referralCode),
+      });
+      await db.markWelcomeEmailSent(user.id);
+      result.sent++;
+    } catch (err) {
+      result.failed++;
+      result.errors.push({
+        email: user.email,
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+
+  revalidatePath("/admin");
+  return { success: true, data: result };
 }

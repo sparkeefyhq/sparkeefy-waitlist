@@ -175,6 +175,13 @@ export class DatabaseClient {
     await this._db.delete(waitlistUsers).where(eq(waitlistUsers.id, id));
   }
 
+  async markWelcomeEmailSent(id: string): Promise<void> {
+    await this._db
+      .update(waitlistUsers)
+      .set({ welcomeEmailSentAt: new Date() })
+      .where(eq(waitlistUsers.id, id));
+  }
+
 
   // ==========================================================================
   // REFERRAL OPERATIONS

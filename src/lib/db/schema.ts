@@ -35,6 +35,7 @@ export const waitlistUsers = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
     magicLinkToken: varchar("magic_link_token", { length: 64 }).notNull().unique(),
+    welcomeEmailSentAt: timestamp("welcome_email_sent_at", { mode: "date" }),
   },
   (table) => [
     index("waitlist_users_email_idx").on(table.email),

@@ -27,6 +27,7 @@ export interface WaitlistUser {
   additionalRemarks: string | null;
   referralCode: string;
   magicLinkToken: string;
+  welcomeEmailSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
