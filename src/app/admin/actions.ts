@@ -87,3 +87,20 @@ export async function getAdminSignupData(): Promise<AdminSignupData | null> {
     signupsLast7Days,
   };
 }
+
+export async function deleteSignup(
+  formData: FormData
+): Promise<{ error?: string }> {
+  const ok = await verifyAdminCookie();
+  if (!ok) {
+    redirect("/admin/login");
+  }
+
+  const id = formData.get("id");
+  if (typeof id !== "string" || !id) {
+    return { error: "Invalid signup id" };
+  }
+
+  await db.deleteUser(id);
+  redirect("/admin");
+}

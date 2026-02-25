@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAdminSignupData } from "../actions";
+import { getAdminSignupData, deleteSignup } from "../actions";
 import type { AdminSignupRow } from "../actions";
 
 function formatDate(d: Date): string {
@@ -63,12 +63,13 @@ export default async function AdminDashboardPage() {
               <th className="px-4 py-3 font-medium">Marketing</th>
               <th className="px-4 py-3 font-medium">Created</th>
               <th className="px-4 py-3 font-medium">Remarks</th>
+              <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">
                   No sign-ups yet
                 </td>
               </tr>
@@ -94,6 +95,17 @@ export default async function AdminDashboardPage() {
                   </td>
                   <td className="max-w-[200px] px-4 py-3 text-muted-foreground">
                     {truncate(row.additionalRemarks, 50)}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <form action={deleteSignup}>
+                      <input type="hidden" name="id" value={row.id} />
+                      <button
+                        type="submit"
+                        className="text-xs text-red-600 hover:text-red-700 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </form>
                   </td>
                 </tr>
               ))

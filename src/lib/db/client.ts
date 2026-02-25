@@ -171,6 +171,11 @@ export class DatabaseClient {
   }
 
 
+  async deleteUser(id: string): Promise<void> {
+    await this._db.delete(waitlistUsers).where(eq(waitlistUsers.id, id));
+  }
+
+
   // ==========================================================================
   // REFERRAL OPERATIONS
   // ==========================================================================
