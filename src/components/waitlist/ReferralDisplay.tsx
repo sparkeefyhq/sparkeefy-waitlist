@@ -388,7 +388,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
             <p className="text-xs md:text-base text-white/80 md:text-white/80">Share your invite link via</p>
 
             {/* Social icons */}
-            <div className="flex flex-wrap justify-center gap-2 md:gap-[13px] items-center mt-2 md:mt-4">
+            <div className="flex flex-wrap justify-start gap-2 md:gap-[13px] items-center mt-2 md:mt-4">
               <SocialButton onClick={() => void handleShare("instagram")} ariaLabel="Share via Instagram">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="md:w-6 md:h-6">
                   <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2"/>
@@ -444,7 +444,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                   style={{ left: "20.33%" }}
                 >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`text-[9px] md:text-[17px] mt-1 transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>
+                  <p className={`text-[9px] md:text-[17px] mt-1 whitespace-nowrap transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>
                     3 invites
                   </p>
                 </div>
@@ -455,7 +455,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                   style={{ left: "49.52%" }}
                 >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`text-[9px] md:text-[17px] mt-1 transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>
+                  <p className={`text-[9px] md:text-[17px] mt-1 whitespace-nowrap transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>
                     6 invites
                   </p>
                 </div>
@@ -467,7 +467,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                 >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
                   <p
-                    className="font-bold text-[9px] md:text-[17px] mt-1 bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
+                    className="font-bold text-[9px] md:text-[17px] mt-1 whitespace-nowrap bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
                     style={{ WebkitTextFillColor: "transparent" }}
                   >
                     10 invites
