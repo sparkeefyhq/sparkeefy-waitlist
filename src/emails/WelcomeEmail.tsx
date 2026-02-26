@@ -39,12 +39,12 @@ export function WelcomeEmail({
   referralCode,
   referralLink,
 }: MagicLinkEmailData) {
-  const previewText = `You're in — welcome to Sparkeefy Early Access.`;
+  const previewText = `You're in - welcome to Sparkeefy Early Access.`;
 
   const rewardTiers = [
     { invites: "3 invites", reward: "1 month Sparkeefy Pro" },
     { invites: "6 invites", reward: "3 months Sparkeefy Pro" },
-    { invites: "10 invites", reward: "Founder Seat — lifetime pricing + feature access" },
+    { invites: "10 invites", reward: "Founder Seat - lifetime pricing + feature access" },
   ];
 
   return (
@@ -173,15 +173,35 @@ export function WelcomeEmail({
           {/* ── Footer ── */}
           <Section style={styles.footer}>
             <Text style={styles.footerBrand}>Sparkeefy</Text>
-            <Text style={styles.footerLinks}>
-              <Link href="https://sparkeefy.com" style={styles.footerLink}>Website</Link>
-              {" · "}
-              <Link href="https://instagram.com/sparkeefy" style={styles.footerLink}>Instagram</Link>
-              {" · "}
-              <Link href="https://x.com/sparkeefy" style={styles.footerLink}>X</Link>
-              {" · "}
-              <Link href="https://sparkeefy.com/privacy" style={styles.footerLink}>Privacy</Link>
-            </Text>
+
+            {/* Social icon links */}
+            <table role="presentation" cellSpacing={0} cellPadding={0} style={{ margin: "0 auto 16px" }}>
+              <tr>
+                <td style={{ paddingRight: 20 }}>
+                  <Link href="https://www.linkedin.com/company/sparkeefy" style={{ textDecoration: "none" }}>
+                    <Img
+                      src="https://img.icons8.com/ios-filled/50/0A66C2/linkedin.png"
+                      width={24}
+                      height={24}
+                      alt="LinkedIn"
+                      style={{ display: "block" }}
+                    />
+                  </Link>
+                </td>
+                <td>
+                  <Link href="https://sparkeefy.com" style={{ textDecoration: "none" }}>
+                    <Img
+                      src="https://img.icons8.com/ios/50/ffffff/globe--v1.png"
+                      width={24}
+                      height={24}
+                      alt="Sparkeefy.com"
+                      style={{ display: "block", opacity: 0.7 }}
+                    />
+                  </Link>
+                </td>
+              </tr>
+            </table>
+
             <Text style={styles.footerAddress}>
               You&apos;re receiving this because you signed up at sparkeefy.com
             </Text>
@@ -255,7 +275,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "Georgia, 'Times New Roman', serif",
     fontStyle: "italic",
     fontSize: 36,
-    fontWeight: 400,
+    fontWeight: 700,
     color: colors.pink,
     margin: "0 0 4px",
     letterSpacing: "-0.5px",

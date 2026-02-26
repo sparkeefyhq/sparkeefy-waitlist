@@ -42,7 +42,7 @@ class EmailService {
     const { data: result, error } = await resend.emails.send({
       from: DEFAULT_FROM,
       to: data.email,
-      subject: "You're in — welcome to Sparkeefy Early Access",
+      subject: "You're in - welcome to Sparkeefy Early Access",
       react: WelcomeEmail({
         email: data.email,
         magicLinkUrl: data.magicLinkUrl,

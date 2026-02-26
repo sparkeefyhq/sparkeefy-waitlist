@@ -266,7 +266,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
       <div className="w-full max-w-[1116px] mx-auto px-4 md:px-0 py-8 md:py-0">
         {/* Header */}
         <div className="flex flex-col items-center mb-8 md:mb-12">
-          <p className="font-retro text-[30px] md:text-[65px] text-[#ffcce5] tracking-[-0.6px] md:tracking-[-1.3px] leading-tight md:leading-normal text-center">
+          <p className="font-retro text-[30px] md:text-[65px] text-[#ffcce5] tracking-[0.5px] md:tracking-[2px] leading-tight md:leading-normal text-center">
             {referralContent.congratulations}
           </p>
           <div className="relative mt-1">
