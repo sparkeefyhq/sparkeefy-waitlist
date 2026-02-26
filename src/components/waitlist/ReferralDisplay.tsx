@@ -422,7 +422,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
               <p className="text-[11px] md:text-sm text-white/70 mt-2">{shareFeedback}</p>
             ) : null}
 
-            {/* Progress bar */}
+            {/* Progress bar — same proportions on mobile and desktop (milestones at 85/418, 207/418, 352/418) */}
             <div className="mt-4 md:mt-8">
               {/* Bar container */}
               <div className="relative w-full md:w-[418px] h-[18px] md:h-[33px] border-[1.5px] md:border-[2.8px] border-white rounded-full">
@@ -436,29 +436,38 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                 />
               </div>
 
-              {/* Milestones */}
-              <div className="flex justify-between md:relative mt-1.5 md:mt-2 px-2 md:px-0 md:h-[60px]">
+              {/* Milestones — proportional positions: 85/418 ≈ 20.33%, 207/418 ≈ 49.52%, 352/418 ≈ 84.21% */}
+              <div className="relative w-full md:w-[418px] mt-1.5 md:mt-2 h-[60px]">
                 {/* 3 invites */}
-                <div className="flex flex-col items-center md:absolute md:left-[85px]">
+                <div
+                  className="flex flex-col items-center absolute top-0 -translate-x-1/2 md:left-[85px]"
+                  style={{ left: "20.33%" }}
+                >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`text-[9px] md:text-[17px] md:mt-1 transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>
+                  <p className={`text-[9px] md:text-[17px] mt-1 transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>
                     3 invites
                   </p>
                 </div>
 
                 {/* 6 invites */}
-                <div className="flex flex-col items-center md:absolute md:left-[207px]">
+                <div
+                  className="flex flex-col items-center absolute top-0 -translate-x-1/2 md:left-[207px]"
+                  style={{ left: "49.52%" }}
+                >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`text-[9px] md:text-[17px] md:mt-1 transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>
+                  <p className={`text-[9px] md:text-[17px] mt-1 transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>
                     6 invites
                   </p>
                 </div>
 
                 {/* 10 invites */}
-                <div className="flex flex-col items-center md:absolute md:left-[352px]">
+                <div
+                  className="flex flex-col items-center absolute top-0 -translate-x-1/2 md:left-[352px]"
+                  style={{ left: "84.21%" }}
+                >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
                   <p
-                    className="font-bold text-[9px] md:text-[17px] md:mt-1 bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
+                    className="font-bold text-[9px] md:text-[17px] mt-1 bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
                     style={{ WebkitTextFillColor: "transparent" }}
                   >
                     10 invites
