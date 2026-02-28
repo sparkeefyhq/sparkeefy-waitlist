@@ -16,7 +16,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "email:dev": "email dev --dir src/emails"
+    "email:dev": "email dev --dir src/emails",
+    "sync-welcome-sent": "npx tsx scripts/sync-welcome-sent-from-resend.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

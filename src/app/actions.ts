@@ -223,6 +223,7 @@ async function joinWaitlistInternal(
             referralCode: user.referralCode,
             referralLink: buildAbsoluteReferralLink(user.referralCode),
           });
+          await db.markWelcomeEmailSent(user.id);
         } catch {
           // Email not sent (no-op when disabled)
         }
