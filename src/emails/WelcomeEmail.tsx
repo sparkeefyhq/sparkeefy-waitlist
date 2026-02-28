@@ -44,7 +44,7 @@ export function WelcomeEmail({
   const rewardTiers = [
     { invites: "3 invites", reward: "1 month Sparkeefy Pro" },
     { invites: "6 invites", reward: "3 months Sparkeefy Pro" },
-    { invites: "10 invites", reward: "Founder Seat - lifetime pricing + feature access" },
+    { invites: "10 invites", reward: "Founder Seat" },
   ];
 
   return (
