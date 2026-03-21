@@ -257,6 +257,64 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
     </div>
   );
 
+  // Progress bar mapping: Interpolating invite counts into milestone positions
+  // 3: 85/418 = 20.33%; 6: 207/418 = 49.52%; 10: 352/418 = 84.21%
+  const getProgressBarPercentage = (invites: number) => {
+    if (invites <= 0) return 0;
+    if (invites <= 3) return (invites / 3) * 20.33;
+    if (invites <= 6) return 20.33 + ((invites - 3) / 3) * (49.52 - 20.33);
+    if (invites <= 10) return 49.52 + ((invites - 6) / 4) * (84.21 - 49.52);
+    return 100;
+  };
+
+  function StrikeSVG() {
+    return (
+      <svg
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+8px)] h-2 pointer-events-none overflow-visible"
+        viewBox="0 0 78 8"
+        preserveAspectRatio="none"
+      >
+        <motion.path
+          d="M76.2008 2.35045C71.2961 5.45388 64.7859 9.27333 60.4399 3.70035C56.6025 -1.22051 50.5474 1.34062 45.2054 4.31906C43.6067 5.21042 40.7836 6.6474 38.4215 6.32516C36.2193 6.02473 34.325 3.87979 32.3979 3.1004C28.4088 1.48708 21.7895 3.92868 17.8943 4.71278C12.1958 5.85989 6.90054 6.91018 0.93457 6.40015"
+          stroke="#FFCCE5"
+          strokeWidth="1.86903"
+          strokeLinecap="round"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+        />
+      </svg>
+    );
+  }
+
+  function CircleSVG() {
+    return (
+      <svg
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[48px] pointer-events-none overflow-visible z-20"
+        viewBox="0 0 97 42"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <motion.path
+          d="M39.6417 28.7011C54.9317 28.635 75.1886 28.9599 88.5177 20.6262C92.1979 18.3253 97.8782 14.6587 94.7454 9.89513C90.039 2.73878 76.4292 1.68673 68.8061 1.04995C55.199 -0.0866792 41.2316 1.25386 28.0483 4.68895C19.83 6.83032 6.52743 10.6445 1.80312 18.2356C-10.543 38.0736 80.5473 40.3545 86.6828 40.6541"
+          stroke="#FFD292"
+          strokeWidth="2"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        />
+        <defs>
+          <linearGradient id="milestone-gold-gradient" x1="0.654175" y1="20.6541" x2="95.6542" y2="20.6541" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#FFD292" />
+            <stop offset="1" stopColor="#D39032" />
+          </linearGradient>
+        </defs>
+      </svg>
+    );
+  }
+
   return (
     <WaitlistLayout
       variant="referral"
@@ -430,7 +488,7 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                 <motion.div
                   className="absolute left-[3px] md:left-[5px] top-1/2 -translate-y-1/2 h-[12px] md:h-[23px] rounded-full bg-gradient-to-r from-white to-[#ff0080]"
                   initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((displayInvites / 10) * 100, 100)}%` }}
+                  animate={{ width: `${getProgressBarPercentage(displayInvites)}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                   style={{ maxWidth: "calc(100% - 6px)" }}
                 />
@@ -443,10 +501,13 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                   className="flex flex-col items-center absolute top-0 -translate-x-1/2 md:left-[85px]"
                   style={{ left: "20.33%" }}
                 >
-                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`text-[9px] md:text-[17px] mt-1 whitespace-nowrap transition-colors duration-300 ${displayInvites >= 3 ? "text-white" : "text-white/50"}`}>
-                    3 invites
-                  </p>
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 3 ? "bg-white/50" : "bg-white"}`} />
+                  <div className="relative mt-1">
+                    <p className={`text-[9px] md:text-[17px] whitespace-nowrap transition-colors duration-300 ${displayInvites >= 3 ? "text-white/50" : "text-white"}`}>
+                      3 invites
+                    </p>
+                    {displayInvites >= 3 && <StrikeSVG />}
+                  </div>
                 </div>
 
                 {/* 6 invites */}
@@ -454,10 +515,13 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                   className="flex flex-col items-center absolute top-0 -translate-x-1/2 md:left-[207px]"
                   style={{ left: "49.52%" }}
                 >
-                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white" : "bg-white/50"}`} />
-                  <p className={`text-[9px] md:text-[17px] mt-1 whitespace-nowrap transition-colors duration-300 ${displayInvites >= 6 ? "text-white" : "text-white/50"}`}>
-                    6 invites
-                  </p>
+                  <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 6 ? "bg-white/50" : "bg-white"}`} />
+                  <div className="relative mt-1">
+                    <p className={`text-[9px] md:text-[17px] whitespace-nowrap transition-colors duration-300 ${displayInvites >= 6 ? "text-white/50" : "text-white"}`}>
+                      6 invites
+                    </p>
+                    {displayInvites >= 6 && <StrikeSVG />}
+                  </div>
                 </div>
 
                 {/* 10 invites */}
@@ -466,12 +530,15 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
                   style={{ left: "84.21%" }}
                 >
                   <div className={`w-[9px] h-[9px] rounded-full transition-colors duration-300 ${displayInvites >= 10 ? "bg-[#ffd292]" : "bg-[#ffd292]/50"}`} />
-                  <p
-                    className="font-bold text-[9px] md:text-[17px] mt-1 whitespace-nowrap bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
-                    style={{ WebkitTextFillColor: "transparent" }}
-                  >
-                    10 invites
-                  </p>
+                  <div className="relative mt-1">
+                    <p
+                      className="font-bold text-[9px] md:text-[17px] whitespace-nowrap bg-gradient-to-r from-[#ffd292] to-[#d39032] bg-clip-text"
+                      style={{ WebkitTextFillColor: "transparent" }}
+                    >
+                      10 invites
+                    </p>
+                    {displayInvites >= 10 && <CircleSVG />}
+                  </div>
                 </div>
               </div>
             </div>
@@ -480,4 +547,5 @@ export default function ReferralDisplay({ stats: initialStats, token }: Referral
       </div>
     </WaitlistLayout>
   );
+
 }
