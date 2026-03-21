@@ -5,7 +5,7 @@ import Image from "next/image";
 import StarsBackground from "@/components/home/StarsBackground";
 import { motion } from "framer-motion";
 
-const PRIVACY_BG = "/img/about-hero-bg-2.png";
+const PRIVACY_BG = "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114715/about-hero-bg-2_rfoovv.png";
 
 const privacyPoints = [
   {
@@ -85,7 +85,7 @@ const PrivacyHeroMobile = () => {
             className="w-full h-full relative"
           >
             <Image
-              src="/img/lock.png"
+              src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115447/lock_i0amrn.png"
               alt="Privacy Security"
               fill
               className="object-contain"

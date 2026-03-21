@@ -253,7 +253,7 @@ const WhoIsSparkeefyFor = () => {
           >
             <div className="mb-3 flex justify-center md:justify-start h-28">
              <Image
-                src="/img/couples.png"
+                src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115452/couples_xzbgew.png"
                 alt="Couples"
                 width={100}
                 height={100}
@@ -278,7 +278,7 @@ const WhoIsSparkeefyFor = () => {
           >
             <div className="mb-3 flex justify-center md:justify-start h-28">
               <Image
-                src="/img/friends.png"
+                src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115446/friends_annguv.png"
                 alt="Friends"
                 width={96}
                 height={96}
@@ -303,7 +303,7 @@ const WhoIsSparkeefyFor = () => {
           >
             <div className="mb-3 flex justify-center md:justify-start h-28">
              <Image
-                src="/img/family-members.png"
+                src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115446/family-members_uk1eje.png"
                 alt="Family Members"
                 width={104}
                 height={104}
