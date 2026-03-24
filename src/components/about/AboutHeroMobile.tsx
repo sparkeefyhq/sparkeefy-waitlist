@@ -5,10 +5,10 @@ import StarsBackground from "@/components/home/StarsBackground";
 import { motion, AnimatePresence } from "framer-motion";
 
 const bgImages = [
-  "/img/about-hero-bg-mobile-2.png",
-  "/img/about-hero-bg-mobile-1.png",
-  "/img/about-hero-bg-mobile-3.png",
-  "/img/about-hero-bg-mobile-4.png",
+  "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/about-hero-bg-mobile-2_d4sl4l.png",
+  "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/about-hero-bg-mobile-1_y90ztt.png",
+  "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114715/about-hero-bg-mobile-3_tbngz4.png",
+  "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/about-hero-bg-mobile-4_qhzryq.png",
 ];
 
 const tabs = [
@@ -31,7 +31,7 @@ const content = [
       "Designed to work quietly in the background, with notifications <b class='text-white'>only when they matter.</b>",
       "Gentle reminders help meaningful moments from <b class='text-white'>slipping away.</b>",
     ],
-    image: "/img/feature-card-img-1.png",
+    image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/feature-card-img-1_gzkkod.png",
   },
   {
     id: 1,
@@ -45,7 +45,7 @@ const content = [
       "<b class='text-white'>Suggestions you can shape and send in your own words - especially in sensitive moments</b>",
       "<b class='text-white'>Communicate clearly</b> - without sounding scripted or forced",
     ],
-    image: "/img/feature-card-img-2.png",
+    image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/feature-card-img-2_ywhpt3.png",
   },
   {
     id: 2,
@@ -59,7 +59,7 @@ const content = [
       "<b class='text-white'>Suggestions</b> that consider your mood, budget and their preferences.",
       "Helps you narrow things down and decide faster.",
     ],
-    image: "/img/feature-card-img-3.png",
+    image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/feature-card-img-3_xndfk5.png",
   },
   {
     id: 3,
@@ -73,7 +73,7 @@ const content = [
       "<b class='text-white'>Gift ideas</b> that reflect their tastes, interests, and the little details",
       "<b class='text-white'>Helps you decide</b> with confidence, without second-guessing",
     ],
-    image: "/img/feature-card-img-4.png",
+    image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114713/feature-card-img-4_stikjh.png",
   },
 ];
 

@@ -9,7 +9,7 @@ export const featureCards = [
         gradient: "bg-[linear-gradient(104deg,_#DE0371_-1.62%,_#670138_18.3%,_#420126_31.79%,_#270119_50.85%,_#080A0A_74.33%,_#000_91.17%)] [box-shadow:0_18.599px_37.818px_0_rgba(0,_0,_0,_0.22)]",
         accentColor: "#FF0080",
         gradientStartColor: "#FFB3D9",
-        image: "/img/feature-card-img-1.png",
+        image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/feature-card-img-1_gzkkod.png",
     },
     {
         id: "say-it-better",
@@ -21,7 +21,7 @@ export const featureCards = [
         gradient: "bg-[linear-gradient(104deg,_#06B0B7_-1.05%,_#006A6E_10.96%,_#153B3D_18.84%,_#1D292A_29.46%,_#1F2324_47.22%,_#171A1A_59.96%,_#080A0A_74.43%,_#000_91.16%)] [box-shadow:0_18.599px_37.818px_0_rgba(0,_0,_0,_0.22)]",
         accentColor: "#06B0B7",
         gradientStartColor: "#99F6E4",
-        image: "/img/feature-card-img-2.png",
+        image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/feature-card-img-2_ywhpt3.png",
     },
     {
         id: "plan-with-ease",
@@ -33,7 +33,7 @@ export const featureCards = [
         gradient: "bg-[linear-gradient(104deg,_#955BF0_-2.66%,_#804FCD_6.16%,_#6D44AE_9.53%,_#643FA0_12.5%,_#5B3991_16.49%,_#442D69_25.94%,_#33224F_36.75%,_#191325_53.7%,_#110F18_66.37%,_#080A0A_78.13%,_#000_91.17%)] [box-shadow:0_18.599px_37.818px_0_rgba(0,_0,_0,_0.22)]",
         accentColor: "#955BF0",
         gradientStartColor: "#E9D5FF",
-        image: "/img/feature-card-img-3.png",
+        image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114716/feature-card-img-3_xndfk5.png",
     },
     {
         id: "gift-thoughtfully",
@@ -45,6 +45,6 @@ export const featureCards = [
         gradient: "bg-[linear-gradient(104deg,_#EDB320_0.22%,_#936206_16.55%,_#523704_36.66%,_#352405_49.66%,_#271902_59%,_#000_91.17%)] [box-shadow:0_18.599px_37.818px_0_rgba(0,_0,_0,_0.22)]",
         accentColor: "#FEBF67",
         gradientStartColor: "#FDE68A",
-        image: "/img/feature-card-img-4.png",
+        image: "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114713/feature-card-img-4_stikjh.png",
     },
 ];

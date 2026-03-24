@@ -186,7 +186,7 @@ const Footer = () => {
                 className="hover:scale-105 transition-all duration-300"
               >
                 <Image
-                  src="/img/app-store.png"
+                  src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115451/app-store_czci7o.png"
                   alt="Download on the App Store"
                   width={145}
                   height={45}
@@ -197,7 +197,7 @@ const Footer = () => {
                 className="hover:scale-105 transition-all duration-300"
               >
                 <Image
-                  src="/img/google-play.png"
+                  src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115446/google-play_fjuegw.png"
                   alt="Get it on Google Play"
                   width={145}
                   height={45}
@@ -283,7 +283,7 @@ const Footer = () => {
                 className="hover:scale-105 transition-all duration-300"
               >
                 <Image
-                  src="/img/app-store.png"
+                  src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115451/app-store_czci7o.png"
                   alt="Download on the App Store"
                   width={145}
                   height={45}
@@ -294,7 +294,7 @@ const Footer = () => {
                 className="hover:scale-105 transition-all duration-300"
               >
                 <Image
-                  src="/img/google-play.png"
+                  src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774115446/google-play_fjuegw.png"
                   alt="Get it on Google Play"
                   width={145}
                   height={45}
@@ -315,7 +315,7 @@ const Footer = () => {
         {/* Gradient Image */}
         <div className="absolute bottom-0 left-0 w-full h-full z-0 opacity-100 mix-blend-normal">
           <Image
-            src="/img/footer-gradient-bg.png"
+            src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774114715/footer-gradient-bg_tvh8pa.png"
             alt="Gradient Background"
             layout="fill"
             objectFit="cover"
@@ -323,7 +323,7 @@ const Footer = () => {
             className="hidden md:block object-bottom lg:[@media(min-height:900px)]:object-top"
           />
           <Image
-            src="/img/footer-gradient-bg-mobile.png"
+            src="https://res.cloudinary.com/djqi5un1w/image/upload/v1774114714/footer-gradient-bg-mobile_svc5v7.png"
             alt="Gradient Background"
             layout="fill"
             objectFit="cover"
