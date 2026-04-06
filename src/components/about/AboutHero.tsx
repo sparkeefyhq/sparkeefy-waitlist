@@ -5,8 +5,8 @@ import StarsBackground from "@/components/home/StarsBackground";
 import { motion, AnimatePresence } from "framer-motion";
 
 const bgImages = [
-  "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114714/about-hero-bg-1_j6pk2b.png",
   "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114715/about-hero-bg-2_rfoovv.png",
+  "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114714/about-hero-bg-1_j6pk2b.png",
   "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114717/about-hero-bg-3_ijyswg.png",
   "https://res.cloudinary.com/djqi5un1w/image/upload/v1774114717/about-hero-bg-4_wvc8ob.png",
 ];
