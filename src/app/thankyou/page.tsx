@@ -28,36 +28,53 @@ const confettiItems = [
    ICONS
    ══════════════════════════════════════════════════ */
 
-/** 1 — Medal / winner badge with star + ribbon tails */
+/** 1 — Minimal spark/starburst outline for early launch / first access */
 const IconMedal = () => (
-  <svg width="30" height="30" viewBox="0 0 30 30" fill="none"
-    stroke="white" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="15" cy="12" r="7.5" />
-    {/* 5-point star */}
-    <path d="M15 8.5l1.3 2.7h2.8l-2.3 1.8.9 2.8-2.7-1.9-2.7 1.9.9-2.8-2.3-1.8h2.8z" strokeWidth={1.3} />
-    {/* Left ribbon */}
-    <path d="M10.5 18l-2 7 6.5-2.5" />
-    {/* Right ribbon */}
-    <path d="M19.5 18l2 7-6.5-2.5" />
-  </svg>
+<svg
+  width="30"
+  height="30"
+  viewBox="0 0 30 30"
+  fill="none"
+  stroke="white"
+  strokeWidth={1.9}
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  {/* party popper cone */}
+  <path d="M8 20l8-8" />
+  <path d="M10 22l10-10" />
+  <path d="M8 20l2 2 10-10-2-2z" />
+
+  {/* confetti */}
+  <path d="M18 6v3" />
+  <path d="M23 9l-2 2" />
+  <path d="M24 15h-3" />
+  <path d="M9 7l1.8 1.8" />
+  <path d="M14 4l.8 2.5" />
+
+  {/* tiny spark */}
+  <circle cx="22.5" cy="20.5" r="1.2" />
+</svg>
 );
 
-/** 2 — Classic speech bubble with bottom-left tail (chat icon) */
+/** 2 — Minimal pen/edit outline for contribution and shaping */
 const IconChat = () => (
   <svg width="30" height="30" viewBox="0 0 30 30" fill="none"
     stroke="white" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-    {/* Rounded rectangle body */}
-    <path d="M4 5h22a2 2 0 012 2v12a2 2 0 01-2 2H10l-6 4V7a2 2 0 012-2z" />
+    <path d="M9 20.5l1.1-4.2 8.9-8.9a1.8 1.8 0 0 1 2.6 0l1.1 1.1a1.8 1.8 0 0 1 0 2.6l-8.9 8.9L9 20.5z" />
+    <path d="M17.5 7.9l4.6 4.6" />
+    <path d="M8.7 21.3l3.2-.8" />
   </svg>
 );
 
-/** 3 — Concentric circles target (bullseye) */
+/** 3 — Minimal gift box outline for rewards and perks */
 const IconTarget = () => (
   <svg width="30" height="30" viewBox="0 0 30 30" fill="none"
     stroke="white" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="15" cy="15" r="12" />
-    <circle cx="15" cy="15" r="7.5" />
-    <circle cx="15" cy="15" r="3" fill="white" stroke="none" />
+    <path d="M6.5 13.2h17v10.3c0 .9-.7 1.6-1.6 1.6H8.1c-.9 0-1.6-.7-1.6-1.6V13.2z" />
+    <path d="M5.9 10.2h18.2a1.2 1.2 0 0 1 1.2 1.2v1.8H4.7v-1.8a1.2 1.2 0 0 1 1.2-1.2z" />
+    <path d="M15 10.2v14.9" />
+    <path d="M15 10.2c0-2.3-1.4-3.8-3.2-3.8-1.6 0-2.9 1.2-2.9 2.8 0 1.7 1.2 2.8 3 2.8H15zm0 0c0-2.3 1.4-3.8 3.2-3.8 1.6 0 2.9 1.2 2.9 2.8 0 1.7-1.2 2.8-3 2.8H15" />
   </svg>
 );
 
@@ -96,7 +113,22 @@ const ThankYou: React.FC = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @font-face {
+          font-family: 'RetroVintage';
+          src: url('/fonts/retro-vintage/RetroVintage-Regular.woff2') format('woff2'),
+               url('/fonts/retro-vintage/RetroVintage-Regular.woff') format('woff');
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+        }
+        @font-face {
+          font-family: 'RetroVintage';
+          src: url('/fonts/retro-vintage/RetroVintage-Shadow.woff2') format('woff2'),
+               url('/fonts/retro-vintage/RetroVintage-Shadow.woff') format('woff');
+          font-weight: 700;
+          font-style: normal;
+          font-display: swap;
+        }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         .ty-root {
@@ -108,6 +140,10 @@ const ThankYou: React.FC = () => {
           color: #1f2937;
           -webkit-font-smoothing: antialiased;
         }
+
+        /* Retro vintage font helper */
+        .ty-retro { font-family: 'RetroVintage', serif; font-weight: 400; font-style: normal; -webkit-font-smoothing: antialiased; }
+        .ty-retro-heading { font-weight: 500; display: inline-block; font-size: calc(1em + 10px); line-height: inherit;margin-top: 5px; vertical-align: baseline; }
 
         .ty-container {
           max-width: 700px;
@@ -295,17 +331,17 @@ const ThankYou: React.FC = () => {
 
           {/* ── Hero ── */}
           <section className="ty-hero">
-            <div className="ty-pill">Welcome to Sparkeefy! 🎉</div>
+            
             <h1 className="ty-h1">
-              Thank you for believing <br />
-              <span>in Sparkeefy!</span>
+              Welcome to <br />
+              <span className="ty-retro ty-retro-heading">Sparkeefy!</span>
             </h1>
             {/* Line from img 2 */}
             <p className="ty-subtitle">The app that makes relationships feel effortless</p>
             {/* Body from img 2 */}
             <p className="ty-body">
-              You're officially in consideration for Sparkeefy's first group of early users.
-              People joining early help shape what Sparkeefy becomes.
+              You're officially in consideration for <span className="ty-retro">Sparkeefy</span>'s first group of early users.
+              People joining early help shape what <span className="ty-retro">Sparkeefy</span> becomes.
             </p>
           </section>
 
@@ -368,7 +404,7 @@ const ThankYou: React.FC = () => {
                 <div className="ty-prop-icon"><IconMedal /></div>
                 <div className="ty-prop-text">
                   <p className="ty-prop-title">Early Access</p>
-                  <p className="ty-prop-desc">Get Sparkeefy before everyone else</p>
+                  <p className="ty-prop-desc">Get <span className="ty-retro">Sparkeefy</span> before everyone else</p>
                 </div>
               </div>
 
@@ -376,7 +412,7 @@ const ThankYou: React.FC = () => {
               <div className="ty-prop">
                 <div className="ty-prop-icon"><IconChat /></div>
                 <div className="ty-prop-text">
-                  <p className="ty-prop-title">Shape Sparkeefy</p>
+                  <p className="ty-prop-title">Shape <span className="ty-retro">Sparkeefy</span></p>
                   <p className="ty-prop-desc">Share feedback that drives real change</p>
                 </div>
               </div>
@@ -386,7 +422,7 @@ const ThankYou: React.FC = () => {
                 <div className="ty-prop-icon"><IconTarget /></div>
                 <div className="ty-prop-text">
                   <p className="ty-prop-title">Exclusive Perks</p>
-                  <p className="ty-prop-desc">3 months of Sparkeefy Pro + exclusive early access benefits</p>
+                  <p className="ty-prop-desc">3 months of <span className="ty-retro">Sparkeefy</span> Pro + exclusive early access benefits</p>
                 </div>
               </div>
 
@@ -400,7 +436,7 @@ const ThankYou: React.FC = () => {
               <div>
                 {/* Updated from img 2 */}
                 <p className="ty-discord-title">Unlock Your Community Access</p>
-                <p className="ty-discord-sub">Meet other early users, share feedback, get sneak peeks, and help us build Sparkeefy in public - together.</p>
+                <p className="ty-discord-sub">Meet other early users, share feedback, get sneak peeks, and help us build <span className="ty-retro">Sparkeefy</span> in public - together.</p>
               </div>
             </div>
             <a href="https://discord.gg/jdJEFcpPE" className="ty-discord-btn">Join Discord</a>
@@ -410,7 +446,7 @@ const ThankYou: React.FC = () => {
           <footer className="ty-footer">
             <div className="ty-footer-box">
               <p className="ty-footer-title">Keep an eye on your emails 👀</p>
-              <p className="ty-footer-sub">Your Sparkeefy invite could be next.</p>
+              <p className="ty-footer-sub">Your <span className="ty-retro">Sparkeefy</span> invite could be next.</p>
             </div>
           </footer>
 
