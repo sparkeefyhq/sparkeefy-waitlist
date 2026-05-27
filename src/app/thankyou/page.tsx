@@ -295,7 +295,7 @@ const ThankYou: React.FC = () => {
 
           {/* ── Hero ── */}
           <section className="ty-hero">
-            <div className="ty-pill">You're in! 🎉</div>
+            <div className="ty-pill">Welcome to Sparkeefy! 🎉</div>
             <h1 className="ty-h1">
               Thank you for believing <br />
               <span>in Sparkeefy!</span>
@@ -367,8 +367,8 @@ const ThankYou: React.FC = () => {
               <div className="ty-prop">
                 <div className="ty-prop-icon"><IconMedal /></div>
                 <div className="ty-prop-text">
-                  <p className="ty-prop-title">First access</p>
-                  <p className="ty-prop-desc">Be the first to try new features</p>
+                  <p className="ty-prop-title">Early Access</p>
+                  <p className="ty-prop-desc">Get Sparkeefy before everyone else</p>
                 </div>
               </div>
 
@@ -376,7 +376,7 @@ const ThankYou: React.FC = () => {
               <div className="ty-prop">
                 <div className="ty-prop-icon"><IconChat /></div>
                 <div className="ty-prop-text">
-                  <p className="ty-prop-title">Shape the product</p>
+                  <p className="ty-prop-title">Shape Sparkeefy</p>
                   <p className="ty-prop-desc">Share feedback that drives real change</p>
                 </div>
               </div>
@@ -385,8 +385,8 @@ const ThankYou: React.FC = () => {
               <div className="ty-prop">
                 <div className="ty-prop-icon"><IconTarget /></div>
                 <div className="ty-prop-text">
-                  <p className="ty-prop-title">Make an impact</p>
-                  <p className="ty-prop-desc">Help build something meaningful</p>
+                  <p className="ty-prop-title">Exclusive Perks</p>
+                  <p className="ty-prop-desc">3 months of Sparkeefy Pro + exclusive early access benefits</p>
                 </div>
               </div>
 
@@ -400,16 +400,16 @@ const ThankYou: React.FC = () => {
               <div>
                 {/* Updated from img 2 */}
                 <p className="ty-discord-title">Unlock Your Community Access</p>
-                <p className="ty-discord-sub">Meet other early users and share feedback.</p>
+                <p className="ty-discord-sub">Meet other early users, share feedback, get sneak peeks, and help us build Sparkeefy in public - together.</p>
               </div>
             </div>
-            <a href="#" className="ty-discord-btn">Join Discord</a>
+            <a href="https://discord.gg/jdJEFcpPE" className="ty-discord-btn">Join Discord</a>
           </div>
 
           {/* ── Footer ── */}
           <footer className="ty-footer">
             <div className="ty-footer-box">
-              <p className="ty-footer-title">Keep an eye on your email/messages 👀</p>
+              <p className="ty-footer-title">Keep an eye on your emails 👀</p>
               <p className="ty-footer-sub">Your Sparkeefy invite could be next.</p>
             </div>
           </footer>
