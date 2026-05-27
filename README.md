@@ -1,2 +1,7 @@
-# sparkeefy-waitlist
-Waitlist and referral system for Sparkeefy. Next.js app with server actions for signups and referrals.
+# Sparkeefy Waitlist
+
+Waitlist app for Sparkeefy.
+
+---
+
+*Trigger rebuild — Wed May 27 2026*
