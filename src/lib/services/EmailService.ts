@@ -59,11 +59,19 @@ class EmailService {
   }
 
   /** Backwards-compatible alias used by the join flow. */
-  async sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void> {
+  async sendMagicLinkEmail(
+    data: MagicLinkEmailData
+  ): Promise<{ sent: boolean; id?: string; error?: string }> {
     try {
-      await this.sendWelcomeEmail(data);
-    } catch {
-      // Swallow in the join flow — email is best-effort there
+      const { id } = await this.sendWelcomeEmail(data);
+      return { sent: true, id };
+    } catch (err) {
+      // Swallow in the join flow — email is best-effort there.
+      // But return enough info so callers can avoid marking it as "sent".
+      return {
+        sent: false,
+        error: err instanceof Error ? err.message : "Unknown email error",
+      };
     }
   }
 

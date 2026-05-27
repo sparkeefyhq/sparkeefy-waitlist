@@ -217,12 +217,17 @@ async function joinWaitlistInternal(
 
         // Send magic link email
         try {
-          await emailService.sendMagicLinkEmail({
+          const emailResult = await emailService.sendMagicLinkEmail({
             email: user.email,
             magicLinkUrl: buildMagicLinkUrl(user.magicLinkToken),
             referralCode: user.referralCode,
             referralLink: buildAbsoluteReferralLink(user.referralCode),
           });
+
+          // Only mark as "sent" when Resend confirms the send request succeeded.
+          if (emailResult.sent) {
+            await db.markWelcomeEmailSent(user.id);
+          }
         } catch {
           // Email not sent (no-op when disabled)
         }

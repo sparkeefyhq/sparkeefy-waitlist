@@ -175,10 +175,10 @@ export class DatabaseClient {
     await this._db.delete(waitlistUsers).where(eq(waitlistUsers.id, id));
   }
 
-  async markWelcomeEmailSent(id: string): Promise<void> {
+  async markWelcomeEmailSent(id: string, sentAt?: Date): Promise<void> {
     await this._db
       .update(waitlistUsers)
-      .set({ welcomeEmailSentAt: new Date() })
+      .set({ welcomeEmailSentAt: sentAt ?? new Date() })
       .where(eq(waitlistUsers.id, id));
   }
 
