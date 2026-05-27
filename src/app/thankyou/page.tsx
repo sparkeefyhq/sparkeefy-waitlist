@@ -143,7 +143,7 @@ const ThankYou: React.FC = () => {
 
         /* Retro vintage font helper */
         .ty-retro { font-family: 'RetroVintage', serif; font-weight: 400; font-style: normal; -webkit-font-smoothing: antialiased; }
-        .ty-retro-heading { font-weight: 500; display: inline-block; font-size: calc(1em + 10px); line-height: inherit;margin-top: 5px; vertical-align: baseline; }
+        .ty-retro-heading { font-weight: 500; display: inline-block; font-size: calc(1em + 7px); line-height: inherit;margin-top: 5px; vertical-align: baseline; }
 
         .ty-container {
           max-width: 700px;
