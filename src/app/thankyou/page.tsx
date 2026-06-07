@@ -171,12 +171,13 @@ const ThankYou: React.FC = () => {
         }
         .ty-h1 span { color: #7c3aed; }
         .ty-subtitle {
-          font-size: clamp(13px, 3.5vw, 15px);
+          font-size: clamp(16px, 4vw, 19px);
           font-weight: 600; color: rgba(76,29,149,0.82); margin-bottom: 6px;
         }
         .ty-body {
           font-size: 13px; color: #6b7280;
-          max-width: 330px; margin: 12px auto 0; line-height: 1.65;
+          max-width: 400px; margin: 12px auto 0; line-height: 1.65;
+          white-space: nowrap;
         }
 
         /* ── Illustration ── */
@@ -337,11 +338,11 @@ const ThankYou: React.FC = () => {
               <span className="ty-retro ty-retro-heading">Sparkeefy!</span>
             </h1>
             {/* Line from img 2 */}
-            <p className="ty-subtitle">The app that makes relationships feel effortless</p>
+            <p className="ty-subtitle">The app that makes relationships<br />feel effortless</p>
             {/* Body from img 2 */}
             <p className="ty-body">
-              You're officially in consideration for <span className="ty-retro">Sparkeefy</span>'s first group of early users.
-              People joining early help shape what <span className="ty-retro">Sparkeefy</span> becomes.
+              Thanks for applying to become a <span style={{color: '#7c3aed'}}><span className="ty-retro">Sparkeefy</span> Founding User.</span>
+          
             </p>
           </section>
 
@@ -382,8 +383,8 @@ const ThankYou: React.FC = () => {
                 <div className="ty-step-circle" style={{ background:"#fb923c", boxShadow:"0 4px 14px rgba(251,146,60,0.28)" }}>
                   <IconCalendar />
                 </div>
-                <span className="ty-step-label">June 1 → Early</span>
-                <span className="ty-step-sub">APK access drops</span>
+                <span className="ty-step-label">Private testing begins</span>
+                <span className="ty-step-sub">App access will be sent</span>
               </div>
             </div>
           </div>
@@ -394,7 +395,7 @@ const ThankYou: React.FC = () => {
 
             <div className="ty-purple-header">
               <p className="ty-purple-sub">You're not just joining.</p>
-              <h3 className="ty-purple-title">You're building the future with us.</h3>
+              <h3 className="ty-purple-title">You're helping shape the future of how people care, connect, and show up.</h3>
             </div>
 
             <div className="ty-props">
@@ -446,7 +447,9 @@ const ThankYou: React.FC = () => {
           <footer className="ty-footer">
             <div className="ty-footer-box">
               <p className="ty-footer-title">Keep an eye on your emails 👀</p>
-              <p className="ty-footer-sub">Your <span className="ty-retro">Sparkeefy</span> invite could be next.</p>
+              <p className="ty-footer-sub">
+                Your <span className="ty-retro">Sparkeefy</span> invite could be closer than you think.
+              </p>
             </div>
           </footer>
 
