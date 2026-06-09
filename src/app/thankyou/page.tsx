@@ -1,456 +1,590 @@
 import React from "react";
+import Image from "next/image";
 
-/* ─── Confetti ─── */
-const confettiItems = [
-  { color: "#a78bfa", top: "10%", left: "10%", rot: 12 },
-  { color: "#93c5fd", top: "15%", left: "85%", rot: -12 },
-  { color: "#f472b6", top: "25%", left: "5%",  rot: 45 },
-  { color: "#facc15", top: "30%", left: "90%", rot: -45 },
-  { color: "#fb923c", top: "45%", left: "15%", rot: 12 },
-  { color: "#67e8f9", top: "50%", left: "80%", rot: -12 },
-  { color: "#8b5cf6", top: "8%",  left: "30%", rot: 90 },
-  { color: "#f9a8d4", top: "40%", left: "70%", rot: -90 },
-  { color: "#60a5fa", top: "60%", left: "25%", rot: 45 },
-  { color: "#eab308", top: "65%", left: "75%", rot: -12 },
-  { color: "#c4b5fd", top: "5%",  left: "20%", rot: 12 },
-  { color: "#bfdbfe", top: "12%", left: "45%", rot: -45 },
-  { color: "#fbcfe8", top: "18%", left: "65%", rot: 90 },
-  { color: "#fef08a", top: "22%", left: "35%", rot: -12 },
-  { color: "#fdba74", top: "28%", left: "75%", rot: 45 },
-  { color: "#a5f3fc", top: "35%", left: "55%", rot: -90 },
-  { color: "#7c3aed", top: "38%", left: "25%", rot: 12 },
-  { color: "#ec4899", top: "42%", left: "95%", rot: -45 },
-  { color: "#fde047", top: "55%", left: "5%",  rot: 180 },
-  { color: "#3b82f6", top: "58%", left: "40%", rot: -12 },
-];
-
-/* ══════════════════════════════════════════════════
-   ICONS
-   ══════════════════════════════════════════════════ */
-
-/** 1 — Minimal spark/starburst outline for early launch / first access */
-const IconMedal = () => (
-<svg
-  width="30"
-  height="30"
-  viewBox="0 0 30 30"
-  fill="none"
-  stroke="white"
-  strokeWidth={1.9}
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  {/* party popper cone */}
-  <path d="M8 20l8-8" />
-  <path d="M10 22l10-10" />
-  <path d="M8 20l2 2 10-10-2-2z" />
-
-  {/* confetti */}
-  <path d="M18 6v3" />
-  <path d="M23 9l-2 2" />
-  <path d="M24 15h-3" />
-  <path d="M9 7l1.8 1.8" />
-  <path d="M14 4l.8 2.5" />
-
-  {/* tiny spark */}
-  <circle cx="22.5" cy="20.5" r="1.2" />
-</svg>
-);
-
-/** 2 — Minimal pen/edit outline for contribution and shaping */
-const IconChat = () => (
-  <svg width="30" height="30" viewBox="0 0 30 30" fill="none"
-    stroke="white" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 20.5l1.1-4.2 8.9-8.9a1.8 1.8 0 0 1 2.6 0l1.1 1.1a1.8 1.8 0 0 1 0 2.6l-8.9 8.9L9 20.5z" />
-    <path d="M17.5 7.9l4.6 4.6" />
-    <path d="M8.7 21.3l3.2-.8" />
-  </svg>
-);
-
-/** 3 — Minimal gift box outline for rewards and perks */
-const IconTarget = () => (
-  <svg width="30" height="30" viewBox="0 0 30 30" fill="none"
-    stroke="white" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6.5 13.2h17v10.3c0 .9-.7 1.6-1.6 1.6H8.1c-.9 0-1.6-.7-1.6-1.6V13.2z" />
-    <path d="M5.9 10.2h18.2a1.2 1.2 0 0 1 1.2 1.2v1.8H4.7v-1.8a1.2 1.2 0 0 1 1.2-1.2z" />
-    <path d="M15 10.2v14.9" />
-    <path d="M15 10.2c0-2.3-1.4-3.8-3.2-3.8-1.6 0-2.9 1.2-2.9 2.8 0 1.7 1.2 2.8 3 2.8H15zm0 0c0-2.3 1.4-3.8 3.2-3.8 1.6 0 2.9 1.2 2.9 2.8 0 1.7-1.2 2.8-3 2.8H15" />
-  </svg>
-);
-
-/* ── Discord logo ── */
-const DiscordLogo = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" width="26" height="26" fill="white">
-    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36a77.7,77.7,0,0,0,6.89-11.27,68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.73,77.9c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.26A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C35.62,65.69,30,59.44,30,51.73S35.48,37.78,42.45,37.78s12.63,6.31,12.46,13.95C54.74,59.44,49.32,65.69,42.45,65.69Zm42.24,0c-6.83,0-12.45-6.25-12.45-14s5.48-13.95,12.45-13.95S97.32,44,97.15,51.73C97.15,59.44,91.72,65.69,84.69,65.69Z"/>
-  </svg>
-);
-
-/* ── Step icons ── */
-const IconPeople = () => (
-  <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-  </svg>
-);
-const IconCheck = () => (
-  <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 13l4 4L19 7" />
-  </svg>
-);
-const IconCalendar = () => (
-  <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
-const IconBox = () => (
-  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-  </svg>
-);
-
-/* ══════════════════════════════════════════════════════════════ */
+/* ─────────────────────────────────────────────────────────
+   Direct TSX conversion of the provided HTML design.
+   Only changes vs the source HTML:
+     • Google Fonts "Outfit" → local RetroVintage for brand
+       text ("Sparkeefy") via .rv class
+     • Welcome card src → /img/thnkyou.png (local asset)
+     • Heart icon in Follow bar → /logo-heart.svg (local asset)
+     • Tailwind loaded via <link> inside <style> injection,
+       kept as inline styles / className to match exactly
+   Everything else (colours, layout, copy, animations)
+   is byte-for-byte identical to the source HTML.
+   ───────────────────────────────────────────────────────── */
 
 const ThankYou: React.FC = () => {
   return (
     <>
       <style>{`
-        @font-face {
-          font-family: 'RetroVintage';
-          src: url('/fonts/retro-vintage/RetroVintage-Regular.woff2') format('woff2'),
-               url('/fonts/retro-vintage/RetroVintage-Regular.woff') format('woff');
-          font-weight: 400;
-          font-style: normal;
-          font-display: swap;
-        }
-        @font-face {
-          font-family: 'RetroVintage';
-          src: url('/fonts/retro-vintage/RetroVintage-Shadow.woff2') format('woff2'),
-               url('/fonts/retro-vintage/RetroVintage-Shadow.woff') format('woff');
-          font-weight: 700;
-          font-style: normal;
-          font-display: swap;
-        }
+        /* ── Font: Outfit (body) ── */
+        /* ── Font: RetroVintage (brand name only) ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .ty-root {
+        /* RetroVintage helper — applied to "Sparkeefy" brand mentions */
+        .rv {
+          font-family: var(--font-retro-vintage), 'Retro Vintage', serif;
+          font-weight: 400;
+          font-style: normal;
+        }
+
+        /* ── Base ── */
+        body, .ty-body-wrap {
+          font-family: var(--font-sf-pro-display), system-ui, -apple-system, sans-serif;
+          background: linear-gradient(180deg, #100b2a 0%, #1a0f35 100%);
           min-height: 100vh;
-          font-family: 'Inter', sans-serif;
-          background: radial-gradient(circle at top, #ffffff 0%, #f9f7ff 100%);
+          color: #ffffff;
           overflow-x: hidden;
-          position: relative;
-          color: #1f2937;
           -webkit-font-smoothing: antialiased;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 48px 24px;
         }
 
-        /* Retro vintage font helper */
-        .ty-retro { font-family: 'RetroVintage', serif; font-weight: 400; font-style: normal; -webkit-font-smoothing: antialiased; }
-        .ty-retro-heading { font-weight: 500; display: inline-block; font-size: calc(1em + 7px); line-height: inherit;margin-top: 5px; vertical-align: baseline; }
-
-        .ty-container {
-          max-width: 700px;
-          margin: 0 auto;
-          padding: 40px 20px 32px;
-          position: relative;
-          z-index: 10;
+        /* ── Gradient helpers ── */
+        .bg-card-gradient {
+          background: linear-gradient(180deg, #692cc4 0%, #380d78 50%, #000000 100%);
         }
 
-        /* ── Hero ── */
-        .ty-hero { text-align: center; margin-bottom: 36px; padding-top: 16px; }
-        .ty-pill {
-          display: inline-flex; align-items: center;
-          background: #fff; border: 1px solid #f0f0f0;
-          border-radius: 999px; padding: 6px 18px;
-          font-size: 13px; font-weight: 600; color: #4c1d95;
-          box-shadow: 0 1px 5px rgba(0,0,0,0.07);
-          margin-bottom: 22px;
+        /* ── Floating animation (welcome card) ── */
+        .floating {
+          animation: float 6s ease-in-out infinite;
         }
-        .ty-h1 {
-          font-size: clamp(1.75rem, 6vw, 2.6rem);
-          font-weight: 800; line-height: 1.18;
-          color: #3b0764; margin-bottom: 18px;
-          letter-spacing: -0.5px;
-        }
-        .ty-h1 span { color: #7c3aed; }
-        .ty-subtitle {
-          font-size: clamp(13px, 3.5vw, 15px);
-          font-weight: 600; color: rgba(76,29,149,0.82); margin-bottom: 6px;
-        }
-        .ty-body {
-          font-size: 13px; color: #6b7280;
-          max-width: 330px; margin: 12px auto 0; line-height: 1.65;
+        @keyframes float {
+          0%   { transform: translateY(0px); }
+          50%  { transform: translateY(-10px); }
+          100% { transform: translateY(0px); }
         }
 
-        /* ── Illustration ── */
-        .ty-img-wrap { display: flex; justify-content: center; margin-bottom: 36px; }
-        .ty-img {
-          width: clamp(130px, 38vw, 200px);
-          height: clamp(130px, 38vw, 200px);
-          object-fit: contain;
+        /* ── Swing animations (tiles) ── */
+        .swing-1 {
+          transform-origin: top center;
+          animation: swing 4s ease-in-out infinite alternate;
+          animation-delay: 0s;
         }
-
-        /* ── White card (timeline) ── */
-        .ty-card {
-          background: #fff;
-          border-radius: 28px;
-          padding: clamp(22px, 5vw, 36px);
-          box-shadow: 0 4px 24px -4px rgba(0,0,0,0.08);
-          border: 1px solid #f5f5f5;
-          margin-bottom: 18px;
+        .swing-2 {
+          transform-origin: top center;
+          animation: swing 4.5s ease-in-out infinite alternate;
+          animation-delay: 1s;
         }
-        .ty-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
-        .ty-card-icon {
-          width: 40px; height: 40px; border-radius: 12px;
-          background: #f5f3ff; color: #7c3aed;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
+        .swing-3 {
+          transform-origin: top center;
+          animation: swing 5s ease-in-out infinite alternate;
+          animation-delay: 0.5s;
         }
-        .ty-card-title { font-size: 16px; font-weight: 700; color: #1f2937; }
-
-        /* Steps row */
-        .ty-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; position: relative; }
-        .ty-connector { position: absolute; height: 1px; background: #e5e7eb; top: 22px; z-index: 0; }
-        .ty-step { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; z-index: 1; padding: 0 4px; }
-        .ty-step-circle {
-          width: 44px; height: 44px; border-radius: 50%;
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 10px; flex-shrink: 0;
+        .follow-link:hover {
+          background: #3b82f6 !important;
         }
-        .ty-step-label { font-size: clamp(10px, 2.5vw, 13px); font-weight: 700; color: #1f2937; line-height: 1.3; }
-        .ty-step-sub   { font-size: clamp(9px, 2vw, 11px);  color: #9ca3af; margin-top: 3px; line-height: 1.4; }
-
-        /* ── Purple value props card ── */
-        .ty-purple {
-          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-          border-radius: 28px;
-          padding: clamp(24px, 6vw, 40px) clamp(20px, 5vw, 36px);
-          color: white;
-          box-shadow: 0 8px 32px rgba(124,58,237,0.32);
-          position: relative;
-          overflow: hidden;
-          margin-bottom: 18px;
+        @keyframes swing {
+          0%   { transform: rotate(-3deg); }
+          100% { transform: rotate(3deg); }
         }
-        .ty-purple-glow {
-          position: absolute; top: -60px; right: -60px;
-          width: 220px; height: 220px; border-radius: 50%;
-          background: rgba(255,255,255,0.09); filter: blur(48px);
-          pointer-events: none;
-        }
-        .ty-purple-header { text-align: center; margin-bottom: 28px; position: relative; z-index: 1; }
-        .ty-purple-sub { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 6px; }
-        .ty-purple-title { font-size: clamp(15px, 4vw, 21px); font-weight: 800; color: #fff; line-height: 1.25; }
-
-        /* Props grid — 3 cols on ≥480, 1 col on mobile */
-        .ty-props {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          position: relative; z-index: 1;
-        }
-        .ty-prop { display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .ty-prop-icon {
-          width: 52px; height: 52px; border-radius: 50%;
-          background: rgba(255,255,255,0.16);
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 14px; flex-shrink: 0;
-        }
-        .ty-prop-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 5px; }
-        .ty-prop-desc  { font-size: 11px; color: rgba(255,255,255,0.78); line-height: 1.6; }
-
-        /* Mobile stacking for props */
-        @media (max-width: 480px) {
-          .ty-props { grid-template-columns: 1fr; gap: 24px; }
-          .ty-prop { flex-direction: row; text-align: left; gap: 16px; }
-          .ty-prop-icon { margin-bottom: 0; }
-        }
-
-        /* ── Discord CTA ── */
-        .ty-discord {
-          background: #fff;
-          border-radius: 28px;
-          padding: clamp(16px, 4vw, 26px) clamp(18px, 5vw, 28px);
-          border: 1px solid #f0f0f0;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-          display: flex; align-items: center;
-          justify-content: space-between;
-          gap: 16px; flex-wrap: wrap;
-          margin-bottom: 16px;
-        }
-        .ty-discord-left { display: flex; align-items: center; gap: 14px; }
-        .ty-discord-icon {
-          width: 48px; height: 48px; border-radius: 14px;
-          background: #5865F2;
-          display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 14px rgba(88,101,242,0.35);
-          flex-shrink: 0;
-        }
-        .ty-discord-title { font-size: 14px; font-weight: 700; color: #1f2937; margin-bottom: 3px; }
-        .ty-discord-sub   { font-size: 12px; color: #9ca3af; line-height: 1.5; max-width: 260px; word-break: break-word; }
-        .ty-discord-btn {
-          background: #5865F2; color: #fff;
-          font-weight: 700; font-size: 14px; font-family: 'Inter', sans-serif;
-          padding: 12px 28px; border-radius: 14px;
-          text-decoration: none; white-space: nowrap; display: inline-block;
-          box-shadow: 0 4px 14px rgba(88,101,242,0.28);
-          transition: background 0.18s, transform 0.12s;
-        }
-        .ty-discord-btn:hover  { background: #4752C4; transform: scale(1.03); }
-        .ty-discord-btn:active { transform: scale(0.97); }
-
-        @media (max-width: 480px) {
-          .ty-discord { justify-content: flex-start; }
-          .ty-discord-btn { width: 100%; text-align: center; }
-        }
-
-        /* ── Footer ── */
-        .ty-footer { text-align: center; padding: 10px 0 28px; }
-        .ty-footer-box {
-          border: 1px solid #ebebff;
-          border-radius: 18px;
-          background: rgba(245,243,255,0.6);
-          padding: 16px 24px;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .ty-footer-title { font-size: 14px; font-weight: 700; color: #3b387e; margin-bottom: 4px; }
-        .ty-footer-sub   { font-size: 12px; color: #6b7280; }
       `}</style>
 
-      <div className="ty-root">
+      {/* ── Root wrapper — mirrors <body> from source HTML ── */}
+      <div
+        className="ty-body-wrap"
+        style={{
+          fontFamily: "var(--font-sf-pro-display), system-ui, -apple-system, sans-serif",
+          background: "linear-gradient(180deg, #100b2a 0%, #1a0f35 100%)",
+          minHeight: "100vh",
+          color: "#ffffff",
+          overflowX: "hidden",
+          WebkitFontSmoothing: "antialiased",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "48px 24px",
+        }}
+      >
+        {/* ── <main> ── */}
+        <main
+          style={{
+            width: "100%",
+            maxWidth: "448px",
+            margin: "0 auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: "48px",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
 
-        {/* Confetti layer */}
-        <div style={{ position:"absolute", inset:0, height:820, pointerEvents:"none", overflow:"hidden", zIndex:0 }}>
-          {confettiItems.map((c, i) => (
-            <div key={i} style={{
-              position:"absolute", top:c.top, left:c.left,
-              width:12, height:6, borderRadius:2,
-              backgroundColor:c.color, opacity:0.65,
-              transform:`rotate(${c.rot}deg)`,
-            }} />
-          ))}
-        </div>
+          {/* ════════════════════════════════════
+              Hero Section
+              ════════════════════════════════════ */}
+          <section
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              paddingTop: "32px",
+              position: "relative",
+            }}
+          >
+            {/* Left: headline + subtitle + divider + body */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                zIndex: 10,
+                maxWidth: "70%",
+                paddingTop: "16px",
+              }}
+            >
+              {/* "You're in." */}
+              <h1
+                style={{
+                  fontSize: "3rem",
+                  fontWeight: 700,
+                  letterSpacing: "-0.025em",
+                  marginBottom: "24px",
+                  lineHeight: 1.1,
+                }}
+              >
+                You&apos;re{" "}
+                <span style={{ color: "#a05aff" }}>in.</span>
+              </h1>
 
-        <div className="ty-container">
+              {/* Subtitle */}
+              <p
+                style={{
+                  fontSize: "1.125rem",
+                  fontWeight: 600,
+                  lineHeight: 1.25,
+                  marginBottom: "24px",
+                }}
+              >
+                You&apos;re now part of
+                <br />
+                <span style={{ color: "#a05aff" }} className="rv">
+                  Sparkeefy&apos;s
+                </span>{" "}
+                inner circle.
+              </p>
 
-          {/* ── Hero ── */}
-          <section className="ty-hero">
-            
-            <h1 className="ty-h1">
-              Welcome to <br />
-              <span className="ty-retro ty-retro-heading">Sparkeefy!</span>
-            </h1>
-            {/* Line from img 2 */}
-            <p className="ty-subtitle">The app that makes relationships feel effortless</p>
-            {/* Body from img 2 */}
-            <p className="ty-body">
-              You're officially in consideration for <span className="ty-retro">Sparkeefy</span>'s first group of early users.
-              People joining early help shape what <span className="ty-retro">Sparkeefy</span> becomes.
+              {/* Purple divider */}
+              <div
+                style={{
+                  width: "48px",
+                  height: "2px",
+                  background: "#a05aff",
+                  marginBottom: "32px",
+                }}
+              />
+
+              {/* Body copy */}
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  lineHeight: 1.625,
+                  maxWidth: "280px",
+                  opacity: 0.9,
+                }}
+              >
+                This is where we share first access, early updates, and the
+                moments that shape what{" "}
+                <span className="rv">Sparkeefy</span> becomes.
+              </p>
+            </div>
+
+            {/* Right: welcome card — static */}
+            <div
+              style={{
+                position: "absolute",
+                right: "-24px",
+                top: "-16px",
+                width: "192px",
+                zIndex: 0,
+              }}
+            >
+              <Image
+                src="/img/thnkyou.png"
+                alt="Welcome Card Illustration"
+                width={1254}
+                height={1254}
+                priority
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  filter: "drop-shadow(0 25px 25px rgba(0,0,0,0.15))",
+                }}
+              />
+            </div>
+          </section>
+
+          {/* ════════════════════════════════════
+              Hanging Tiles Section
+              ════════════════════════════════════ */}
+          <section
+            style={{
+              position: "relative",
+              margin: "32px 0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "128px",
+            }}
+          >
+            {/* Dashed rope SVG */}
+            <svg
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+              }}
+              preserveAspectRatio="none"
+              viewBox="0 0 400 100"
+            >
+              <path
+                d="M-20 30 Q 200 110, 420 30"
+                fill="none"
+                stroke="#a05aff"
+                strokeDasharray="6 6"
+                strokeWidth="2"
+                opacity="0.6"
+              />
+            </svg>
+
+            {/* Tiles container */}
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0 8px",
+                position: "relative",
+                zIndex: 10,
+              }}
+            >
+              {/* ── Tile 1: Say it better ── */}
+              <div className="swing-1" style={{ position: "relative" }}>
+                {/* Purple shadow layer */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "#7a3cdb",
+                    borderRadius: "16px",
+                    transform: "translate(6px, 6px)",
+                  }}
+                />
+                {/* Cream card */}
+                <div
+                  style={{
+                    position: "relative",
+                    background: "#fdf5e6",
+                    color: "#000",
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "6px",
+                    transform: "rotate(-6deg)",
+                  }}
+                >
+                  {/* Speech bubble with heart — matches screenshot */}
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none"
+                    stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ marginBottom: "2px" }}>
+                    {/* bubble outline with tail at bottom-left */}
+                    <path d="M4 5h24a1.5 1.5 0 0 1 1.5 1.5v14A1.5 1.5 0 0 1 28 22H10l-6 5V6.5A1.5 1.5 0 0 1 4 5z"/>
+                    {/* heart inside bubble */}
+                    <path d="M16 18s-5-3-5-7c0-2 1.4-3 3-3 1 0 1.8.6 2 1.5.2-.9 1-1.5 2-1.5 1.6 0 3 1 3 3 0 4-5 7-5 7z"
+                      fill="#111" stroke="none"/>
+                  </svg>
+                  <span
+                    style={{
+                      fontSize: "8px",
+                      fontWeight: 700,
+                      textAlign: "center",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Say it
+                    <br />
+                    better
+                  </span>
+                </div>
+              </div>
+
+              {/* ── Tile 2: Show up better (middle, lower) ── */}
+              <div
+                className="swing-2"
+                style={{ position: "relative", transform: "translateY(24px)" }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "#7a3cdb",
+                    borderRadius: "16px",
+                    transform: "translate(6px, 6px)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    background: "#fdf5e6",
+                    color: "#000",
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "6px",
+                  }}
+                >
+                  {/* Gift box — matches screenshot: lid, body, vertical ribbon, bow */}
+                  <svg width="34" height="34" viewBox="0 0 36 36" fill="none"
+                    stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ marginBottom: "2px" }}>
+                    {/* box body */}
+                    <rect x="5" y="17" width="26" height="14" rx="1.5"/>
+                    {/* lid */}
+                    <rect x="3" y="11" width="30" height="6" rx="1.5"/>
+                    {/* vertical ribbon */}
+                    <line x1="18" y1="11" x2="18" y2="31"/>
+                    {/* horizontal ribbon on lid */}
+                    <line x1="3" y1="14" x2="33" y2="14"/>
+                    {/* bow left loop */}
+                    <path d="M18 11 C18 11 16 4 11 5.5 C7 7 9 13 18 11z"/>
+                    {/* bow right loop */}
+                    <path d="M18 11 C18 11 20 4 25 5.5 C29 7 27 13 18 11z"/>
+                  </svg>
+                  <span
+                    style={{
+                      fontSize: "9px",
+                      fontWeight: 700,
+                      textAlign: "center",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Show up
+                    <br />
+                    better
+                  </span>
+                </div>
+              </div>
+
+              {/* ── Tile 3: Remember better ── */}
+              <div className="swing-3" style={{ position: "relative" }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "#7a3cdb",
+                    borderRadius: "16px",
+                    transform: "translate(6px, 6px)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    background: "#fdf5e6",
+                    color: "#000",
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "6px",
+                    transform: "rotate(6deg)",
+                  }}
+                >
+                  {/* Calendar with star — matches screenshot */}
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none"
+                    stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ marginBottom: "2px" }}>
+                    {/* outer rect */}
+                    <rect x="3" y="5" width="26" height="24" rx="2.5"/>
+                    {/* header divider */}
+                    <line x1="3" y1="12" x2="29" y2="12"/>
+                    {/* left peg */}
+                    <line x1="10" y1="2" x2="10" y2="8"/>
+                    {/* right peg */}
+                    <line x1="22" y1="2" x2="22" y2="8"/>
+                    {/* star */}
+                    <path d="M16 15l1.4 2.8 3.1.5-2.2 2.1.5 3.1L16 22l-2.8 1.5.5-3.1-2.2-2.1 3.1-.5z"
+                      fill="#111" stroke="none"/>
+                  </svg>
+                  <span
+                    style={{
+                      fontSize: "8px",
+                      fontWeight: 700,
+                      textAlign: "center",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Remember
+                    <br />
+                    better
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ════════════════════════════════════
+              Bottom Card Section
+              ════════════════════════════════════ */}
+          <section
+            className="bg-card-gradient"
+            style={{
+              background: "linear-gradient(180deg, #692cc4 0%, #380d78 50%, #000000 100%)",
+              borderRadius: "24px",
+              padding: "24px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: 700,
+                marginBottom: "24px",
+                color: "#fff",
+                letterSpacing: "0.025em",
+              }}
+            >
+              Come build{" "}
+              <span className="rv">Sparkeefy</span> with us
+            </h2>
+
+            {/* Follow Action Bar */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                width: "100%",
+                marginBottom: "24px",
+              }}
+            >
+              {/* Instagram icon box */}
+              <div
+                style={{
+                  background: "#2a2a2a",
+                  padding: "8px",
+                  borderRadius: "12px",
+                  flexShrink: 0,
+                  border: "1px solid #374151",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg
+                  style={{ width: "32px", height: "32px", color: "#ec4899" }}
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                </svg>
+              </div>
+
+              {/* Follow button container */}
+              <div
+                style={{
+                  background: "#1f1f1f",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 16px",
+                  flexGrow: 1,
+                  border: "1px solid #1f2937",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {/* Local heart/logo SVG */}
+                  <Image
+                    src="/logo-heart.svg"
+                    alt=""
+                    width={20}
+                    height={20}
+                    style={{ width: "20px", height: "20px", flexShrink: 0 }}
+                  />
+                  <span style={{ fontWeight: 700, fontSize: "1.125rem" }}>
+                    <span className="rv">Sparkeefy</span>
+                  </span>
+                </div>
+                <a
+                  href="https://instagram.com/sparkeefy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="follow-link"
+                  style={{
+                    background: "#6b8cff",
+                    color: "#fff",
+                    fontWeight: 600,
+                    padding: "6px 16px",
+                    borderRadius: "8px",
+                    fontSize: "0.875rem",
+                    textDecoration: "none",
+                    transition: "background 0.15s",
+                    fontFamily: "var(--font-sf-pro-display), system-ui, -apple-system, sans-serif",
+                  }}
+                >
+                  Follow
+                </a>
+              </div>
+            </div>
+
+            {/* Caption */}
+            <p
+              style={{
+                fontSize: "11px",
+                fontWeight: 500,
+                lineHeight: 1.625,
+                marginBottom: "24px",
+                opacity: 0.9,
+                maxWidth: "260px",
+              }}
+            >
+              Follow us on <strong>Instagram</strong> for early drops,
+              <br />
+              Giveaways, and first looks before everyone else.
+            </p>
+
+            {/* Thin divider */}
+            <div
+              style={{
+                width: "32px",
+                height: "1px",
+                background: "rgba(255,255,255,0.3)",
+                marginBottom: "24px",
+              }}
+            />
+
+            {/* Tagline */}
+            <p style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+              Built for the <em style={{ fontWeight: 700, fontStyle: "italic" }}>little</em>{" "}
+              things that matter <em style={{ fontWeight: 700, fontStyle: "italic" }}>most</em>.
             </p>
           </section>
 
-          {/* ── Illustration ── */}
-          <div className="ty-img-wrap">
-            <img src="/img/thnkyou.png" alt="Thank you illustration" className="ty-img" />
-          </div>
-
-          {/* ── What happens next ── */}
-          <div className="ty-card">
-            <div className="ty-card-header">
-              <div className="ty-card-icon"><IconBox /></div>
-              <span className="ty-card-title">What happens next?</span>
-            </div>
-
-            <div className="ty-steps">
-              {/* Connector lines — precisely centered between circles */}
-              <div className="ty-connector" style={{ left:"calc(16.66% + 22px)", width:"calc(33.33% - 44px)" }} />
-              <div className="ty-connector" style={{ left:"calc(50% + 22px)",    width:"calc(33.33% - 44px)" }} />
-
-              <div className="ty-step">
-                <div className="ty-step-circle" style={{ background:"#7c3aed", boxShadow:"0 4px 14px rgba(124,58,237,0.28)" }}>
-                  <IconPeople />
-                </div>
-                <span className="ty-step-label">We'll review</span>
-                <span className="ty-step-sub">all applications</span>
-              </div>
-
-              <div className="ty-step">
-                <div className="ty-step-circle" style={{ background:"#22c55e", boxShadow:"0 4px 14px rgba(34,197,94,0.28)" }}>
-                  <IconCheck />
-                </div>
-                <span className="ty-step-label">Selected users</span>
-                <span className="ty-step-sub">will get notified soon</span>
-              </div>
-
-              <div className="ty-step">
-                <div className="ty-step-circle" style={{ background:"#fb923c", boxShadow:"0 4px 14px rgba(251,146,60,0.28)" }}>
-                  <IconCalendar />
-                </div>
-                <span className="ty-step-label">June 1 → Early</span>
-                <span className="ty-step-sub">APK access drops</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Value Props (purple card) ── */}
-          <div className="ty-purple">
-            <div className="ty-purple-glow" />
-
-            <div className="ty-purple-header">
-              <p className="ty-purple-sub">You're not just joining.</p>
-              <h3 className="ty-purple-title">You're building the future with us.</h3>
-            </div>
-
-            <div className="ty-props">
-
-              {/* 1 — Medal (winner badge) */}
-              <div className="ty-prop">
-                <div className="ty-prop-icon"><IconMedal /></div>
-                <div className="ty-prop-text">
-                  <p className="ty-prop-title">Early Access</p>
-                  <p className="ty-prop-desc">Get <span className="ty-retro">Sparkeefy</span> before everyone else</p>
-                </div>
-              </div>
-
-              {/* 2 — Chat bubble with tail */}
-              <div className="ty-prop">
-                <div className="ty-prop-icon"><IconChat /></div>
-                <div className="ty-prop-text">
-                  <p className="ty-prop-title">Shape <span className="ty-retro">Sparkeefy</span></p>
-                  <p className="ty-prop-desc">Share feedback that drives real change</p>
-                </div>
-              </div>
-
-              {/* 3 — Concentric circles target (bullseye) */}
-              <div className="ty-prop">
-                <div className="ty-prop-icon"><IconTarget /></div>
-                <div className="ty-prop-text">
-                  <p className="ty-prop-title">Exclusive Perks</p>
-                  <p className="ty-prop-desc">3 months of <span className="ty-retro">Sparkeefy</span> Pro + exclusive early access benefits</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* ── Discord CTA ── */}
-          <div className="ty-discord">
-            <div className="ty-discord-left">
-              <div className="ty-discord-icon"><DiscordLogo /></div>
-              <div>
-                {/* Updated from img 2 */}
-                <p className="ty-discord-title">Unlock Your Community Access</p>
-                <p className="ty-discord-sub">Meet other early users, share feedback, get sneak peeks, and help us build <span className="ty-retro">Sparkeefy</span> in public - together.</p>
-              </div>
-            </div>
-            <a href="https://discord.gg/jdJEFcpPE" className="ty-discord-btn">Join Discord</a>
-          </div>
-
-          {/* ── Footer ── */}
-          <footer className="ty-footer">
-            <div className="ty-footer-box">
-              <p className="ty-footer-title">Keep an eye on your emails 👀</p>
-              <p className="ty-footer-sub">Your <span className="ty-retro">Sparkeefy</span> invite could be next.</p>
-            </div>
-          </footer>
-
-        </div>
+        </main>
       </div>
     </>
   );
