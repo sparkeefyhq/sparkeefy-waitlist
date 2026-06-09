@@ -526,11 +526,11 @@ const ThankYou: React.FC = () => {
                     style={{ width: "20px", height: "20px", flexShrink: 0 }}
                   />
                   <span style={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                    <span className="rv">Sparkeefy</span>
+                    <span className="rv">@Sparkeefy</span>
                   </span>
                 </div>
                 <a
-                  href="https://instagram.com/sparkeefy"
+                  href="https://www.instagram.com/sparkeefy/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="follow-link"
