@@ -25,9 +25,13 @@ const ThankYou: React.FC = () => {
         /* RetroVintage helper — applied to "Sparkeefy" brand mentions */
         .rv {
           font-family: var(--font-retro-vintage), 'Retro Vintage', serif;
-          font-weight: 400;
+          font-weight: 100 !important;
+          font-size: 1.15rem !important;
           font-style: normal;
+          font-synthesis: none;
         }
+
+
 
         /* ── Base ── */
         body, .ty-body-wrap {
@@ -198,16 +202,17 @@ const ThankYou: React.FC = () => {
                 position: "absolute",
                 right: "-24px",
                 top: "-16px",
-                width: "192px",
+                width: "170px",
                 zIndex: 0,
               }}
             >
               <Image
-                src="/img/thnkyou.png"
+                src="/img/thnkyou-new.png?v=3"
                 alt="Welcome Card Illustration"
                 width={1254}
                 height={1254}
                 priority
+                unoptimized={true}
                 style={{
                   width: "100%",
                   height: "auto",
@@ -511,22 +516,22 @@ const ThankYou: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "12px 16px",
+                  padding: "16px 8px 16px 20px",
                   flexGrow: 1,
                   border: "1px solid #1f2937",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   {/* Local heart/logo SVG */}
                   <Image
                     src="/logo-heart.svg"
                     alt=""
-                    width={20}
-                    height={20}
-                    style={{ width: "20px", height: "20px", flexShrink: 0 }}
+                    width={24}
+                    height={24}
+                    style={{ width: "24px", height: "24px", flexShrink: 0 }}
                   />
                   <span style={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                    <span className="rv">@Sparkeefy</span>
+                    @Sparkeefy
                   </span>
                 </div>
                 <a
@@ -538,9 +543,9 @@ const ThankYou: React.FC = () => {
                     background: "#6b8cff",
                     color: "#fff",
                     fontWeight: 600,
-                    padding: "6px 16px",
+                    padding: "8px 18px",
                     borderRadius: "8px",
-                    fontSize: "0.875rem",
+                    fontSize: "0.8rem",
                     textDecoration: "none",
                     transition: "background 0.15s",
                     fontFamily: "var(--font-sf-pro-display), system-ui, -apple-system, sans-serif",
