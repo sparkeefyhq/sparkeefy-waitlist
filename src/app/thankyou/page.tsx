@@ -22,14 +22,7 @@ const ThankYou: React.FC = () => {
         /* ── Font: RetroVintage (brand name only) ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* RetroVintage helper — applied to "Sparkeefy" brand mentions */
-        .rv {
-          font-family: var(--font-retro-vintage), 'Retro Vintage', serif;
-          font-weight: 100 !important;
-          font-size: 1.15rem !important;
-          font-style: normal;
-          font-synthesis: none;
-        }
+
 
 
 
@@ -164,7 +157,7 @@ const ThankYou: React.FC = () => {
               >
                 You&apos;re now part of
                 <br />
-                <span style={{ color: "#a05aff" }} className="rv">
+                <span style={{ color: "#a05aff" }}>
                   Sparkeefy&apos;s
                 </span>{" "}
                 inner circle.
@@ -192,7 +185,7 @@ const ThankYou: React.FC = () => {
               >
                 This is where we share first access, early updates, and the
                 moments that shape what{" "}
-                <span className="rv">Sparkeefy</span> becomes.
+                <span>Sparkeefy</span> becomes.
               </p>
             </div>
 
@@ -206,13 +199,9 @@ const ThankYou: React.FC = () => {
                 zIndex: 0,
               }}
             >
-              <Image
-                src="/img/thnkyou-new.png?v=3"
+              <img
+                src="/img/thnkyou-new.png?v=4"
                 alt="Welcome Card Illustration"
-                width={1254}
-                height={1254}
-                priority
-                unoptimized={true}
                 style={{
                   width: "100%",
                   height: "auto",
@@ -469,10 +458,15 @@ const ThankYou: React.FC = () => {
                 marginBottom: "24px",
                 color: "#fff",
                 letterSpacing: "0.025em",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
               }}
             >
-              Come build{" "}
-              <span className="rv">Sparkeefy</span> with us
+              <span>Come build</span>
+              <img src="/logo-text.svg" alt="Sparkeefy" style={{ height: "1.1em", width: "auto" }} />
+              <span>with us</span>
             </h2>
 
             {/* Follow Action Bar */}
@@ -516,9 +510,10 @@ const ThankYou: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "16px 8px 16px 20px",
+                  padding: "16px 12px",
                   flexGrow: 1,
                   border: "1px solid #1f2937",
+                  gap: "12px",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -530,7 +525,7 @@ const ThankYou: React.FC = () => {
                     height={24}
                     style={{ width: "24px", height: "24px", flexShrink: 0 }}
                   />
-                  <span style={{ fontWeight: 700, fontSize: "1.125rem" }}>
+                  <span style={{ fontWeight: 700, fontSize: "1rem" }}>
                     @Sparkeefy
                   </span>
                 </div>
@@ -543,12 +538,13 @@ const ThankYou: React.FC = () => {
                     background: "#6b8cff",
                     color: "#fff",
                     fontWeight: 600,
-                    padding: "8px 18px",
+                    padding: "8px 16px",
                     borderRadius: "8px",
                     fontSize: "0.8rem",
                     textDecoration: "none",
                     transition: "background 0.15s",
                     fontFamily: "var(--font-sf-pro-display), system-ui, -apple-system, sans-serif",
+                    flexShrink: 0,
                   }}
                 >
                   Follow
