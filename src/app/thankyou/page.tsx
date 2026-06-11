@@ -37,7 +37,7 @@ const ThankYou: React.FC = () => {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 48px 24px;
+          padding: 24px 24px;
         }
 
         /* ── Gradient helpers ── */
@@ -93,7 +93,7 @@ const ThankYou: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: "48px 24px",
+          padding: "24px 24px",
         }}
       >
         {/* ── <main> ── */}
@@ -200,7 +200,7 @@ const ThankYou: React.FC = () => {
               }}
             >
               <img
-                src="/img/thnkyou-new.png?v=4"
+                src="/img/thnkyou.jpeg"
                 alt="Welcome Card Illustration"
                 style={{
                   width: "100%",
@@ -217,7 +217,7 @@ const ThankYou: React.FC = () => {
           <section
             style={{
               position: "relative",
-              margin: "32px 0",
+              margin: "-26px 0 32px 0",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -439,6 +439,7 @@ const ThankYou: React.FC = () => {
           <section
             className="bg-card-gradient"
             style={{
+              marginTop: "-32px",
               background: "linear-gradient(180deg, #692cc4 0%, #380d78 50%, #000000 100%)",
               borderRadius: "24px",
               padding: "24px",
@@ -482,7 +483,7 @@ const ThankYou: React.FC = () => {
               {/* Instagram icon box */}
               <div
                 style={{
-                  background: "#2a2a2a",
+                  background: "#1e1d1dff",
                   padding: "8px",
                   borderRadius: "12px",
                   flexShrink: 0,
@@ -549,7 +550,7 @@ const ThankYou: React.FC = () => {
               {/* Follow button container */}
               <div
                 style={{
-                  background: "#1f1f1f",
+                  background: "#1e1d1dff",
                   borderRadius: "12px",
                   display: "flex",
                   alignItems: "center",
@@ -607,9 +608,9 @@ const ThankYou: React.FC = () => {
                 maxWidth: "260px",
               }}
             >
-              Follow us on <strong>Instagram</strong> for early drops,
+              Follow us on <strong>Instagram</strong> for Early Drops,
               <br />
-              Giveaways, and first looks before everyone else.
+              Giveaways, and First looks before everyone else.
             </p>
 
             {/* Thin divider */}
