@@ -7,6 +7,9 @@
  * magic link token). No emails are sent; restored users show up in /admin as
  * "welcome email not sent".
  *
+ * The backup has no signup dates, so restored users get RESTORED_CREATED_AT
+ * and a RESTORED_REMARK saying the date is approximate, visible in /admin.
+ *
  * Usage (from repo root):
  *   npm run restore-signups -- path/to/backup.csv           # dry run
  *   npm run restore-signups -- path/to/backup.csv --apply   # write to DB
@@ -21,6 +24,10 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, "..", ".env") });
+
+// Midday UTC so the date reads as Feb 19 in both India and US timezones.
+const RESTORED_CREATED_AT = new Date("2026-02-19T12:00:00Z");
+const RESTORED_REMARK = "Restored from backup - original date approx. Feb 19-20, 2026";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -82,11 +89,13 @@ async function main(): Promise<void> {
         async (code: string) => !!(await db.findUserByReferralCode(code)),
         5
       );
-      await db.createUser({
+      const user = await db.createUser({
         email,
         referralCode,
         magicLinkToken: await generateMagicLinkToken(),
+        additionalRemarks: RESTORED_REMARK,
       });
+      await db.updateUser(user.id, { createdAt: RESTORED_CREATED_AT });
       restored++;
     } catch (err) {
       failed++;
