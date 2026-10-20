@@ -10,6 +10,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, sql, and, asc, desc, count } from "drizzle-orm";
 import { Pool } from "pg";
+import { BULK_WELCOME_ELIGIBLE_SQL, REFERRAL_PUSH_ELIGIBLE_SQL } from "./eligibility";
 import type { WaitlistUser, Referral, CreateUserInput } from "../types";
 import {
   waitlistUsers,
@@ -28,9 +29,8 @@ const pool = new Pool({
 
 const drizzleDb = drizzle(pool);
 
-/** Who the bulk "Send all unsent" may email. Synthetic and restored rows never qualify. */
-const BULK_WELCOME_ELIGIBLE = sql`(welcome_email_sent_at IS NULL AND NOT is_synthetic
-  AND data_source = 'organic' AND welcome_email_status IS NULL)`;
+const BULK_WELCOME_ELIGIBLE = sql.raw(BULK_WELCOME_ELIGIBLE_SQL);
+const REFERRAL_PUSH_ELIGIBLE = sql.raw(REFERRAL_PUSH_ELIGIBLE_SQL);
 
 export type AdminStats = {
   totalSignups: number;
@@ -42,6 +42,15 @@ export type AdminStats = {
   imported: number;
   syntheticSignups: number;
   syntheticReferrals: number;
+  referralPushPending: number;
+};
+
+export type ReferralPushTarget = {
+  id: string;
+  email: string;
+  firstName: string | null;
+  referralCode: string;
+  referralCount: number;
 };
 
 export type AdminSignupRow = Omit<WaitlistUser, "magicLinkToken" | "updatedAt"> & {
@@ -280,6 +289,7 @@ export class DatabaseClient {
         count(*) FILTER (WHERE welcome_email_status = 'held_import' AND welcome_email_sent_at IS NULL)::int AS held_import,
         count(*) FILTER (WHERE data_source = 'historical_import')::int AS imported,
         count(*) FILTER (WHERE is_synthetic)::int AS synthetic_signups,
+        count(*) FILTER (WHERE ${REFERRAL_PUSH_ELIGIBLE})::int AS referral_push_pending,
         (SELECT count(*) FROM referrals WHERE data_source <> 'synthetic_seed')::int AS total_referrals,
         (SELECT count(*) FROM referrals WHERE data_source = 'synthetic_seed')::int AS synthetic_referrals
       FROM waitlist_users`);
@@ -294,6 +304,7 @@ export class DatabaseClient {
       imported: r.imported,
       syntheticSignups: r.synthetic_signups,
       syntheticReferrals: r.synthetic_referrals,
+      referralPushPending: r.referral_push_pending,
     };
   }
 
@@ -352,6 +363,31 @@ export class DatabaseClient {
       .orderBy(asc(waitlistUsers.createdAt))
       .limit(limit);
     return rows as WaitlistUser[];
+  }
+
+  /** Next batch for the referral push email, with each user's referral count. */
+  async listReferralPushEligible(limit: number): Promise<ReferralPushTarget[]> {
+    const result = await this._db.execute(sql`
+      SELECT u.id, u.email, u.first_name, u.referral_code,
+             (SELECT count(*) FROM referrals r WHERE r.referrer_id = u.id)::int AS referral_count
+        FROM waitlist_users u
+       WHERE ${REFERRAL_PUSH_ELIGIBLE}
+       ORDER BY u.created_at ASC
+       LIMIT ${limit}`);
+    return (result.rows as Record<string, unknown>[]).map((r) => ({
+      id: r.id as string,
+      email: r.email as string,
+      firstName: r.first_name as string | null,
+      referralCode: r.referral_code as string,
+      referralCount: r.referral_count as number,
+    }));
+  }
+
+  async markReferralPushSent(id: string): Promise<void> {
+    await this._db
+      .update(waitlistUsers)
+      .set({ referralPushSentAt: new Date() })
+      .where(eq(waitlistUsers.id, id));
   }
 
   /** Archive the row and its referrals, then delete, in one transaction. */

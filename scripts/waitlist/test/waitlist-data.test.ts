@@ -15,6 +15,7 @@ import { applyImport, parseTimestamp, planImport, type ImportOptions } from "../
 import { rollbackBatch } from "../lib/batches.ts";
 import { initEnvironment, seedSynthetic } from "../lib/seed.ts";
 import { planReferralDegrees, planSynthetic, type ExistingState } from "../lib/synthetic.ts";
+import { BULK_WELCOME_ELIGIBLE_SQL, REFERRAL_PUSH_ELIGIBLE_SQL } from "../../../src/lib/db/eligibility.ts";
 
 const ADMIN_URL = process.env.TEST_PG_URL ?? "postgresql://sparkeefy@localhost:55432/postgres";
 const DB_NAME = `waitlist_test_${process.pid}`;
@@ -43,6 +44,7 @@ before(async () => {
   db = connect(url.toString());
   await db.query(readFileSync(join(dir, "base-schema.sql"), "utf8"));
   await db.query(readFileSync(join(dir, "..", "..", "..", "src/lib/db/sql/0001_data_integrity.sql"), "utf8"));
+  await db.query(readFileSync(join(dir, "..", "..", "..", "src/lib/db/sql/0002_referral_push.sql"), "utf8"));
 });
 
 after(async () => {
@@ -224,5 +226,31 @@ describe("synthetic seeding", () => {
                 VALUES ('real.person@gmail.com', 'Qq2wE3rT', repeat('b', 64), 'synthetic_seed', true, '22222222-2222-4222-8222-222222222222', 'suppressed_synthetic')`),
       /synthetic_email_chk/
     );
+  });
+});
+
+describe("email eligibility (same SQL the admin uses)", () => {
+  const eligible = async (cond: string) =>
+    (await db.query(`SELECT email FROM waitlist_users WHERE ${cond} ORDER BY email`)).rows.map((r) => r.email);
+
+  test("referral push: only real, opted-in, welcomed, not-yet-pushed users", async () => {
+    await db.query(`DELETE FROM waitlist_users`);
+    await db.query(`DELETE FROM import_batches`);
+    const ins = (email: string, optIn: boolean, welcomed: boolean, pushed: boolean) =>
+      db.query(
+        `INSERT INTO waitlist_users (email, referral_code, magic_link_token, marketing_opt_in, welcome_email_sent_at, referral_push_sent_at)
+         VALUES ($1::text, substr(md5($1::text), 1, 8), md5($1::text) || md5($1::text || 'x'), $2, CASE WHEN $3 THEN now() END, CASE WHEN $4 THEN now() END)`,
+        [email, optIn, welcomed, pushed]
+      );
+    await ins("yes@example.com", true, true, false);
+    await ins("no-optin@example.com", false, true, false);
+    await ins("not-welcomed@example.com", true, false, false);
+    await ins("already-pushed@example.com", true, true, true);
+    await initEnvironment(db, "local", "test");
+    await seedSynthetic(db, { seed: "elig", targets: { total: 54, referrals: 10, last7: 6, spikeTotal: 0 }, dryRun: false, operator: "test" });
+
+    assert.deepEqual(await eligible(REFERRAL_PUSH_ELIGIBLE_SQL), ["yes@example.com"]);
+    // Welcome bulk send: never synthetic, never already sent.
+    assert.deepEqual(await eligible(BULK_WELCOME_ELIGIBLE_SQL), ["not-welcomed@example.com"]);
   });
 });

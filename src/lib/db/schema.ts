@@ -71,6 +71,8 @@ export const waitlistUsers = pgTable(
     importedAt: timestamp("imported_at", { mode: "date" }),
     // null = normal; 'held_import' = restored, not auto-sent; 'suppressed_synthetic' = never send
     welcomeEmailStatus: varchar("welcome_email_status", { length: 32 }),
+    // When the "invite friends" referral email was sent (migration 0002).
+    referralPushSentAt: timestamp("referral_push_sent_at", { mode: "date" }),
   },
   (table) => [
     index("waitlist_users_email_idx").on(table.email),
