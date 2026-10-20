@@ -12,7 +12,7 @@ import { createHash } from "crypto";
 import { db } from "@/lib/db/client";
 import { emailService } from "@/lib/services/EmailService";
 import { buildMagicLinkUrl, buildAbsoluteReferralLink } from "@/lib/utils/links";
-import type { AdminSignupRow, AdminStats } from "@/lib/db/client";
+import type { AdminSignupRow } from "@/lib/db/client";
 
 const ADMIN_COOKIE_NAME = "admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -56,52 +56,49 @@ export async function logoutAdmin(): Promise<never> {
   redirect("/admin/login");
 }
 
-export type { AdminSignupRow, AdminStats } from "@/lib/db/client";
+export type { AdminSignupRow } from "@/lib/db/client";
 
-const ADMIN_PAGE_SIZE = 50;
-const SOURCES = ["organic", "historical_import", "synthetic_seed"] as const;
+/** Rows per admin page (backend pagination). */
+const ADMIN_PAGE_SIZE = 100;
+/** Upper bound for the bulk welcome send. */
+const ADMIN_MAX_ROWS = 20000;
 
 export type AdminSignupData = {
   users: AdminSignupRow[];
-  stats: AdminStats;
+  totalSignups: number;
+  totalReferrals: number;
+  signupsLast7Days: number;
+  /** Welcome emails: sent / real signups; synthetic rows are excluded (suppressed). */
+  welcomeSent: number;
+  bulkUnsent: number;
+  syntheticSignups: number;
+  syntheticReferrals: number;
   page: number;
   pageCount: number;
-  matching: number;
-  query: string;
-  source: string | null;
 };
 
-/** One page of signups plus dashboard metrics, all computed in SQL. */
-export async function getAdminSignupData(params: {
-  page?: number;
-  query?: string;
-  source?: string;
-} = {}): Promise<AdminSignupData | null> {
+/** One page of signups plus dashboard metrics, computed in SQL (no per-user queries). */
+export async function getAdminSignupData(requestedPage = 1): Promise<AdminSignupData | null> {
   const ok = await verifyAdminCookie();
   if (!ok) return null;
 
-  const query = (params.query ?? "").trim().slice(0, 100);
-  const source = SOURCES.find((s) => s === params.source) ?? null;
-  const page = Math.max(1, Math.floor(params.page ?? 1));
-
+  const page = Math.max(1, Math.floor(requestedPage) || 1);
   const [stats, list] = await Promise.all([
     db.getAdminStats(),
-    db.listAdminSignups({
-      limit: ADMIN_PAGE_SIZE,
-      offset: (page - 1) * ADMIN_PAGE_SIZE,
-      query: query || undefined,
-      source: source ?? undefined,
-    }),
+    db.listAdminSignups({ limit: ADMIN_PAGE_SIZE, offset: (page - 1) * ADMIN_PAGE_SIZE }),
   ]);
 
   return {
     users: list.rows,
-    stats,
+    totalSignups: stats.totalSignups,
+    totalReferrals: stats.totalReferrals,
+    signupsLast7Days: stats.signupsLast7Days,
+    welcomeSent: stats.welcomeSent,
+    bulkUnsent: stats.bulkUnsent,
+    syntheticSignups: stats.syntheticSignups,
+    syntheticReferrals: stats.syntheticReferrals,
     page,
     pageCount: Math.max(1, Math.ceil(list.total / ADMIN_PAGE_SIZE)),
-    matching: list.total,
-    query,
-    source,
   };
 }
 
@@ -158,12 +155,8 @@ export async function sendWelcomeEmailAction(
   }
 }
 
-/** Per click, to stay well inside the serverless request time limit. */
-const BULK_SEND_LIMIT = 100;
-
 export type BulkEmailResult = {
   total: number;
-  remaining: number;
   sent: number;
   failed: number;
   errors: Array<{ email: string; error: string }>;
@@ -183,11 +176,10 @@ export async function sendAllWelcomeEmailsAction(): Promise<
   }
 
   // Only organic, real, never-emailed users; restored and synthetic rows are excluded.
-  const unsent = await db.listBulkWelcomeEligible(BULK_SEND_LIMIT);
+  const unsent = await db.listBulkWelcomeEligible(ADMIN_MAX_ROWS);
 
   const result: BulkEmailResult = {
     total: unsent.length,
-    remaining: 0,
     sent: 0,
     failed: 0,
     errors: [],
@@ -212,7 +204,6 @@ export async function sendAllWelcomeEmailsAction(): Promise<
     }
   }
 
-  result.remaining = (await db.getAdminStats()).bulkUnsent;
   revalidatePath("/admin");
   return { success: true, data: result };
 }
