@@ -9,7 +9,6 @@
 
 import { Resend } from "resend";
 import { WelcomeEmail } from "@/emails/WelcomeEmail";
-import { ReferralPushEmail } from "@/emails/ReferralPushEmail";
 
 export interface WelcomeEmailData {
   email: string;
@@ -20,20 +19,6 @@ export interface WelcomeEmailData {
 
 /** Re-export under the old name so existing imports keep working */
 export type MagicLinkEmailData = WelcomeEmailData;
-
-export interface ReferralPushEmailData {
-  email: string;
-  firstName: string | null;
-  referralLink: string;
-  referralCount: number;
-}
-
-/** Reserved test domains (synthetic staging data) are never emailed. */
-function assertDeliverable(email: string): void {
-  if (/\.test$/i.test(email.trim())) {
-    throw new Error("Refusing to email a reserved .test address (synthetic data).");
-  }
-}
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -53,7 +38,10 @@ class EmailService {
         "Email sending is not configured. Set RESEND_API_KEY in your environment."
       );
     }
-    assertDeliverable(data.email);
+    // Reserved test domains (synthetic staging data) are never emailed.
+    if (/\.test$/i.test(data.email.trim())) {
+      throw new Error("Refusing to email a reserved .test address (synthetic data).");
+    }
 
     const { data: result, error } = await resend.emails.send({
       from: DEFAULT_FROM,
@@ -75,28 +63,6 @@ class EmailService {
   }
 
   /** Backwards-compatible alias used by the join flow. */
-  async sendReferralPushEmail(data: ReferralPushEmailData): Promise<{ id: string }> {
-    if (!resend) {
-      throw new Error(
-        "Email sending is not configured. Set RESEND_API_KEY in your environment."
-      );
-    }
-    assertDeliverable(data.email);
-
-    const { data: result, error } = await resend.emails.send({
-      from: DEFAULT_FROM,
-      to: data.email,
-      subject: "Invite friends to Sparkeefy and get in sooner",
-      react: ReferralPushEmail(data),
-    });
-
-    if (error) {
-      throw new Error(`Resend error: ${error.message}`);
-    }
-
-    return { id: result?.id ?? "unknown" };
-  }
-
   async sendMagicLinkEmail(
     data: MagicLinkEmailData
   ): Promise<{ sent: boolean; id?: string; error?: string }> {

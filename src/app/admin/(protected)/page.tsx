@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAdminSignupData, deleteSignup, sendReferralPushAction } from "../actions";
+import { getAdminSignupData, deleteSignup } from "../actions";
 import type { AdminSignupRow } from "../actions";
 import { SendEmailButton } from "@/components/admin/SendEmailButton";
 import { SendAllEmailsButton } from "@/components/admin/SendAllEmailsButton";
@@ -109,23 +109,6 @@ export default async function AdminDashboardPage({
               ` · ${stats.heldImport} restored signup${stats.heldImport === 1 ? "" : "s"} held (send individually)`}
           </p>
           <SendAllEmailsButton unsentCount={unsentCount} />
-        </section>
-      )}
-
-      {/* Referral push bar */}
-      {totalSignups > 0 && (
-        <section className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
-          <p className="text-sm text-muted-foreground">
-            {stats.referralPushPending > 0
-              ? `Referral email: ${stats.referralPushPending} opted-in user${stats.referralPushPending === 1 ? "" : "s"} not yet invited to share (sends 100 per click)`
-              : "Referral email: every opted-in user has been invited to share"}
-          </p>
-          <SendAllEmailsButton
-            unsentCount={stats.referralPushPending}
-            action={sendReferralPushAction}
-            label="Send referral email"
-            doneLabel="Referral email sent to everyone eligible"
-          />
         </section>
       )}
 

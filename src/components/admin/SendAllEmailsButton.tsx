@@ -4,19 +4,7 @@ import { useState, useTransition } from "react";
 import { sendAllWelcomeEmailsAction } from "@/app/admin/actions";
 import type { BulkEmailResult } from "@/app/admin/actions";
 
-type BulkAction = () => Promise<{ success: boolean; data?: BulkEmailResult; error?: string }>;
-
-export function SendAllEmailsButton({
-  unsentCount,
-  action = sendAllWelcomeEmailsAction,
-  label = "Send all unsent",
-  doneLabel = "All welcome emails sent",
-}: {
-  unsentCount: number;
-  action?: BulkAction;
-  label?: string;
-  doneLabel?: string;
-}) {
+export function SendAllEmailsButton({ unsentCount }: { unsentCount: number }) {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<BulkEmailResult | null>(null);
   const [error, setError] = useState("");
@@ -25,7 +13,7 @@ export function SendAllEmailsButton({
   if (unsentCount === 0 && !result) {
     return (
       <span className="text-xs text-muted-foreground">
-        {doneLabel}
+        All welcome emails sent
       </span>
     );
   }
@@ -41,7 +29,7 @@ export function SendAllEmailsButton({
     setResult(null);
 
     startTransition(async () => {
-      const res = await action();
+      const res = await sendAllWelcomeEmailsAction();
       if (res.success && res.data) {
         setResult(res.data);
       } else {
@@ -99,7 +87,7 @@ export function SendAllEmailsButton({
             <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
               <path d="M1.75 2h12.5a.75.75 0 0 1 .721.544l-6.97 4.39-6.972-4.39A.75.75 0 0 1 1.75 2ZM1 3.788v8.462A.75.75 0 0 0 1.75 13h12.5a.75.75 0 0 0 .75-.75V3.788l-6.692 4.214a.75.75 0 0 1-.816 0L1 3.788Z" />
             </svg>
-            {label} ({unsentCount})
+            Send all unsent ({unsentCount})
           </>
         )}
       </button>
