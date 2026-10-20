@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# waitlist import backups and per-row reports (contain emails)
+.backups/

@@ -98,6 +98,9 @@ export function SendAllEmailsButton({ unsentCount }: { unsentCount: number }) {
           {result.failed > 0 && (
             <span className="text-red-500"> · {result.failed} failed</span>
           )}
+          {result.remaining > 0 && (
+            <span className="text-muted-foreground"> · {result.remaining} still pending</span>
+          )}
         </span>
       )}
 

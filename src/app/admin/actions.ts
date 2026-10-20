@@ -12,7 +12,7 @@ import { createHash } from "crypto";
 import { db } from "@/lib/db/client";
 import { emailService } from "@/lib/services/EmailService";
 import { buildMagicLinkUrl, buildAbsoluteReferralLink } from "@/lib/utils/links";
-import type { WaitlistUser } from "@/lib/types";
+import type { AdminSignupRow, AdminStats } from "@/lib/db/client";
 
 const ADMIN_COOKIE_NAME = "admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -56,38 +56,52 @@ export async function logoutAdmin(): Promise<never> {
   redirect("/admin/login");
 }
 
-export type AdminSignupRow = WaitlistUser & { referralCount: number };
+export type { AdminSignupRow, AdminStats } from "@/lib/db/client";
+
+const ADMIN_PAGE_SIZE = 50;
+const SOURCES = ["organic", "historical_import", "synthetic_seed"] as const;
 
 export type AdminSignupData = {
   users: AdminSignupRow[];
-  totalSignups: number;
-  totalReferrals: number;
-  signupsLast7Days: number;
+  stats: AdminStats;
+  page: number;
+  pageCount: number;
+  matching: number;
+  query: string;
+  source: string | null;
 };
 
-export async function getAdminSignupData(): Promise<AdminSignupData | null> {
+/** One page of signups plus dashboard metrics, all computed in SQL. */
+export async function getAdminSignupData(params: {
+  page?: number;
+  query?: string;
+  source?: string;
+} = {}): Promise<AdminSignupData | null> {
   const ok = await verifyAdminCookie();
   if (!ok) return null;
 
-  const users = await db.listWaitlistUsers();
-  const totalReferrals = await db.countAllReferrals();
-  const now = Date.now();
-  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const query = (params.query ?? "").trim().slice(0, 100);
+  const source = SOURCES.find((s) => s === params.source) ?? null;
+  const page = Math.max(1, Math.floor(params.page ?? 1));
 
-  const rows: AdminSignupRow[] = [];
-  let signupsLast7Days = 0;
-  for (const user of users) {
-    const count = await db.countUserReferrals(user.id);
-    const created = user.createdAt instanceof Date ? user.createdAt.getTime() : new Date(user.createdAt).getTime();
-    if (created >= sevenDaysAgo) signupsLast7Days++;
-    rows.push({ ...user, referralCount: count });
-  }
+  const [stats, list] = await Promise.all([
+    db.getAdminStats(),
+    db.listAdminSignups({
+      limit: ADMIN_PAGE_SIZE,
+      offset: (page - 1) * ADMIN_PAGE_SIZE,
+      query: query || undefined,
+      source: source ?? undefined,
+    }),
+  ]);
 
   return {
-    users: rows,
-    totalSignups: rows.length,
-    totalReferrals,
-    signupsLast7Days,
+    users: list.rows,
+    stats,
+    page,
+    pageCount: Math.max(1, Math.ceil(list.total / ADMIN_PAGE_SIZE)),
+    matching: list.total,
+    query,
+    source,
   };
 }
 
@@ -98,7 +112,8 @@ export async function deleteSignup(formData: FormData): Promise<void> {
   const id = formData.get("id");
   if (typeof id !== "string" || !id) return;
 
-  await db.deleteUser(id);
+  // Archived first (waitlist_deletions), so a delete can always be undone.
+  await db.deleteUserWithArchive(id);
   redirect("/admin");
 }
 
@@ -121,6 +136,9 @@ export async function sendWelcomeEmailAction(
 
   const user = await db.findUserById(userId);
   if (!user) return { success: false, error: "User not found" };
+  if (user.isSynthetic) {
+    return { success: false, error: "Synthetic test row: emails are suppressed" };
+  }
 
   try {
     await emailService.sendWelcomeEmail({
@@ -140,8 +158,12 @@ export async function sendWelcomeEmailAction(
   }
 }
 
+/** Per click, to stay well inside the serverless request time limit. */
+const BULK_SEND_LIMIT = 100;
+
 export type BulkEmailResult = {
   total: number;
+  remaining: number;
   sent: number;
   failed: number;
   errors: Array<{ email: string; error: string }>;
@@ -160,11 +182,12 @@ export async function sendAllWelcomeEmailsAction(): Promise<
     };
   }
 
-  const users = await db.listWaitlistUsers();
-  const unsent = users.filter((u) => !u.welcomeEmailSentAt);
+  // Only organic, real, never-emailed users; restored and synthetic rows are excluded.
+  const unsent = await db.listBulkWelcomeEligible(BULK_SEND_LIMIT);
 
   const result: BulkEmailResult = {
     total: unsent.length,
+    remaining: 0,
     sent: 0,
     failed: 0,
     errors: [],
@@ -189,6 +212,7 @@ export async function sendAllWelcomeEmailsAction(): Promise<
     }
   }
 
+  result.remaining = (await db.getAdminStats()).bulkUnsent;
   revalidatePath("/admin");
   return { success: true, data: result };
 }
