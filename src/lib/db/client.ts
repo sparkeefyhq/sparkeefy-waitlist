@@ -39,6 +39,13 @@ export type BackupListRow = {
   backupReferralCount: number;
 };
 
+export type AllEmailRow = {
+  email: string;
+  at: Date | null;
+  referrals: number;
+  source: "signup" | "backup sheet";
+};
+
 export type AdminStats = {
   totalSignups: number;
   totalReferrals: number;
@@ -333,6 +340,47 @@ export class DatabaseClient {
       })),
       total: t.n,
       referralTotal: t.referrals,
+    };
+  }
+
+  /**
+   * Every email in one list: real signups and the backup list, newest first,
+   * each tagged with where it came from. For viewing and export only; the
+   * signup numbers and email sends still read waitlist_users alone.
+   */
+  async listAllEmails(options: { limit?: number; offset?: number }): Promise<{
+    rows: AllEmailRow[];
+    total: number;
+    signups: number;
+    backup: number;
+  }> {
+    const combined = sql`
+      SELECT u.email, (u.created_at AT TIME ZONE 'UTC') AS at,
+             (SELECT count(*) FROM referrals r WHERE r.referrer_id = u.id)::int AS referrals,
+             'signup' AS source
+        FROM waitlist_users u WHERE NOT u.is_synthetic
+      UNION ALL
+      SELECT b.email, (b.backup_signed_up_at AT TIME ZONE 'UTC'), b.backup_referral_count, 'backup sheet'
+        FROM backup_list b`;
+    const [page, totals] = await Promise.all([
+      this._db.execute(sql`
+        SELECT * FROM (${combined}) AS e ORDER BY e.at DESC NULLS LAST, e.email
+        ${options.limit === undefined ? sql`` : sql`LIMIT ${options.limit} OFFSET ${options.offset ?? 0}`}`),
+      this._db.execute(sql`
+        SELECT (SELECT count(*) FROM waitlist_users WHERE NOT is_synthetic)::int AS signups,
+               (SELECT count(*) FROM backup_list)::int AS backup`),
+    ]);
+    const t = totals.rows[0] as { signups: number; backup: number };
+    return {
+      rows: (page.rows as Record<string, unknown>[]).map((r) => ({
+        email: r.email as string,
+        at: r.at === null ? null : new Date(r.at as string),
+        referrals: r.referrals as number,
+        source: r.source as AllEmailRow["source"],
+      })),
+      total: t.signups + t.backup,
+      signups: t.signups,
+      backup: t.backup,
     };
   }
 
