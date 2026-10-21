@@ -32,6 +32,13 @@ const drizzleDb = drizzle(pool);
 const BULK_WELCOME_ELIGIBLE = sql`(welcome_email_sent_at IS NULL AND NOT is_synthetic
   AND data_source = 'organic' AND welcome_email_status IS NULL)`;
 
+export type BackupListRow = {
+  id: number;
+  email: string;
+  backupSignedUpAt: Date | null;
+  backupReferralCount: number;
+};
+
 export type AdminStats = {
   totalSignups: number;
   totalReferrals: number;
@@ -294,6 +301,38 @@ export class DatabaseClient {
       imported: r.imported,
       syntheticSignups: r.synthetic_signups,
       syntheticReferrals: r.synthetic_referrals,
+    };
+  }
+
+  /**
+   * One page of the backup list (21 Oct xlsx), newest backup date first, plus its
+   * totals. Separate table: never part of the signup/referral numbers or emails.
+   */
+  async listBackupList(options: { limit: number; offset: number }): Promise<{
+    rows: BackupListRow[];
+    total: number;
+    referralTotal: number;
+  }> {
+    const [page, totals] = await Promise.all([
+      this._db.execute(sql`
+        SELECT id, email, (backup_signed_up_at AT TIME ZONE 'UTC') AS backup_signed_up_at, backup_referral_count
+          FROM backup_list
+         ORDER BY backup_signed_up_at DESC NULLS LAST, id
+         LIMIT ${options.limit} OFFSET ${options.offset}`),
+      this._db.execute(sql`
+        SELECT count(*)::int AS n, coalesce(sum(backup_referral_count), 0)::int AS referrals
+          FROM backup_list`),
+    ]);
+    const t = totals.rows[0] as { n: number; referrals: number };
+    return {
+      rows: (page.rows as Record<string, unknown>[]).map((r) => ({
+        id: r.id as number,
+        email: r.email as string,
+        backupSignedUpAt: r.backup_signed_up_at === null ? null : new Date(r.backup_signed_up_at as string),
+        backupReferralCount: r.backup_referral_count as number,
+      })),
+      total: t.n,
+      referralTotal: t.referrals,
     };
   }
 

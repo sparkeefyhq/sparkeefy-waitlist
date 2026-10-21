@@ -20,6 +20,7 @@
     "waitlist:validate": "node scripts/waitlist/validate.ts",
     "waitlist:import": "node scripts/waitlist/import.ts",
     "waitlist:seed": "node scripts/waitlist/seed-synthetic.ts",
+    "waitlist:backup-list": "node scripts/waitlist/import-backup-list.ts",
     "email:dev": "email dev --dir src/emails",
     "sync-welcome-sent": "npx tsx scripts/sync-welcome-sent-from-resend.ts",
     "reconcile-welcome-sent": "npx tsx scripts/reconcile-welcome-sent-status-from-resend.ts"

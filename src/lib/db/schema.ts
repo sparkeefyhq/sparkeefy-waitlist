@@ -12,6 +12,7 @@ import {
   index,
   uniqueIndex,
   integer,
+  serial,
   jsonb,
   text,
   char,
@@ -135,4 +136,17 @@ export const waitlistDeletions = pgTable("waitlist_deletions", {
   deletedBy: varchar("deleted_by", { length: 100 }).notNull().default("admin"),
   deletedAt: timestamp("deleted_at", { mode: "date" }).notNull().defaultNow(),
   restoredAt: timestamp("restored_at", { mode: "date" }),
+});
+
+// ============================================================================
+// BACKUP LIST (21 Oct xlsx; shown on /admin, never counted or emailed)
+// ============================================================================
+
+export const backupList = pgTable("backup_list", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  backupSignedUpAt: timestamp("backup_signed_up_at", { mode: "date" }),
+  backupReferralCount: integer("backup_referral_count").notNull().default(0),
+  source: varchar("source", { length: 255 }).notNull(),
+  importedAt: timestamp("imported_at", { mode: "date" }).notNull().defaultNow(),
 });

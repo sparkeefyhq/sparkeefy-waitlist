@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAdminSignupData, deleteSignup } from "../actions";
+import { getAdminSignupData, getAdminBackupList, deleteSignup } from "../actions";
 import type { AdminSignupRow } from "../actions";
 import { SendEmailButton } from "@/components/admin/SendEmailButton";
 import { SendAllEmailsButton } from "@/components/admin/SendAllEmailsButton";
@@ -28,10 +28,14 @@ function displayName(row: AdminSignupRow): string {
 export default async function AdminDashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; bpage?: string }>;
 }) {
-  const data = await getAdminSignupData(Number((await searchParams).page) || 1);
-  if (!data) {
+  const params = await searchParams;
+  const [data, backup] = await Promise.all([
+    getAdminSignupData(Number(params.page) || 1),
+    getAdminBackupList(Number(params.bpage) || 1),
+  ]);
+  if (!data || !backup) {
     redirect("/admin/login");
   }
 
@@ -178,6 +182,58 @@ export default async function AdminDashboardPage({
           </span>
           {data.page < data.pageCount ? <a href={`/admin?page=${data.page + 1}`}>Older →</a> : <span />}
         </nav>
+      )}
+
+      {backup.total > 0 && (
+        <>
+          <h2 className="pt-4 text-xl font-semibold">Backup list</h2>
+          <p className="text-sm text-muted-foreground">
+            {backup.total} emails and {backup.referralTotal} referrals from the 21 Oct backup file.
+            Listed separately: not included in the numbers above and never emailed.
+          </p>
+          <section className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full min-w-[600px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium text-right">Referrals</th>
+                  <th className="px-4 py-3 font-medium">Signed up (backup)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {backup.rows.map((row, i) => (
+                  <tr
+                    key={row.id}
+                    className={i % 2 === 0 ? "border-b border-border" : "border-b border-border bg-muted/20"}
+                  >
+                    <td className="px-4 py-3">{row.email}</td>
+                    <td className="px-4 py-3 text-right">{row.backupReferralCount}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {row.backupSignedUpAt ? formatDate(row.backupSignedUpAt) : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+          {backup.pageCount > 1 && (
+            <nav className="flex items-center justify-between text-sm text-muted-foreground">
+              {backup.page > 1 ? (
+                <a href={`/admin?page=${data.page}&bpage=${backup.page - 1}`}>← Newer</a>
+              ) : (
+                <span />
+              )}
+              <span>
+                Page {backup.page} of {backup.pageCount}
+              </span>
+              {backup.page < backup.pageCount ? (
+                <a href={`/admin?page=${data.page}&bpage=${backup.page + 1}`}>Older →</a>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+        </>
       )}
     </div>
   );
