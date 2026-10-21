@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAdminSignupData, getAdminBackupList, deleteSignup } from "../actions";
+import { getAdminSignupData, getAdminBackupList, getAdminAllEmails, deleteSignup } from "../actions";
 import type { AdminSignupRow } from "../actions";
 import { SendEmailButton } from "@/components/admin/SendEmailButton";
 import { SendAllEmailsButton } from "@/components/admin/SendAllEmailsButton";
@@ -28,9 +28,14 @@ function displayName(row: AdminSignupRow): string {
 export default async function AdminDashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; bpage?: string }>;
+  searchParams: Promise<{ page?: string; bpage?: string; view?: string }>;
 }) {
   const params = await searchParams;
+  if (params.view === "all") {
+    const all = await getAdminAllEmails(Number(params.page) || 1);
+    if (!all) redirect("/admin/login");
+    return <AllEmailsView data={all} />;
+  }
   const [data, backup] = await Promise.all([
     getAdminSignupData(Number(params.page) || 1),
     getAdminBackupList(Number(params.bpage) || 1),
@@ -45,7 +50,12 @@ export default async function AdminDashboardPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Sign-ups</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Sign-ups</h1>
+        <a href="/admin?view=all" className="text-sm text-muted-foreground hover:underline">
+          All emails ({data.totalSignups + backup.total}) →
+        </a>
+      </div>
 
       <section className="grid gap-4 sm:grid-cols-4">
         <div className="rounded-lg border border-border bg-card p-4">
@@ -234,6 +244,79 @@ export default async function AdminDashboardPage({
             </nav>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+function AllEmailsView({ data }: { data: NonNullable<Awaited<ReturnType<typeof getAdminAllEmails>>> }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">All emails</h1>
+        <a href="/admin" className="text-sm text-muted-foreground hover:underline">
+          ← Sign-ups
+        </a>
+      </div>
+
+      <section className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">All emails</p>
+          <p className="text-2xl font-semibold">{data.total}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Signups</p>
+          <p className="text-2xl font-semibold">{data.signups}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Backup sheet</p>
+          <p className="text-2xl font-semibold">{data.backup}</p>
+        </div>
+      </section>
+
+      <section className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
+        <p className="text-sm text-muted-foreground">
+          Signups and the backup sheet together. Backup sheet rows are not counted as signups and are never emailed.
+        </p>
+        <a href="/admin/all-emails.csv" className="text-sm font-medium hover:underline">
+          Download CSV
+        </a>
+      </section>
+
+      <section className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[600px] text-left text-sm">
+          <thead>
+            <tr className="border-b border-border bg-muted/50">
+              <th className="px-4 py-3 font-medium">Email</th>
+              <th className="px-4 py-3 font-medium">Source</th>
+              <th className="px-4 py-3 font-medium text-right">Referrals</th>
+              <th className="px-4 py-3 font-medium">Signed up</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.rows.map((row, i) => (
+              <tr
+                key={`${row.source}-${row.email}`}
+                className={i % 2 === 0 ? "border-b border-border" : "border-b border-border bg-muted/20"}
+              >
+                <td className="px-4 py-3">{row.email}</td>
+                <td className="px-4 py-3 text-muted-foreground">{row.source === "signup" ? "Signup" : "Backup sheet"}</td>
+                <td className="px-4 py-3 text-right">{row.referrals}</td>
+                <td className="px-4 py-3 whitespace-nowrap">{row.at ? formatDate(row.at) : "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      {data.pageCount > 1 && (
+        <nav className="flex items-center justify-between text-sm text-muted-foreground">
+          {data.page > 1 ? <a href={`/admin?view=all&page=${data.page - 1}`}>← Newer</a> : <span />}
+          <span>
+            Page {data.page} of {data.pageCount}
+          </span>
+          {data.page < data.pageCount ? <a href={`/admin?view=all&page=${data.page + 1}`}>Older →</a> : <span />}
+        </nav>
       )}
     </div>
   );

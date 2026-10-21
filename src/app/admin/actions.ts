@@ -12,7 +12,7 @@ import { createHash } from "crypto";
 import { db } from "@/lib/db/client";
 import { emailService } from "@/lib/services/EmailService";
 import { buildMagicLinkUrl, buildAbsoluteReferralLink } from "@/lib/utils/links";
-import type { AdminSignupRow, BackupListRow } from "@/lib/db/client";
+import type { AdminSignupRow, AllEmailRow, BackupListRow } from "@/lib/db/client";
 
 const ADMIN_COOKIE_NAME = "admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -222,5 +222,23 @@ export async function getAdminBackupList(requestedPage = 1): Promise<AdminBackup
   if (!ok) return null;
   const page = Math.max(1, Math.floor(requestedPage) || 1);
   const list = await db.listBackupList({ limit: ADMIN_PAGE_SIZE, offset: (page - 1) * ADMIN_PAGE_SIZE });
+  return { ...list, page, pageCount: Math.max(1, Math.ceil(list.total / ADMIN_PAGE_SIZE)) };
+}
+
+export type AdminAllEmailsData = {
+  rows: AllEmailRow[];
+  total: number;
+  signups: number;
+  backup: number;
+  page: number;
+  pageCount: number;
+};
+
+/** One page of every email (signups + backup list) for the "All emails" view. */
+export async function getAdminAllEmails(requestedPage = 1): Promise<AdminAllEmailsData | null> {
+  const ok = await verifyAdminCookie();
+  if (!ok) return null;
+  const page = Math.max(1, Math.floor(requestedPage) || 1);
+  const list = await db.listAllEmails({ limit: ADMIN_PAGE_SIZE, offset: (page - 1) * ADMIN_PAGE_SIZE });
   return { ...list, page, pageCount: Math.max(1, Math.ceil(list.total / ADMIN_PAGE_SIZE)) };
 }
