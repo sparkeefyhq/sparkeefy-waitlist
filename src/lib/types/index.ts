@@ -30,6 +30,11 @@ export interface WaitlistUser {
   welcomeEmailSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  /** organic | historical_import | synthetic_seed */
+  dataSource?: string;
+  isSynthetic?: boolean;
+  /** null | held_import | suppressed_synthetic */
+  welcomeEmailStatus?: string | null;
 }
 
 /**

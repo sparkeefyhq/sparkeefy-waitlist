@@ -12,7 +12,7 @@ import { createHash } from "crypto";
 import { db } from "@/lib/db/client";
 import { emailService } from "@/lib/services/EmailService";
 import { buildMagicLinkUrl, buildAbsoluteReferralLink } from "@/lib/utils/links";
-import type { WaitlistUser } from "@/lib/types";
+import type { AdminSignupRow, BackupListRow } from "@/lib/db/client";
 
 const ADMIN_COOKIE_NAME = "admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -56,38 +56,49 @@ export async function logoutAdmin(): Promise<never> {
   redirect("/admin/login");
 }
 
-export type AdminSignupRow = WaitlistUser & { referralCount: number };
+export type { AdminSignupRow } from "@/lib/db/client";
+
+/** Rows per admin page (backend pagination). */
+const ADMIN_PAGE_SIZE = 100;
+/** Upper bound for the bulk welcome send. */
+const ADMIN_MAX_ROWS = 20000;
 
 export type AdminSignupData = {
   users: AdminSignupRow[];
   totalSignups: number;
   totalReferrals: number;
   signupsLast7Days: number;
+  /** Welcome emails: sent / real signups; synthetic rows are excluded (suppressed). */
+  welcomeSent: number;
+  bulkUnsent: number;
+  syntheticSignups: number;
+  syntheticReferrals: number;
+  page: number;
+  pageCount: number;
 };
 
-export async function getAdminSignupData(): Promise<AdminSignupData | null> {
+/** One page of signups plus dashboard metrics, computed in SQL (no per-user queries). */
+export async function getAdminSignupData(requestedPage = 1): Promise<AdminSignupData | null> {
   const ok = await verifyAdminCookie();
   if (!ok) return null;
 
-  const users = await db.listWaitlistUsers();
-  const totalReferrals = await db.countAllReferrals();
-  const now = Date.now();
-  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
-
-  const rows: AdminSignupRow[] = [];
-  let signupsLast7Days = 0;
-  for (const user of users) {
-    const count = await db.countUserReferrals(user.id);
-    const created = user.createdAt instanceof Date ? user.createdAt.getTime() : new Date(user.createdAt).getTime();
-    if (created >= sevenDaysAgo) signupsLast7Days++;
-    rows.push({ ...user, referralCount: count });
-  }
+  const page = Math.max(1, Math.floor(requestedPage) || 1);
+  const [stats, list] = await Promise.all([
+    db.getAdminStats(),
+    db.listAdminSignups({ limit: ADMIN_PAGE_SIZE, offset: (page - 1) * ADMIN_PAGE_SIZE }),
+  ]);
 
   return {
-    users: rows,
-    totalSignups: rows.length,
-    totalReferrals,
-    signupsLast7Days,
+    users: list.rows,
+    totalSignups: stats.totalSignups,
+    totalReferrals: stats.totalReferrals,
+    signupsLast7Days: stats.signupsLast7Days,
+    welcomeSent: stats.welcomeSent,
+    bulkUnsent: stats.bulkUnsent,
+    syntheticSignups: stats.syntheticSignups,
+    syntheticReferrals: stats.syntheticReferrals,
+    page,
+    pageCount: Math.max(1, Math.ceil(list.total / ADMIN_PAGE_SIZE)),
   };
 }
 
@@ -98,7 +109,8 @@ export async function deleteSignup(formData: FormData): Promise<void> {
   const id = formData.get("id");
   if (typeof id !== "string" || !id) return;
 
-  await db.deleteUser(id);
+  // Archived first (waitlist_deletions), so a delete can always be undone.
+  await db.deleteUserWithArchive(id);
   redirect("/admin");
 }
 
@@ -121,6 +133,9 @@ export async function sendWelcomeEmailAction(
 
   const user = await db.findUserById(userId);
   if (!user) return { success: false, error: "User not found" };
+  if (user.isSynthetic) {
+    return { success: false, error: "Synthetic test row: emails are suppressed" };
+  }
 
   try {
     await emailService.sendWelcomeEmail({
@@ -160,8 +175,8 @@ export async function sendAllWelcomeEmailsAction(): Promise<
     };
   }
 
-  const users = await db.listWaitlistUsers();
-  const unsent = users.filter((u) => !u.welcomeEmailSentAt);
+  // Only organic, real, never-emailed users; restored and synthetic rows are excluded.
+  const unsent = await db.listBulkWelcomeEligible(ADMIN_MAX_ROWS);
 
   const result: BulkEmailResult = {
     total: unsent.length,
@@ -191,4 +206,21 @@ export async function sendAllWelcomeEmailsAction(): Promise<
 
   revalidatePath("/admin");
   return { success: true, data: result };
+}
+
+export type AdminBackupListData = {
+  rows: BackupListRow[];
+  total: number;
+  referralTotal: number;
+  page: number;
+  pageCount: number;
+};
+
+/** One page of the backup list (separate from signups; see 0002_backup_list.sql). */
+export async function getAdminBackupList(requestedPage = 1): Promise<AdminBackupListData | null> {
+  const ok = await verifyAdminCookie();
+  if (!ok) return null;
+  const page = Math.max(1, Math.floor(requestedPage) || 1);
+  const list = await db.listBackupList({ limit: ADMIN_PAGE_SIZE, offset: (page - 1) * ADMIN_PAGE_SIZE });
+  return { ...list, page, pageCount: Math.max(1, Math.ceil(list.total / ADMIN_PAGE_SIZE)) };
 }

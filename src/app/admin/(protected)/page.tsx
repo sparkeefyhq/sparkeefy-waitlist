@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAdminSignupData, deleteSignup } from "../actions";
+import { getAdminSignupData, getAdminBackupList, deleteSignup } from "../actions";
 import type { AdminSignupRow } from "../actions";
 import { SendEmailButton } from "@/components/admin/SendEmailButton";
 import { SendAllEmailsButton } from "@/components/admin/SendAllEmailsButton";
@@ -25,15 +25,23 @@ function displayName(row: AdminSignupRow): string {
   return parts.length ? parts.join(" ") : "—";
 }
 
-export default async function AdminDashboardPage() {
-  const data = await getAdminSignupData();
-  if (!data) {
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; bpage?: string }>;
+}) {
+  const params = await searchParams;
+  const [data, backup] = await Promise.all([
+    getAdminSignupData(Number(params.page) || 1),
+    getAdminBackupList(Number(params.bpage) || 1),
+  ]);
+  if (!data || !backup) {
     redirect("/admin/login");
   }
 
   const { users, totalSignups, totalReferrals, signupsLast7Days } = data;
-  const unsentCount = users.filter((u) => !u.welcomeEmailSentAt).length;
-  const sentCount = users.length - unsentCount;
+  const unsentCount = data.bulkUnsent;
+  const sentCount = data.welcomeSent;
 
   return (
     <div className="space-y-6">
@@ -58,14 +66,22 @@ export default async function AdminDashboardPage() {
             {sentCount}
             <span className="text-sm font-normal text-muted-foreground">
               {" "}
-              / {users.length}
+              / {totalSignups}
             </span>
           </p>
         </div>
       </section>
 
+      {data.syntheticSignups > 0 && (
+        <p className="text-sm text-muted-foreground">
+          Synthetic scenario data: {data.syntheticSignups} synthetic signups and{" "}
+          {data.syntheticReferrals} referrals in this database are excluded from the numbers
+          above and never emailed.
+        </p>
+      )}
+
       {/* Bulk send bar */}
-      {users.length > 0 && (
+      {totalSignups > 0 && (
         <section className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
           <p className="text-sm text-muted-foreground">
             {unsentCount > 0
@@ -124,7 +140,9 @@ export default async function AdminDashboardPage() {
                     {truncate(row.additionalRemarks, 50)}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {row.welcomeEmailSentAt ? (
+                    {row.isSynthetic ? (
+                      <span className="text-xs text-muted-foreground">Suppressed</span>
+                    ) : row.welcomeEmailSentAt ? (
                       <span
                         className="inline-flex items-center gap-1 text-xs text-green-600"
                         title={`Sent ${formatDate(row.welcomeEmailSentAt)}`}
@@ -155,6 +173,68 @@ export default async function AdminDashboardPage() {
           </tbody>
         </table>
       </section>
+
+      {data.pageCount > 1 && (
+        <nav className="flex items-center justify-between text-sm text-muted-foreground">
+          {data.page > 1 ? <a href={`/admin?page=${data.page - 1}`}>← Newer</a> : <span />}
+          <span>
+            Page {data.page} of {data.pageCount}
+          </span>
+          {data.page < data.pageCount ? <a href={`/admin?page=${data.page + 1}`}>Older →</a> : <span />}
+        </nav>
+      )}
+
+      {backup.total > 0 && (
+        <>
+          <h2 className="pt-4 text-xl font-semibold">Backup list</h2>
+          <p className="text-sm text-muted-foreground">
+            {backup.total} emails and {backup.referralTotal} referrals from the 21 Oct backup file.
+            Listed separately: not included in the numbers above and never emailed.
+          </p>
+          <section className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full min-w-[600px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium text-right">Referrals</th>
+                  <th className="px-4 py-3 font-medium">Signed up (backup)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {backup.rows.map((row, i) => (
+                  <tr
+                    key={row.id}
+                    className={i % 2 === 0 ? "border-b border-border" : "border-b border-border bg-muted/20"}
+                  >
+                    <td className="px-4 py-3">{row.email}</td>
+                    <td className="px-4 py-3 text-right">{row.backupReferralCount}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {row.backupSignedUpAt ? formatDate(row.backupSignedUpAt) : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+          {backup.pageCount > 1 && (
+            <nav className="flex items-center justify-between text-sm text-muted-foreground">
+              {backup.page > 1 ? (
+                <a href={`/admin?page=${data.page}&bpage=${backup.page - 1}`}>← Newer</a>
+              ) : (
+                <span />
+              )}
+              <span>
+                Page {backup.page} of {backup.pageCount}
+              </span>
+              {backup.page < backup.pageCount ? (
+                <a href={`/admin?page=${data.page}&bpage=${backup.page + 1}`}>Older →</a>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+        </>
+      )}
     </div>
   );
 }

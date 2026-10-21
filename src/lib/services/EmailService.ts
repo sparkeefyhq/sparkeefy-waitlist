@@ -38,6 +38,10 @@ class EmailService {
         "Email sending is not configured. Set RESEND_API_KEY in your environment."
       );
     }
+    // Reserved test domains (synthetic staging data) are never emailed.
+    if (/\.test$/i.test(data.email.trim())) {
+      throw new Error("Refusing to email a reserved .test address (synthetic data).");
+    }
 
     const { data: result, error } = await resend.emails.send({
       from: DEFAULT_FROM,
