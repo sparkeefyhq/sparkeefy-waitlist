@@ -2,35 +2,44 @@ import type { Metadata } from "next";
 import LegalPage from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Delete your account | Sparkeefy",
-  description: "How to delete your Sparkeefy account and data.",
+  title: "Delete your account | Keefie",
+  description: "How to delete your Keefie account and data.",
 };
 
 // Play's account deletion requirement: a web link that names the app and explains
-// how to delete the account and its data without reinstalling the app.
+// how to delete the account and its data without reinstalling the app. Keep in
+// line with section 20 of src/content/privacyPolicy.ts.
 export default function DeleteAccount() {
   return (
-    <LegalPage title="Delete your Sparkeefy account" updated="21 October 2026">
-      <p>This page is for the <strong>Sparkeefy</strong> app (Android package com.sparkeefy.app).</p>
+    <LegalPage title="Delete your Keefie account" updated="24 October 2026">
+      <p>
+        This page is for the <strong>Keefie</strong> app, operated by Withera Labs Private Limited.
+      </p>
 
       <h2>In the app</h2>
-      <p>Open Sparkeefy, go to <strong>Profile &gt; Settings</strong>, tap <strong>Delete Account</strong>, and confirm.</p>
+      <p>
+        Open Keefie, go to <strong>Settings</strong>, tap <strong>Delete Account</strong>, and confirm. Uninstalling
+        the app does not delete your account.
+      </p>
 
       <h2>Without the app</h2>
       <p>
-        Email <a href="mailto:founder@sparkeefy.com?subject=Delete%20my%20Sparkeefy%20account">founder@sparkeefy.com</a>{" "}
-        from any address with the subject &quot;Delete my Sparkeefy account&quot; and the phone number or Google email you
-        signed in with. We will confirm it is your account and delete it within 30 days.
+        Email{" "}
+        <a href="mailto:support@sparkeefy.com?subject=Account%20Deletion%20Request">support@sparkeefy.com</a> with the
+        subject <strong>Account Deletion Request</strong> and the phone number or Google account email linked to your
+        Keefie account. We may need to verify that the account is yours before deleting it. Never send passwords or
+        OTPs by email.
       </p>
 
       <h2>What gets deleted</h2>
       <p>
-        Everything tied to your account: your profile and photo, the people you added, memories, events, Wingman chats,
-        facts Wingman remembered, uploaded photos and notification settings. This cannot be undone.
+        We delete or de-identify the personal information tied to your account: your profile, the people you added,
+        memories, notes, events, Wingman conversations and uploaded photos. This cannot be undone.
       </p>
       <p>
-        Security logs and backups that include your data are kept only as long as needed and are then deleted
-        automatically. To stop the Wingman bubble right away, turn it off in Settings &gt; Accessibility &gt; Sparkeefy.
+        Limited records may stay for a short time in encrypted backups and security logs until they expire, or where
+        the law requires us to keep them. See section 20 of our <a href="/privacy-policy">Privacy Policy</a>. To stop
+        the Wingman bubble right away, turn it off in Settings → Accessibility → Keefie.
       </p>
     </LegalPage>
   );
