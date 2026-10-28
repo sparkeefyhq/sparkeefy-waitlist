@@ -5,7 +5,7 @@
 export const PRIVACY_POLICY_MD = `# Privacy Policy
 
 **Effective Date:** 25 August 2026
-**Last Updated:** 24 October 2026
+**Last Updated:** 29 October 2026
 
 Keefie ("we," "us," or "our") is operated by Withera Labs Private Limited, a company incorporated in India.
 
@@ -82,11 +82,13 @@ You should avoid submitting unnecessary highly sensitive information such as:
 
 Keefie uses artificial intelligence to provide features including Wingman responses, communication guidance, personalization, suggestions, and recommendations.
 
-### DeepSeek
+### AI models and providers
 
-Keefie currently uses DeepSeek as an AI service provider.
+Reply suggestions and Wingman responses are written by **DeepSeek V4 Flash**, an AI model made by DeepSeek. We run this model through **OpenRouter**, an AI routing service based in the United States, which sends our requests only to **CoreWeave**, a cloud provider that hosts the model in the United States. We have set it up so requests are not passed to other hosts. Your information is not sent to DeepSeek the company.
 
-When you use an AI-powered feature, relevant information may be transmitted to DeepSeek for the purpose of generating a response.
+When a message may involve someone's safety, a small **OpenAI** model (GPT-5.4 nano), also reached through OpenRouter, may check it so Keefie can respond with care.
+
+When you use an AI-powered feature, relevant information is sent to these providers only to generate the response.
 
 Depending on the request, this may include:
 
@@ -95,7 +97,7 @@ Depending on the request, this may include:
 - Relevant relationship context
 - Other information reasonably necessary to generate the requested response
 
-Information processed by DeepSeek may be processed or stored outside India, including in mainland China, in accordance with DeepSeek's infrastructure and privacy practices.
+Information sent to these AI providers is processed in the United States.
 
 We seek to limit information transmitted to AI providers to information reasonably necessary to provide the requested functionality.
 
@@ -154,21 +156,31 @@ Where reasonably possible, denying location access will not prevent you from usi
 
 ## 8. Contact, Accessibility, and Calendar Data
 
-### Accessibility Service (Wingman overlay)
+### Wingman overlay: the two permissions it needs
 
-Wingman uses Android's Accessibility Service to show a bubble over supported messaging and dating apps and, only after you tap that bubble, to read the chat that is visible on your screen.
+The Wingman overlay is optional. It helps you reply inside the chat apps you already use, and it needs two Android permissions. Keefie asks for each one only after explaining it in the app, and the rest of Keefie works without them.
 
-Supported apps include WhatsApp, WhatsApp Business, Instagram, Snapchat, Discord, Tinder, Bumble, Hinge, Badoo, OkCupid, Match, and Coffee Meets Bagel.
+**1. Display over other apps.** This lets the Keefie bubble and its reply panel appear on top of your chat apps, so you can get help without leaving the chat. It only lets Keefie draw on the screen. It does not let Keefie read anything.
 
-The data read this way is:
+**2. Accessibility Service.** This lets Keefie notice when a chat's message box is open in a supported app, so the bubble can appear, and, only after you tap the bubble, read the chat that is visible on your screen. Before you tap, Keefie does not read or store your messages.
 
-- **Messages:** the messages visible in the open chat
+Supported apps:
+
+- **Messaging and social:** WhatsApp, WhatsApp Business, Instagram, Snapchat, Discord
+- **Dating:** Tinder, Bumble, Hinge, Aisle, TrulyMadly, QuackQuack, happn, Hily, Boo, Feeld, Plenty of Fish, Muzz, Badoo, OkCupid, Match, Coffee Meets Bagel
+
+When you tap the bubble, Keefie reads:
+
+- **Messages:** the messages visible in the open chat, and whether each one is yours or theirs
 - **Contacts:** the contact or group name shown at the top of the chat, and in group chats the display names of the people who sent the messages
-- The name of the chat app you are using, so the overlay works in that app
+- Details shown with the messages: the time and day, and a message quoted in a reply
+- Whether the chat is a group, and which supported app (and app version) you are using, so the overlay reads that app correctly
 
-We send this data to our servers and our AI provider (DeepSeek) only to generate reply suggestions and to keep context about that person in your People list. We do not sell it and we do not use it for advertising.
+We send this data to our servers and to the AI providers described in section 4 (OpenRouter, which runs DeepSeek's model on CoreWeave) only to generate reply suggestions and to keep context about that person in your People list. We do not sell it and we do not use it for advertising.
 
-Keefie does not read apps outside the supported list, and never sends messages for you. A reply is placed in the message box only when you tap it, and you send it yourself. The overlay is optional and stays off until you turn it on after an in-app disclosure. You can turn the Accessibility Service off at any time in Settings → Accessibility → Keefie. Keefie may also request permission to display over other apps so the Wingman bubble can appear.
+The chat read by the overlay is kept for up to 7 days so Keefie can follow that conversation, then it is deleted. Details about a person that are kept in your People list stay until you delete them or your account.
+
+Keefie does not read apps outside the supported list and never sends messages for you. A reply is placed in the message box only when you tap it, and you send it yourself. You can turn either permission off at any time in your phone's settings (Settings → Accessibility → Keefie, and Settings → Apps → Keefie → Display over other apps); the overlay then stops working, and the rest of Keefie keeps working.
 
 ### Contacts and calendar
 
@@ -289,7 +301,11 @@ Our current providers include:
 
 **Supabase.** We use Supabase, including PostgreSQL database infrastructure, to store and manage application data.
 
-**DeepSeek.** We use DeepSeek to process relevant information when generating AI-powered responses.
+**OpenRouter.** We use OpenRouter, an AI routing service in the United States, to reach the AI models that generate AI-powered responses.
+
+**CoreWeave.** OpenRouter sends our requests to CoreWeave, which hosts the DeepSeek V4 Flash model in the United States. Your information is not sent to DeepSeek the company.
+
+**OpenAI.** A small OpenAI model, reached through OpenRouter, may check messages that could involve someone's safety.
 
 **PostHog.** We use PostHog for product analytics and understanding application usage.
 
@@ -362,7 +378,7 @@ Withera Labs Private Limited is based in India, but Keefie relies on technology 
 
 Your information may therefore be processed or stored in India or other countries where our service providers maintain infrastructure.
 
-In particular, information transmitted to DeepSeek in connection with AI functionality may be processed or stored in mainland China.
+In particular, information sent to our AI providers (OpenRouter, CoreWeave and OpenAI) is processed in the United States.
 
 Other infrastructure providers may process information in additional jurisdictions depending on their infrastructure configuration.
 
