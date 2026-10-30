@@ -23,7 +23,8 @@
     "waitlist:backup-list": "node scripts/waitlist/import-backup-list.ts",
     "email:dev": "email dev --dir src/emails",
     "sync-welcome-sent": "npx tsx scripts/sync-welcome-sent-from-resend.ts",
-    "reconcile-welcome-sent": "npx tsx scripts/reconcile-welcome-sent-status-from-resend.ts"
+    "reconcile-welcome-sent": "npx tsx scripts/reconcile-welcome-sent-status-from-resend.ts",
+    "restore-signups": "npx tsx scripts/restore-signups-from-backup.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
